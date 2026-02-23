@@ -4,6 +4,7 @@
 > This version of the library is an **MVP (Minimal Viable Project)** release.  
 > Many of the implemented functions exist in the codebase but are **not yet actively used**.  
 > This version serves as the foundation for upcoming releases.
+> P.S. Still in development! Refactoring whole project.
 
 ---
 
@@ -83,3 +84,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ```
+

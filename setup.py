@@ -66,9 +66,5 @@ tuix_cy = Extension(
 )
 
 setup(
-    name="tuix",  # обов’язково додай ім’я пакета
-    version="0.1.0",
-    license="MIT",  # або інша ліцензія
-    license_files=("LICENSE",),  # твій файл ліцензії
     ext_modules=cythonize([tuix_cy]) if has_cython else [tuix_cy],
 )

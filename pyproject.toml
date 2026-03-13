@@ -3,11 +3,12 @@ requires = ["setuptools>=64", "wheel", "Cython>=0.29"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tuix"
+name = "tuix-core"
 version = "0.2.0"
 description = "A lightweight and modular terminal UI engine. Designed to make building interactive terminal interfaces simple and structured."
+readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
 license-files = ["LICENSE"]
 
 [project.urls]
@@ -20,7 +21,7 @@ where = ["src"]
 testpaths = ["tests"]
 
 [tool.cibuildwheel]
-build = "cp38-*"
+build = "cp31-*"
 
 [tool.cibuildwheel.linux]
 archs = ["x86_64", "i686", "aarch64"]

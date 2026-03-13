@@ -1,0 +1,82 @@
+name: Build and Publish Wheels
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install cibuildwheel
+        run: |
+          python -m pip install --upgrade pip
+          pip install cibuildwheel
+
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir dist
+        env:
+          CIBW_BUILD: "cp3[10-99]-*"
+          CIBW_ARCHS_WINDOWS: "AMD64 x86"
+          CIBW_ARCHS_LINUX: "x86_64 i686"
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+
+      - name: Upload wheels artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: dist/*.whl
+
+  collect_and_publish:
+    name: Collect all wheels and publish to PyPI
+    needs: build_wheels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Twine
+        run: pip install --upgrade pip twine
+
+      - name: Create unified dist folder
+        run: mkdir -p dist_all
+
+      - name: Download Ubuntu wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-ubuntu-latest
+          path: dist_all
+      - name: Download Windows wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-windows-latest
+          path: dist_all
+      - name: Download MacOS wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-macos-latest
+          path: dist_all
+
+      - name: List all wheels
+        run: ls dist_all
+
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: "__token__"
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload dist_all/*.whl

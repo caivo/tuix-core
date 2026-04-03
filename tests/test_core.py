@@ -50,6 +50,14 @@ class TestScenes:
 # ── Registry ─────────────────────────────────────────────────────────────────
 
 class TestRegistry:
+    def test_registry_layout_matches_c(self):
+        expected = (
+            ctypes.sizeof(_structs.TuixScenes)
+            + ctypes.sizeof(_structs.TuixSubcycles)
+            + ctypes.sizeof(_structs.TuixBuilders)
+        )
+        assert _structs.TuixRegistry.current_scene_name.offset == expected
+
     def test_set_scene_name_bytes(self):
         registry.registry.current_scene_name = SCENE
         assert registry.registry.current_scene_name == SCENE

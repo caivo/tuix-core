@@ -44,7 +44,10 @@ TuixScene* tuix_get_scene(const char* name);
  * registry's own interned string and marks the scene active.
  * Returns 0 on success, -1 if the scene does not exist.
  */
-int tuix_select_scene(char* name);
+int tuix_select_scene(const char* name);
+
+int tuix_scene_set_focus(const char* scene_name, int uid);
+int tuix_scene_set_previous_focus(const char* scene_name);
 
 #ifdef __cplusplus
 }

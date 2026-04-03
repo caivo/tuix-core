@@ -5,14 +5,14 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
-CRITICAL_SECTION tuix_registry_lock;
+TUIX_REGISTRY_API CRITICAL_SECTION tuix_registry_lock;
 #else
 #include <pthread.h>
-pthread_mutex_t tuix_registry_lock;
+TUIX_REGISTRY_API pthread_mutex_t tuix_registry_lock;
 #endif
 
 // Define single shared registry
-TuixRegistry tuix_registry = {0};
+TUIX_REGISTRY_API TuixRegistry tuix_registry = {0};
 
 int tuix_init() {
     int response = tuix_init_registry();

@@ -118,7 +118,9 @@ void tuix_free_buffer(char* scene_name, int uid) {
         printf("Scene not found: %s\n", scene_name);
         return;
     }
+
     tuix_lock();
+
     if (scene->count == 0) {
         tuix_unlock();
         printf("There are no buffers available\n");
@@ -128,6 +130,18 @@ void tuix_free_buffer(char* scene_name, int uid) {
     for (int i = 0; i < scene->count; i++) {
 
         if (scene->buffers[i]->obj->uid == uid) {
+
+            int was_focused = (scene->current_focus == uid);
+
+            int new_focus_uid = -1;
+
+            if (was_focused && scene->count > 1) {
+                int new_idx = (i - 1 + scene->count) % scene->count;
+                if (new_idx == i) new_idx = (i + 1) % scene->count;
+
+                new_focus_uid = scene->buffers[new_idx]->obj->uid;
+            }
+
             tuix_subcycle_free(scene_name, uid);
 
             if (scene->buffers[i]->pixels)
@@ -142,19 +156,39 @@ void tuix_free_buffer(char* scene_name, int uid) {
             scene->count--;
 
             if (scene->count == 0) {
+                scene->current_focus = -1;
+
                 free(scene->buffers);
                 scene->buffers = NULL;
                 scene->capacity = 0;
+
                 tuix_unlock();
                 return;
             }
-            /* Keep capacity unchanged to avoid frequent realloc/shrink cycles. */
+
+            if (was_focused) {
+                scene->current_focus = new_focus_uid;
+            }
+            else {
+                int found = 0;
+                for (int k = 0; k < scene->count; k++) {
+                    if (scene->buffers[k]->obj->uid == scene->current_focus) {
+                        found = 1;
+                        break;
+                    }
+                }
+                if (!found) {
+                    scene->current_focus = scene->buffers[0]->obj->uid;
+                    printf("Focused object UID: %d\n", scene->current_focus);
+                }
+            }
+
             tuix_unlock();
             return;
         }
     }
-    tuix_unlock();
 
+    tuix_unlock();
     printf("Buffer not found: %d\n", uid);
 }
 

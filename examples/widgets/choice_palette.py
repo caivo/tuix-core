@@ -14,12 +14,12 @@ def sleep_ms(ms):
 
 
 COLOURS = [
-    (b"Red",     255,  60,  60),
-    (b"Green",    60, 220,  80),
-    (b"Blue",     60, 120, 255),
-    (b"Yellow",  255, 220,  40),
-    (b"Cyan",     40, 220, 220),
-    (b"Magenta", 200,  60, 200),
+    (b"Red", 255, 60, 60),
+    (b"Green", 60, 220, 80),
+    (b"Blue", 60, 120, 255),
+    (b"Yellow", 255, 220, 40),
+    (b"Cyan", 40, 220, 220),
+    (b"Magenta", 200, 60, 200),
 ]
 
 
@@ -42,7 +42,7 @@ def main():
 
     while not objects.tuix_choice_is_confirmed(obj):
         snap = input.get_snapshot()
-        kb   = snap.keyboard
+        kb = snap.keyboard
         if kb and kb.has_event and kb.code == 0x1B:
             break
         objects.tuix_choice_feed_input(obj, snap)
@@ -52,7 +52,6 @@ def main():
     if objects.tuix_choice_is_confirmed(obj):
         idx = int(objects.tuix_choice_get_result(obj))
         name, r, g, b = COLOURS[idx]
-        # leave one rendered frame on screen before printing
         engine.main_loop()
         time.sleep(0.3)
         print(f"\nChosen: {name.decode()}  RGB({r}, {g}, {b})")

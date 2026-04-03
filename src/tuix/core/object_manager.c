@@ -7,6 +7,8 @@
 #include "subcycles/subcycle_registrant.h"
 
 #include <stdlib.h>
+#include <stdio.h>
+
 
 TuixObject tuix_objects_new_object(char* builder_name, char* scene_name, float width_mod, float height_mod, float margin_top_mod, float margin_left_mod) {
     TuixBuilder *builder = tuix_get_builder_by_name(builder_name);
@@ -41,7 +43,11 @@ int tuix_create_object(char* builder_name, char* scene_name, float width_mod, fl
     }
 
     /* Use the heap-allocated obj copy stored in the buffer, not the stack copy. */
-    tuix_subcycle_init(scene_name, buffer->obj);
-    
+        if (tuix_subcycle_init(scene_name, buffer->obj) != 0) {
+        tuix_free_buffer(scene_name, obj.uid);
+        return -1;
+    }
+    tuix_scene_set_focus(scene_name, obj.uid);
+
     return buffer->obj->uid;
 }

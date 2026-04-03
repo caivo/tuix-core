@@ -70,6 +70,7 @@ typedef struct TuixScene {
     int count;
     int active;
     int capacity;
+    int current_focus;
 } TuixScene;
 
 typedef struct TuixScenes {

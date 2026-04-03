@@ -6,6 +6,7 @@
 #include "main.h"
 #include "compositor/compositor.h"
 #include "rendering.h"
+#include "batch_executor.h"
 
 #ifdef _WIN32
 #include <windows.h>

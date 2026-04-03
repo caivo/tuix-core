@@ -64,11 +64,37 @@ class TuixInputSnapshot(ctypes.Structure):
         ('keyboard', ctypes.c_void_p),
     ]
 
-class TuixRegistry(ctypes.Structure):
+
+class TuixScenes(ctypes.Structure):
     _fields_ = [
         ('scenes', ctypes.c_void_p),
+        ('count', ctypes.c_int),
+        ('capacity', ctypes.c_int),
+        ('names', ctypes.POINTER(ctypes.c_char_p)),
+    ]
+
+
+class TuixSubcycles(ctypes.Structure):
+    _fields_ = [
         ('subcycles', ctypes.c_void_p),
+        ('count', ctypes.c_int),
+        ('capacity', ctypes.c_int),
+    ]
+
+
+class TuixBuilders(ctypes.Structure):
+    _fields_ = [
         ('builders', ctypes.c_void_p),
+        ('count', ctypes.c_int),
+        ('capacity', ctypes.c_int),
+    ]
+
+
+class TuixRegistry(ctypes.Structure):
+    _fields_ = [
+        ('scenes', TuixScenes),
+        ('subcycles', TuixSubcycles),
+        ('builders', TuixBuilders),
         ('current_scene_name', ctypes.c_char_p),
         ('next_uid', ctypes.c_int),
         ('terminal_width', ctypes.c_int),

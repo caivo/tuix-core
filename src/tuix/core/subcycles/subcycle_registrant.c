@@ -7,8 +7,21 @@
 #include <stdio.h>
 #include <string.h>
 
+static int is_registered_builder_ptr(const TuixBuilder *builder) {
+    if (!builder) return 0;
+    for (int i = 0; i < tuix_registry.builders.count; i++) {
+        if (tuix_registry.builders.builders[i] == builder) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int tuix_subcycle_init(char* scene_name, TuixObject *obj) {
-    if (!obj || !obj->builder || !obj->builder->create_state || !obj->builder->destroy_state || !obj->builder->handler_func || !obj->builder->build_content) {
+    if (!obj || !is_registered_builder_ptr(obj->builder)) {
+        return -1;
+    }
+    if (!obj->builder->create_state || !obj->builder->destroy_state || !obj->builder->handler_func || !obj->builder->build_content) {
         return -1;
     }
     if (obj->state != NULL) {
@@ -20,13 +33,14 @@ int tuix_subcycle_init(char* scene_name, TuixObject *obj) {
         if (strcmp(scene_subcycles->scene_name, scene_name) == 0) {
             int new_count = scene_subcycles->count + 1;
             TuixSubcycle** tmp = realloc(scene_subcycles->subcycles, new_count * sizeof(TuixSubcycle*));
+            TuixSubcycle* subcycle;
             if (!tmp) {
                 printf("Memory allocation failed!\n");
                 return -1;
             }
             scene_subcycles->subcycles = tmp;
             scene_subcycles->count++;
-            TuixSubcycle* subcycle = malloc(sizeof(TuixSubcycle));
+            subcycle = malloc(sizeof(TuixSubcycle));
             if (!subcycle) {
                 printf("Memory allocation failed!\n");
                 return -1;
@@ -69,7 +83,8 @@ void tuix_subcycle_free(char* scene_name, int uid) {
                         free(scene_subcycles->subcycles);
                         scene_subcycles->subcycles = NULL;
                     } else {
-                        TuixSubcycle** tmp = realloc(scene_subcycles->subcycles, scene_subcycles->count * sizeof(TuixSubcycle*));
+                        TuixSubcycle** tmp;
+                        tmp = realloc(scene_subcycles->subcycles, scene_subcycles->count * sizeof(TuixSubcycle*));
                         if (tmp) {
                             scene_subcycles->subcycles = tmp;
                         }

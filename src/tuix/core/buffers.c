@@ -13,6 +13,63 @@ static void* safe_realloc(void* ptr, size_t size) {
     return tmp;
 }
 
+static int find_scene_index(const char* name) {
+    for (int i = 0; i < tuix_registry.scenes.count; i++) {
+        if (strcmp(tuix_registry.scenes.names[i], name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+static int find_subcycles_index(const char* name) {
+    for (int i = 0; i < tuix_registry.subcycles.count; i++) {
+        if (strcmp(tuix_registry.subcycles.subcycles[i]->scene_name, name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+static void clear_scene_subcycles_content(TuixSceneSubcycles* scene_subcycles) {
+    if (!scene_subcycles) return;
+
+    for (int i = 0; i < scene_subcycles->count; i++) {
+        TuixSubcycle* sub = scene_subcycles->subcycles[i];
+        if (!sub) continue;
+
+        if (sub->obj && sub->obj->state && sub->obj->builder && sub->obj->builder->destroy_state) {
+            sub->obj->builder->destroy_state(sub->obj->state);
+            sub->obj->state = NULL;
+        }
+
+        free(sub);
+    }
+
+    free(scene_subcycles->subcycles);
+    scene_subcycles->subcycles = NULL;
+    scene_subcycles->count = 0;
+    scene_subcycles->capacity = 0;
+}
+
+static void clear_scene_buffers_content(TuixScene* scene) {
+    if (!scene) return;
+
+    for (int i = 0; i < scene->count; i++) {
+        TuixBuffer* buf = scene->buffers[i];
+        if (!buf) continue;
+        free(buf->pixels);
+        free(buf->obj);
+        free(buf);
+    }
+
+    free(scene->buffers);
+    scene->buffers = NULL;
+    scene->count = 0;
+    scene->capacity = 0;
+    scene->current_focus = -1;
+}
+
 
 int tuix_init_scene(const char* name) {
     for (int i = 0; i < tuix_registry.scenes.count; i++) {
@@ -36,6 +93,7 @@ int tuix_init_scene(const char* name) {
         printf("Memory allocation failed!\n");
         exit(1);
     }
+    sc->current_focus = -1;
 
     TuixSceneSubcycles* scene_subcycles = calloc(1, sizeof(TuixSceneSubcycles));
     if (!scene_subcycles) {
@@ -69,113 +127,80 @@ void tuix_free_scene(const char* name) {
         printf("There are no scenes available\n");
         return;
     }
+
     tuix_lock();
-    for (int i = 0; i < tuix_registry.scenes.count; i++) {
+    int scene_idx = find_scene_index(name);
+    if (scene_idx == -1) {
+        tuix_unlock();
+        printf("Scene not found: %s\n", name);
+        return;
+    }
 
-        if (strcmp(tuix_registry.scenes.names[i], name) == 0) {
-            // Free all buffers in the scene
-            for (int j = 0; j < tuix_registry.scenes.scenes[i]->count; j++) {
-                TuixBuffer* buf = tuix_registry.scenes.scenes[i]->buffers[j];
-                if (buf) {
-                    // Free pixel data
-                    free(buf->pixels);
-                    free(buf->obj);
-                    free(buf);
-                }
-            }
+    int sub_idx = find_subcycles_index(name);
+    if (sub_idx != -1) {
+        TuixSceneSubcycles* scene_subcycles = tuix_registry.subcycles.subcycles[sub_idx];
+        clear_scene_subcycles_content(scene_subcycles);
+        free(scene_subcycles->scene_name);
+        free(scene_subcycles);
 
-            free(tuix_registry.scenes.scenes[i]->buffers);
-            free(tuix_registry.scenes.scenes[i]);
-            free(tuix_registry.scenes.names[i]);
+        for (int j = sub_idx; j < tuix_registry.subcycles.count - 1; j++) {
+            tuix_registry.subcycles.subcycles[j] = tuix_registry.subcycles.subcycles[j + 1];
+        }
+        tuix_registry.subcycles.count--;
 
-            for (int j = i; j < tuix_registry.scenes.count - 1; j++) {
-                tuix_registry.scenes.scenes[j] = tuix_registry.scenes.scenes[j + 1];
-                tuix_registry.scenes.names[j]  = tuix_registry.scenes.names[j + 1];
-            }
-
-            tuix_registry.scenes.count--;
-
-            if (tuix_registry.scenes.count == 0) {
-                free(tuix_registry.scenes.scenes);
-                free(tuix_registry.scenes.names);
-                tuix_registry.scenes.scenes = NULL;
-                tuix_registry.scenes.names = NULL;
-                tuix_registry.scenes.capacity = 0;
-                tuix_unlock();
-                return;
-            }
-            /* Keep capacity as-is to avoid frequent realloc/shrink cycles. */
-            tuix_unlock();
-            return;
+        if (tuix_registry.subcycles.count == 0) {
+            free(tuix_registry.subcycles.subcycles);
+            tuix_registry.subcycles.subcycles = NULL;
+            tuix_registry.subcycles.capacity = 0;
         }
     }
+
+    TuixScene* scene = tuix_registry.scenes.scenes[scene_idx];
+    clear_scene_buffers_content(scene);
+    free(scene);
+    free(tuix_registry.scenes.names[scene_idx]);
+
+    for (int j = scene_idx; j < tuix_registry.scenes.count - 1; j++) {
+        tuix_registry.scenes.scenes[j] = tuix_registry.scenes.scenes[j + 1];
+        tuix_registry.scenes.names[j]  = tuix_registry.scenes.names[j + 1];
+    }
+
+    tuix_registry.scenes.count--;
+
+    if (tuix_registry.scenes.count == 0) {
+        free(tuix_registry.scenes.scenes);
+        free(tuix_registry.scenes.names);
+        tuix_registry.scenes.scenes = NULL;
+        tuix_registry.scenes.names = NULL;
+        tuix_registry.scenes.capacity = 0;
+    }
+
+    if (tuix_registry.current_scene_name && strcmp(tuix_registry.current_scene_name, name) == 0) {
+        tuix_registry.current_scene_name = NULL;
+    }
+
     tuix_unlock();
-    for (int i = 0; i < tuix_registry.subcycles.count; i++) {
-        if (strcmp(tuix_registry.subcycles.subcycles[i]->scene_name, name) == 0) {
-            for (int j = 0; j < tuix_registry.subcycles.subcycles[i]->count; j++) {
-                free(tuix_registry.subcycles.subcycles[i]->subcycles[j]);
-            }
-            free(tuix_registry.subcycles.subcycles[i]->subcycles);
-            free(tuix_registry.subcycles.subcycles[i]->scene_name);
-            free(tuix_registry.subcycles.subcycles[i]);
-
-            for (int j = i; j < tuix_registry.subcycles.count - 1; j++) {
-                tuix_registry.subcycles.subcycles[j] = tuix_registry.subcycles.subcycles[j + 1];
-            }
-
-            tuix_registry.subcycles.count--;
-
-            if (tuix_registry.subcycles.count == 0) {
-                free(tuix_registry.subcycles.subcycles);
-                tuix_registry.subcycles.subcycles = NULL;
-                tuix_registry.subcycles.capacity = 0;
-                return;
-            }
-            /* Keep capacity as-is to avoid frequent realloc/shrink cycles. */
-            return;
-        }
-    }
-
-    printf("Scene not found: %s\n", name);
 }
 
 
 
 void tuix_clear_scene(const char* name) {
-    for (int i = 0; i < tuix_registry.scenes.count; i++) {
-        if (strcmp(tuix_registry.scenes.names[i], name) == 0) {
-            for (int j = 0; j < tuix_registry.scenes.scenes[i]->count; j++) {
-                TuixBuffer* buf = tuix_registry.scenes.scenes[i]->buffers[j];
-                if (buf) {
-                    free(buf->pixels);
-                    free(buf->obj);
-                    free(buf);
-                }
-            }
+    tuix_lock();
 
-            free(tuix_registry.scenes.scenes[i]->buffers);
-            tuix_registry.scenes.scenes[i]->buffers = NULL;
-            tuix_registry.scenes.scenes[i]->count = 0;
-
-            return;
-        }
+    int scene_idx = find_scene_index(name);
+    if (scene_idx == -1) {
+        tuix_unlock();
+        printf("Scene not found: %s\n", name);
+        return;
     }
 
-    for (int i = 0; i < tuix_registry.subcycles.count; i++) {
-        if (strcmp(tuix_registry.subcycles.subcycles[i]->scene_name, name) == 0) {
-            for (int j = 0; j < tuix_registry.subcycles.subcycles[i]->count; j++) {
-                free(tuix_registry.subcycles.subcycles[i]->subcycles[j]);
-            }
-
-            free(tuix_registry.subcycles.subcycles[i]->subcycles);
-            tuix_registry.subcycles.subcycles[i]->subcycles = NULL;
-            tuix_registry.subcycles.subcycles[i]->count = 0;
-
-            return;
-        }
+    int sub_idx = find_subcycles_index(name);
+    if (sub_idx != -1) {
+        clear_scene_subcycles_content(tuix_registry.subcycles.subcycles[sub_idx]);
     }
 
-    printf("Scene not found: %s\n", name);
+    clear_scene_buffers_content(tuix_registry.scenes.scenes[scene_idx]);
+    tuix_unlock();
 }
 
 
@@ -209,7 +234,7 @@ TuixScene* tuix_get_scene(const char* name) {
     return NULL;
 }
 
-int tuix_select_scene(char* name) {
+int tuix_select_scene(const char* name) {
     for (int i = 0; i < tuix_registry.scenes.count; i++) {
         if (strcmp(tuix_registry.scenes.names[i], name) == 0) {
             tuix_registry.scenes.scenes[i]->active = 1;
@@ -220,4 +245,54 @@ int tuix_select_scene(char* name) {
         }
     }
     return -1;
+}
+
+int tuix_scene_set_focus(const char* scene_name, int uid) {
+    tuix_lock();
+    TuixScene* scene = tuix_get_scene(scene_name);
+    if (!scene) {
+        tuix_unlock();
+        printf("Scene not found: %s\n", scene_name);
+        return -1;
+    }
+    for (int i = 0; i < scene->count; i++) {
+        if (scene->buffers[i]->obj->uid == uid) {
+            scene->current_focus = scene->buffers[i]->obj->uid;
+            tuix_unlock();
+            return 0;
+        }
+    }
+    tuix_unlock();
+    printf("Object not found in scene: %s\n", scene_name);
+    return -1;
+}
+
+int tuix_scene_set_previous_focus(const char* scene_name) {
+    tuix_lock();
+    TuixScene* scene = tuix_get_scene(scene_name);
+    if (!scene || scene->count == 0) {
+        if (scene) scene->current_focus = -1;
+        tuix_unlock();
+        return -1;
+    }
+
+    int current_idx = -1;
+
+    for (int i = 0; i < scene->count; i++) {
+        if (scene->buffers[i]->obj->uid == scene->current_focus) {
+            current_idx = i;
+            break;
+        }
+    }
+
+    if (current_idx == -1) {
+        scene->current_focus = scene->buffers[0]->obj->uid;
+        tuix_unlock();
+        return 0;
+    }
+
+    int new_idx = (current_idx - 1 + scene->count) % scene->count;
+    scene->current_focus = scene->buffers[new_idx]->obj->uid;
+    tuix_unlock();
+    return 0;
 }

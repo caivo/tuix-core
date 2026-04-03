@@ -1,12 +1,7 @@
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_namespace_packages
 import sys
 import os
-try:
-    from Cython.Build import cythonize
-    has_cython = True
-except Exception:
-    cythonize = None
-    has_cython = False
+from Cython.Build import cythonize
 
 # Platform-specific linker flags
 if sys.platform == "win32":
@@ -24,6 +19,7 @@ sources = [
     "src/tuix/core/event_shim.c",
     "src/tuix/core/init.c",
     "src/tuix/core/rendering.c",
+    "src/tuix/core/cache_manager_stub.c",
     "src/tuix/core/buffers.c",
     "src/tuix/core/buffer_manager.c",
     "src/tuix/core/object_manager.c",
@@ -56,15 +52,18 @@ include_dirs = [
     "src/tuix/core/subcycles",
 ]
 
-cython_sources = ["src/tuix/core/_tuix_cy.pyx"] if has_cython else ["src/tuix/core/_tuix_cy.c"]
+cython_sources = ["src/tuix/core/_tuix_cy.pyx"]
 tuix_cy = Extension(
     name="tuix.core._tuix_cy",
     sources=cython_sources + sources,
     include_dirs=include_dirs,
+    define_macros=[("TUIX_BUILDING_CORE", "1")],
     extra_compile_args=extra_compile,
     extra_link_args=extra_link,
 )
 
 setup(
-    ext_modules=cythonize([tuix_cy]) if has_cython else [tuix_cy],
+    packages=find_namespace_packages(where="src", include=["tuix*"]),
+    package_dir={"": "src"},
+    ext_modules=cythonize([tuix_cy], force=True),
 )

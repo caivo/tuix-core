@@ -111,6 +111,7 @@ cdef extern from "types.h":
         int count
         int active
         int capacity
+        int current_focus
 
     ctypedef struct TuixScenes:
         TuixScene** scenes
@@ -127,7 +128,7 @@ cdef extern from "types.h":
         const char* name
         const char* version
         const char* author
-        # const char* namespace  # 'namespace' is a Cython keyword; skip
+        const char* namespace_ "namespace"
         create_state_fn create_state
         destroy_state_fn destroy_state
         TuixHandlerResponse (*handler_func)(TuixObject* obj) nogil
@@ -190,6 +191,8 @@ cdef extern from "buffers.h":
     TuixScene* c_tuix_get_scene "tuix_get_scene"(const char* name) nogil
     char** c_tuix_get_scenes "tuix_get_scenes"() nogil
     int c_tuix_select_scene "tuix_select_scene"(char* name) nogil
+    int c_tuix_scene_set_focus "tuix_scene_set_focus"(const char* scene_name, int uid) nogil
+    int c_tuix_scene_set_previous_focus "tuix_scene_set_previous_focus"(const char* scene_name) nogil
 
 cdef extern from "buffer_manager.h":
     void c_tuix_init_buffer "tuix_init_buffer"(char* scene_name, TuixObject obj) nogil
@@ -202,7 +205,22 @@ cdef extern from "buffer_manager.h":
 #  Object management
 # ═══════════════════════════════════════════════════════════════════
 cdef extern from "object_manager.h":
+    TuixObject c_tuix_objects_new_object "tuix_objects_new_object"(char* builder_name, char* scene_name, float width_mod, float height_mod, float margin_top_mod, float margin_left_mod) nogil
     int c_tuix_create_object "tuix_create_object"(char* builder_name, char* scene_name, float width_mod, float height_mod, float margin_top_mod, float margin_left_mod) nogil
+
+# ═══════════════════════════════════════════════════════════════════
+#  Subcycles
+# ═══════════════════════════════════════════════════════════════════
+cdef extern from "subcycles/subcycle_registrant.h":
+    int c_tuix_subcycle_init "tuix_subcycle_init"(char* scene_name, TuixObject* obj) nogil
+    void c_tuix_subcycle_free "tuix_subcycle_free"(char* scene_name, int uid) nogil
+
+# ═══════════════════════════════════════════════════════════════════
+#  Cache manager
+# ═══════════════════════════════════════════════════════════════════
+cdef extern from "cache_manager.h":
+    void c_tuix_cache_scenes "tuix_cache_scenes"() nogil
+    void c_tuix_restore_scenes "tuix_restore_scenes"() nogil
 
 # ═══════════════════════════════════════════════════════════════════
 #  Builders — registration
@@ -271,6 +289,7 @@ cdef extern from "input/input.h":
 # ═══════════════════════════════════════════════════════════════════
 cdef extern from "rendering.h":
     ctypedef void (*TuixRowDoneCallback)(TuixFinalBuffer*, int, void*)
+    TuixRGBTuple c_tuix_rgb16 "tuix_rgb16"(TuixRGBTuple c) nogil
     void c_tuix_render_streaming "tuix_render_streaming"(TuixFinalBuffer* buffer, TuixRowDoneCallback on_row_done, void* user_data) nogil
 
 # ═══════════════════════════════════════════════════════════════════
@@ -293,6 +312,8 @@ cdef extern from "batch_executor.h":
 #  Registry (global)
 # ═══════════════════════════════════════════════════════════════════
 cdef extern from "tuix_registry.h":
+    void c_tuix_lock "tuix_lock"() nogil
+    void c_tuix_unlock "tuix_unlock"() nogil
     TuixRegistry tuix_registry
 
 
@@ -353,6 +374,41 @@ cpdef tuple get_terminal_size():
     return (w, h)
 
 
+cpdef int tuix_init():
+    return init()
+
+cpdef int tuix_shutdown():
+    return shutdown()
+
+cpdef int tuix_init_registry():
+    return init_registry()
+
+cpdef int tuix_destroy_registry():
+    return destroy_registry()
+
+cpdef void tuix_main_loop():
+    main_loop()
+
+cpdef tuple tuix_get_terminal_size():
+    return get_terminal_size()
+
+cpdef void tuix_lock():
+    with nogil:
+        c_tuix_lock()
+
+cpdef void tuix_unlock():
+    with nogil:
+        c_tuix_unlock()
+
+cpdef void tuix_cache_scenes():
+    with nogil:
+        c_tuix_cache_scenes()
+
+cpdef void tuix_restore_scenes():
+    with nogil:
+        c_tuix_restore_scenes()
+
+
 # ═══════════════════════════════════════════════════════════════════
 #  Scenes
 # ═══════════════════════════════════════════════════════════════════
@@ -374,10 +430,65 @@ cpdef void tuix_clear_scene(bytes name):
     with nogil:
         c_tuix_clear_scene(c)
 
+cpdef uintptr_t tuix_get_scene(bytes name):
+    cdef const char* c = name
+    cdef TuixScene* scene
+    with nogil:
+        scene = c_tuix_get_scene(c)
+    return <uintptr_t>scene
+
+cpdef list tuix_get_scenes():
+    cdef char** names = NULL
+    cdef list out = []
+    cdef int i
+    cdef int count = tuix_registry.scenes.count
+    with nogil:
+        names = c_tuix_get_scenes()
+    if names == NULL:
+        return out
+    for i in range(count):
+        if names[i] != NULL:
+            out.append(names[i])
+            free(names[i])
+    free(names)
+    return out
+
+cpdef int tuix_scene_set_focus(bytes scene_name, int uid):
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scene_set_focus(sn, uid)
+    return r
+
+cpdef int tuix_scene_set_previous_focus(bytes scene_name):
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scene_set_previous_focus(sn)
+    return r
+
 
 # ═══════════════════════════════════════════════════════════════════
 #  Object management
 # ═══════════════════════════════════════════════════════════════════
+
+cpdef uintptr_t tuix_objects_new_object(bytes builder_name, bytes scene_name,
+                                        float w, float h, float mt, float ml):
+    cdef char* bn = builder_name
+    cdef char* sn = scene_name
+    cdef TuixObject obj
+    cdef TuixObject* heap_obj = NULL
+    with nogil:
+        obj = c_tuix_objects_new_object(bn, sn, w, h, mt, ml)
+    heap_obj = <TuixObject*>malloc(sizeof(TuixObject))
+    if heap_obj == NULL:
+        raise MemoryError()
+    heap_obj[0] = obj
+    return <uintptr_t>heap_obj
+
+cpdef void tuix_free_object_ptr(uintptr_t obj_addr):
+    if obj_addr != 0:
+        free(<void*>obj_addr)
 
 cpdef int tuix_create_object(bytes builder_name, bytes scene_name,
                              float w, float h, float mt, float ml):
@@ -392,6 +503,15 @@ cpdef int tuix_create_object(bytes builder_name, bytes scene_name,
 # ═══════════════════════════════════════════════════════════════════
 #  Buffer access
 # ═══════════════════════════════════════════════════════════════════
+
+cpdef void tuix_init_buffer(bytes scene_name, uintptr_t obj_addr):
+    cdef char* sn = scene_name
+    cdef TuixObject obj
+    if obj_addr == 0:
+        raise ValueError("obj_addr must be non-zero")
+    obj = (<TuixObject*>obj_addr)[0]
+    with nogil:
+        c_tuix_init_buffer(sn, obj)
 
 cpdef uintptr_t tuix_get_buffer_by_uid(int uid):
     """Return raw pointer to TuixBuffer (as uintptr_t) for the given UID."""
@@ -833,11 +953,17 @@ cpdef int execute_command_buffer(bytes data):
         r = c_tuix_execute_command_buffer(p, length)
     return r
 
+cpdef int tuix_execute_command_buffer(bytes data):
+    return execute_command_buffer(data)
+
 cpdef uint64_t time_now_us():
     cdef uint64_t r
     with nogil:
         r = c_tuix_time_now_us()
     return r
+
+cpdef uint64_t tuix_time_now_us():
+    return time_now_us()
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -973,6 +1099,10 @@ cpdef bytes py_tuix_render_streaming(object py_buf):
     cdef bytes result = _render_ansi_from_pixels(pix, W, H)
     free(pix)
     return result
+
+
+cpdef bytes tuix_render_streaming(object py_buf):
+    return py_tuix_render_streaming(py_buf)
 
 
 cpdef bytes py_tuix_commit_patch_and_render(object py_buf, bytes data):
@@ -1432,6 +1562,56 @@ cpdef int tuix_select_scene(bytes name):
     with nogil:
         r = c_tuix_select_scene(n)
     return r
+
+cpdef int tuix_subcycle_init(bytes scene_name, uintptr_t obj_addr):
+    cdef char* sn = scene_name
+    cdef int r
+    if obj_addr == 0:
+        return -1
+    with nogil:
+        r = c_tuix_subcycle_init(sn, <TuixObject*>obj_addr)
+    return r
+
+cpdef void tuix_subcycle_free(bytes scene_name, int uid):
+    cdef char* sn = scene_name
+    with nogil:
+        c_tuix_subcycle_free(sn, uid)
+
+cpdef uintptr_t tuix_composite_scene(uintptr_t scene_addr):
+    cdef TuixFinalBuffer* fb = NULL
+    if scene_addr == 0:
+        return 0
+    with nogil:
+        fb = c_tuix_composite_scene(<TuixScene*>scene_addr)
+    return <uintptr_t>fb
+
+cpdef void tuix_resolve_geometry(uintptr_t buf_addr):
+    if buf_addr == 0:
+        return
+    with nogil:
+        c_tuix_resolve_geometry(<TuixBuffer*>buf_addr)
+
+cpdef tuple tuix_rgb16(int r, int g, int b):
+    cdef TuixRGBTuple src
+    cdef TuixRGBTuple out
+    if r < 0:
+        r = 0
+    elif r > 255:
+        r = 255
+    if g < 0:
+        g = 0
+    elif g > 255:
+        g = 255
+    if b < 0:
+        b = 0
+    elif b > 255:
+        b = 255
+    src.r = <unsigned char>r
+    src.g = <unsigned char>g
+    src.b = <unsigned char>b
+    with nogil:
+        out = c_tuix_rgb16(src)
+    return (out.r, out.g, out.b)
 
 cpdef void pipeline_tick(bytes scene_name):
     """Run one full engine pipeline iteration entirely in C:

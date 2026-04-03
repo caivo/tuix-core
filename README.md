@@ -1,10 +1,4 @@
-# 🧱 TUIX Core 0.2.0
-
-> ⚠️ **ATTENTION:**  
-> This version is a **major rewrite** of the 0.1 MVP.  
-> The Python API, layout engine, and rendering pipeline have all been overhauled.  
-> Some edge cases and multi-widget input routing are still being ironed out for **v0.2.1**.  
-> P.S. Still in active development!
+# 🧱 TUIX Core 0.2.1
 
 ---
 
@@ -13,7 +7,15 @@
 **TUIX** is a modular terminal UI engine inspired by web technologies.  
 It introduces a **DOM-like component system**, a **layout engine**, and a **buffer-based rendering pipeline** for building structured and styled terminal interfaces.
 
-v0.2 ships a compiled **C + Cython** core for low-latency rendering, four built-in widget builders (progressbar, choice, input, canvas), and a clean Python API layered on top.
+v0.2.1 ships a compiled **C + Cython** core for low-latency rendering, four built-in widget builders (progressbar, choice, input, canvas), and a clean Python API layered on top.
+
+## 🆕 What's New In 0.2.1
+
+- Packaging/build consistency improvements for Windows and editable installs.
+- New scene focus primitives in Python API: `scenes.set_focus(...)` and `scenes.set_previous_focus(...)`.
+- New multimodal example: `examples/multimodal/focus_routing.py`.
+- Examples reorganized by domain: `widgets/`, `multimodal/`, `showcase/`.
+- Extended test coverage for focus APIs and examples layout integrity.
 
 **Core vs Framework:** TUIX provides a low-level engine core - not a high-level application framework. The public API intentionally exposes low-level primitives and is not designed to be "simple" by itself; higher-level, user-friendly frameworks will be built on top of this core once it has matured and stabilised.
 
@@ -115,14 +117,14 @@ Runnable examples are in the `examples/` directory:
 
 | File | Description |
 |---|---|
-| `examples/ex_progressbar.py` | Two bars filling at different speeds |
-| `examples/ex_choice.py` | Colour palette menu, prints chosen RGB to stdout |
-| `examples/ex_canvas.py` | Animated bouncing ball with colour cycling and FPS counter |
-| `examples/ex_multi_widget.py` | Progressbar + choice + input all live simultaneously |
-| `example.py` | Full sequential demo (progressbar → choice → input → canvas) |
+| `examples/widgets/progressbar_dual.py` | Two bars filling at different speeds |
+| `examples/widgets/choice_palette.py` | Colour palette menu, prints chosen RGB to stdout |
+| `examples/widgets/canvas_bounce.py` | Animated bouncing ball with colour cycling and FPS counter |
+| `examples/multimodal/focus_routing.py` | Keyboard + mouse focus routing between choice and input |
+| `examples/showcase/sequential_journey.py` | Full sequential demo (progressbar → choice → input → canvas) |
 
 ```bash
-python examples/ex_canvas.py
+python examples/widgets/canvas_bounce.py
 ```
 
 ---
@@ -140,60 +142,75 @@ pip install pytest
 pytest
 ```
 
-29 tests covering engine lifecycle, scene management, registry, all four widget builders, and canvas draw calls.
+39 tests covering engine lifecycle, scene management, registry, multimodal focus APIs, all four widget builders, canvas draw calls, and examples layout integrity.
 
 ---
 
 ## 📊 Benchmarks
 
-Benchmarked against **blessed, terminal-kit, Ink, ReziTUI, Bubble Tea, Ratatui, OpenTUI.Core, OpenTUI.React** on Windows 10 (12th Gen i5-12450HX, 24 GB RAM).
+Benchmarked against **blessed, terminal-kit, Ink, ReziTUI, Bubble Tea, Ratatui, OpenTUI.Core, OpenTUI.React, TUIX.Renderer, Rich, Urwid, PromptToolkit** on Windows 10 (12th Gen i5-12450HX, 24 GB RAM).
 
 Note to Rezi: Hope you don't mind that I took your benchmarks and reproduced them here - thanks for the reference and inspiration.
+
+Expanded benchmark runs now include CI95 intervals and two byte metrics:
+- `Bytes(local)`: bytes reported by each framework's own counters.
+- `Bytes(pty)`: observed PTY bytes for cross-framework comparison.
 
 ### Startup
 
 | Framework | Mean | ops/s | Peak RSS |
 |---|---:|---:|---:|
-| **TUIX.Core** | 302µs | 3.3K | **3.9 MB** |
-| **TUIX.Python** | 361µs | 2.8K | 18.1 MB |
-| Ratatui | 152µs | 6.6K | 27.0 KB |
-| ReziTUI | 165µs | 6.1K | 76.1 MB |
-| Ink | 2.49ms | 401 | 64.7 MB |
-| Blessed | 41.14ms | 24 | 152.1 MB |
+| **TUIX.Core** | 176µs | 5.7K | 4.0 MB |
+| **TUIX.Python** | 177µs | 5.7K | 18.2 MB |
+| Ratatui | 258µs | 3.9K | 27.0 KB |
+| ReziTUI | 201µs | 5.0K | 78.4 MB |
+| Ink | 3.74ms | 268 | 62.3 MB |
+| Blessed | 31.80ms | 31 | 149.5 MB |
 
 ### Tree Construction (1 000 items)
 
 | Framework | Mean | ops/s |
 |---|---:|---:|
-| **TUIX.Core** | **97µs** | **10.3K** |
-| **TUIX.Python** | 167µs | 6.0K |
-| OpenTUI.Core | 123µs | 8.1K |
-| Ratatui | 962µs | 1.0K |
-| Ink | 42.13ms | 24 |
-| Bubble Tea | 562.95ms | 2 |
+| **TUIX.Core** | **49µs** | **20.2K** |
+| OpenTUI.Core | 103µs | 9.7K |
+| **TUIX.Python** | 140µs | 7.1K |
+| Ratatui | 1.18ms | 847 |
+| Bubble Tea | 1.23ms | 811 |
+| Ink | 79.91ms | 13 |
 
 ### Re-render
 
 | Framework | Mean | ops/s |
 |---|---:|---:|
-| **TUIX.Python** | **10µs** | **96.1K** |
-| Blessed | 31µs | 32.7K |
-| **TUIX.Core** | 37µs | 26.7K |
-| Ratatui | 50µs | 20.1K |
-| Ink | 552µs | 1.8K |
-| Bubble Tea | 10.98ms | 91 |
+| **TUIX.Python** | **11µs** | **88.6K** |
+| **TUIX.Core** | 13µs | 75.6K |
+| Blessed | 30µs | 33.6K |
+| Ratatui | 66µs | 15.1K |
+| Bubble Tea | 121µs | 8.3K |
+| Ink | 1.03ms | 966 |
 
 ### Virtual List (100 000 items, viewport 40)
 
 | Framework | Mean | ops/s | Peak RSS |
 |---|---:|---:|---:|
-| **TUIX.Python** | 70µs | 14.4K | 18.3 MB |
-| **TUIX.Core** | 89µs | 11.2K | **4.4 MB** |
-| Ratatui | 100µs | 10.0K | 27.0 KB |
-| OpenTUI.React | 197µs | 5.1K | 39.0 MB |
-| Ink | 683µs | 1.5K | 359.2 MB |
+| **TUIX.Core** | **13µs** | **80.0K** | **4.1 MB** |
+| OpenTUI.React | 42µs | 24.0K | 38.9 MB |
+| **TUIX.Python** | 62µs | 16.0K | 18.5 MB |
+| Ratatui | 82µs | 12.2K | 27.0 KB |
+| Ink | 1.54ms | 651 | 347.4 MB |
 
-TUIX.Core consistently **tops tree-construction regardless of item count** (97–110µs flat), and TUIX.Python leads the re-render benchmark at **96K ops/s** - all while keeping peak RSS well under 20 MB.  
+### Terminal Full UI (120x40, 24 services)
+
+| Framework | Mean | ops/s | Peak RSS |
+|---|---:|---:|---:|
+| **TUIX.Core** | **33µs** | **30.5K** | **4.6 MB** |
+| **TUIX.Python** | 82µs | 12.1K | 19.0 MB |
+| Ratatui | 393µs | 2.5K | 27.0 KB |
+| Bubble Tea | 608µs | 1.6K | 24.8 MB |
+| OpenTUI.Core | 689µs | 1.5K | 36.7 MB |
+| Ink | 2.60ms | 385 | 348.7 MB |
+
+Across the expanded suite, TUIX.Core leads key throughput-heavy scenarios (tree build, virtual list, and full UI composition), while TUIX.Python and TUIX.Renderer stay highly competitive in low-latency rerender paths. Peak RSS remains low for TUIX variants compared with most JavaScript/Python UI stacks.  
 Full results with CI95 and byte-output columns are in [`BENCHMARKS.md`](BENCHMARKS.md).
 
 ---
@@ -217,16 +234,8 @@ The C core handles layout geometry, compositing, and rendering to the terminal. 
 
 ---
 
-## ⚠️ Known Limitations (v0.2)
-
-- **Multi-widget input routing** - when multiple interactive widgets (e.g. choice + input) are on screen, both receive every keystroke. Proper focus management is planned for **v0.2.1**.
-- `tuix_registry` is not exported from the `.pyd` on Windows; the Python layer uses a proxy that calls `tuix_select_scene` instead of writing the pointer directly.
-
----
-
 ## ⚙️ Future Plans
 
-- Focus/routing system for multi-widget layouts (v0.2.1)
 - Scrollable containers and nested layouts
 - Theme / style system
 - Async-friendly loop integration

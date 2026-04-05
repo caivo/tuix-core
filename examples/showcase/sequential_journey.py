@@ -1,8 +1,6 @@
 import time
 import random
-import ctypes
 from tuix.core import engine, builders, scenes, registry, objects, buffers, input, _structs
-
 def sleep_ms(ms):
     time.sleep(ms / 1000.0)
 
@@ -64,14 +62,13 @@ def main():
 
     # Stage 1: ProgressBar
     uid = objects.create_object(builders.PROGRESSBAR, b"MainScene", 0.8, 0.1, 0.45, 0.1)
-    obj_ptr = buffers.get_buffer_by_uid(uid)
-    obj = obj_ptr.contents.obj if obj_ptr and obj_ptr.contents.obj else None
+    obj = objects.get_object_by_uid(uid)
     if not obj:
         print("progressbar object retrieval failed")
         engine.shutdown()
         return 1
 
-    # Bind progressbar functions from the native shim if not already wrapped
+    # Progressbar demo with animated value
     objects.tuix_progressbar_set_value(obj, 0.0)
     objects.tuix_progressbar_set_style(obj, b'#'[0], b'-'[0], 80, 200, 120, 60, 60, 60)
 
@@ -89,8 +86,7 @@ def main():
 
     # Stage 2: Choice
     uid = objects.create_object(builders.CHOICE, b"MainScene", 0.4, 0.25, 0.35, 0.3)
-    obj_ptr = buffers.get_buffer_by_uid(uid)
-    obj = obj_ptr.contents.obj if obj_ptr and obj_ptr.contents.obj else None
+    obj = objects.get_object_by_uid(uid)
     if not obj:
         print("choice object retrieval failed")
         engine.shutdown()
@@ -121,8 +117,7 @@ def main():
 
     # Stage 3: Input
     uid = objects.create_object(builders.INPUT, b"MainScene", 0.6, 0.1, 0.45, 0.2)
-    obj_ptr = buffers.get_buffer_by_uid(uid)
-    obj = obj_ptr.contents.obj if obj_ptr and obj_ptr.contents.obj else None
+    obj = objects.get_object_by_uid(uid)
     if not obj:
         print("input object retrieval failed")
         engine.shutdown()
@@ -156,16 +151,16 @@ def main():
     engine.main_loop()
     sleep_ms(50)
 
-    cb = buffers.get_buffer_by_uid(uid)
-    if cb and cb.contents.width > 0 and cb.contents.height > 0:
-        cw = cb.contents.width
-        ch = cb.contents.height
+    snap = buffers.get_buffer_snapshot(b"MainScene", uid)
+    if snap and snap['width'] > 0 and snap['height'] > 0:
+        cw = snap['width']
+        ch = snap['height']
         r = colour_r[chosen_colour]
         g = colour_g[chosen_colour]
         b = colour_b[chosen_colour]
 
         # Border
-        tuix_obj = cb.contents.obj.contents if cb.contents.obj else None
+        tuix_obj = objects.get_object_by_uid(uid)
         if tuix_obj:
             objects.tuix_canvas_draw_rect(tuix_obj, 0, 0, cw, ch, b'.', 0, 80, 80, 80, 0, 0, 0)
             # Title

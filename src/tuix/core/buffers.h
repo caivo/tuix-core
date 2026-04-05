@@ -48,6 +48,9 @@ int tuix_select_scene(const char* name);
 
 int tuix_scene_set_focus(const char* scene_name, int uid);
 int tuix_scene_set_previous_focus(const char* scene_name);
+int tuix_scene_get_stats(const char* scene_name, TuixSceneStats* out_stats);
+size_t tuix_compact_scene_pixels(const char* scene_name);
+int tuix_compact_cold_scenes(unsigned long long cold_frames, size_t min_pixel_bytes, int keep_active_scene);
 
 #ifdef __cplusplus
 }

@@ -7,6 +7,7 @@
 #include "compositor/compositor.h"
 #include "rendering.h"
 #include "batch_executor.h"
+#include "input/input.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -72,7 +73,28 @@ static inline TuixBuffer *scene_buffer_by_uid(TuixScene *scene, int uid) {
     return NULL;
 }
 
+static void scene_cycle_focus(TuixScene *scene) {
+    if (!scene || scene->count <= 0) return;
+    if (scene->current_focus <= 0) {
+        scene->current_focus = scene->buffers[0]->obj->uid;
+        return;
+    }
+    int idx = -1;
+    for (int i = 0; i < scene->count; i++) {
+        if (scene->buffers[i]->obj->uid == scene->current_focus) {
+            idx = i;
+            break;
+        }
+    }
+    if (idx < 0) {
+        scene->current_focus = scene->buffers[0]->obj->uid;
+        return;
+    }
+    scene->current_focus = scene->buffers[(idx + 1) % scene->count]->obj->uid;
+}
+
 void tuix_main_loop() {
+    tuix_registry.frame_counter++;
     tuix_get_terminal_size(&tuix_registry.terminal_width, &tuix_registry.terminal_height);
     /* Commit any pending global batch commands before processing frame */
     extern void tuix_batch_global_commit(void);
@@ -86,6 +108,7 @@ void tuix_main_loop() {
     TuixScene *scene = s_cached_scene;
     TuixSceneSubcycles *scene_subcycles = s_cached_subcycles;
     if (!scene || !scene_subcycles) return;
+    scene->last_active_frame = tuix_registry.frame_counter;
 
     int size_changed = (tuix_registry.terminal_width != tuix_registry.terminal_width_old ||
                         tuix_registry.terminal_height != tuix_registry.terminal_height_old);
@@ -94,15 +117,28 @@ void tuix_main_loop() {
         tuix_registry.terminal_height_old = tuix_registry.terminal_height;
     }
 
+    TuixInputSnapshot snap = get_input_snapshot();
+    bool has_keyboard_event = (snap.keyboard && snap.keyboard->has_event);
+    bool has_mouse_event = (snap.mouse && snap.mouse->has_event);
+    bool has_input_event = has_keyboard_event || has_mouse_event;
+    if (has_input_event && snap.keyboard && snap.keyboard->has_event && snap.keyboard->code == 0x09) {
+        scene_cycle_focus(scene);
+        snap.consumed_keyboard = true;
+    }
+    bool has_event = has_input_event || size_changed;
+
     for (int j = 0; j < scene_subcycles->count; j++) {
         TuixSubcycle *subcycle = scene_subcycles->subcycles[j];
-        if (!subcycle->handler) continue;
+        if (!subcycle->on_event) continue;
+        bool all_input_consumed = has_input_event &&
+                                  (!has_keyboard_event || snap.consumed_keyboard) &&
+                                  (!has_mouse_event || snap.consumed_mouse);
+        if (!size_changed && all_input_consumed) break;
 
-        TuixHandlerResponse ans;
+        bool is_focused = (scene->current_focus == subcycle->obj->uid);
+        TuixHandlerResponse ans = subcycle->on_event(subcycle->obj, has_event, is_focused, &snap);
         if (size_changed) {
-            ans = (TuixHandlerResponse){.requires_redraw = 1};
-        } else {
-            ans = subcycle->handler(subcycle->obj);
+            ans.requires_redraw = 1;
         }
 
         TuixBuffer *buffer = scene_buffer_by_uid(scene, subcycle->obj->uid);
@@ -112,10 +148,9 @@ void tuix_main_loop() {
 
     }
 
-    /* Protect buffer generation from concurrent access (e.g., external callers). */
-    tuix_lock();
+     /* Builder callbacks (on_resize/build_content) are intentionally run outside
+         the global registry lock to reduce lock contention and callback latency. */
     tuix_loop_generate_buffers(scene, size_changed);
-    tuix_unlock();
 
     /* Composite and render under lock to avoid concurrent mutations during resize. */
     tuix_lock();

@@ -123,10 +123,26 @@ static TuixPixel* choice_build_content(TuixObject *obj, TuixBuffer* buffer) {
 }
 
 
-static TuixHandlerResponse choice_handler(TuixObject *obj) {
+static TuixHandlerResponse choice_handler(TuixObject *obj, bool has_event, bool is_focused, TuixInputSnapshot* snap) {
     if (!obj || !obj->state)
         return (TuixHandlerResponse){.requires_redraw = 0};
+
     TuixChoiceState *s = (TuixChoiceState*)obj->state;
+    if (is_focused && has_event && snap && !snap->consumed_keyboard && snap->keyboard && snap->keyboard->has_event && s->option_count > 0) {
+        int code = snap->keyboard->code;
+        if (code == TUIX_VK_UP || code == 'k') {
+            if (s->selected > 0) { s->selected--; s->needs_redraw = 1; }
+        } else if (code == TUIX_VK_DOWN || code == 'j') {
+            if (s->selected < s->option_count - 1) { s->selected++; s->needs_redraw = 1; }
+        } else if (code == TUIX_VK_ENTER || code == '\n') {
+            s->confirmed = 1;
+            s->needs_redraw = 1;
+        }
+        if (code == TUIX_VK_UP || code == 'k' || code == TUIX_VK_DOWN || code == 'j' || code == TUIX_VK_ENTER || code == '\n') {
+            snap->consumed_keyboard = true;
+        }
+    }
+
     if (s->needs_redraw) {
         s->needs_redraw = 0;
         return (TuixHandlerResponse){.requires_redraw = 1};
@@ -145,7 +161,7 @@ const TuixBuilder tuix_choice_builder = {
     .namespace  = "tuix",
     .create_state  = choice_create_state,
     .destroy_state = choice_destroy_state,
-    .handler_func  = choice_handler,
+    .on_event  = choice_handler,
     .on_resize     = choice_on_resize,
     .build_content = choice_build_content
 };
@@ -179,25 +195,6 @@ int tuix_choice_set_options(TuixObject *obj, const char **labels, int count) {
     s->selected     = 0;
     s->confirmed    = 0;
     s->needs_redraw = 1;
-    return 0;
-}
-
-int tuix_choice_feed_input(TuixObject *obj, TuixInputSnapshot snap) {
-    if (!obj || !obj->state) return -1;
-    TuixChoiceState *s = (TuixChoiceState*)obj->state;
-    if (s->option_count == 0) return 0;
-    if (!snap.keyboard || !snap.keyboard->has_event) return 0;
-
-    int code = snap.keyboard->code;
-
-    if (code == TUIX_VK_UP || code == 'k') {
-        if (s->selected > 0) { s->selected--; s->needs_redraw = 1; }
-    } else if (code == TUIX_VK_DOWN || code == 'j') {
-        if (s->selected < s->option_count - 1) { s->selected++; s->needs_redraw = 1; }
-    } else if (code == TUIX_VK_ENTER || code == '\n') {
-        s->confirmed = 1;
-        s->needs_redraw = 1;
-    }
     return 0;
 }
 

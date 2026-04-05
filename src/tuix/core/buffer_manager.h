@@ -10,11 +10,18 @@ extern "C" {
 
 void tuix_init_buffer(char* scene_name, TuixObject obj);
 
-TuixBuffer* tuix_get_buffer(char* scene_name, int uid);
-TuixBuffer* tuix_get_buffer_by_uid(int uid);
+int tuix_get_buffer_snapshot(char* scene_name, int uid, TuixBuffer* out_buffer);
+int tuix_get_buffer_snapshot_by_uid(int uid, TuixBuffer* out_buffer);
 
 void tuix_clear_buffer(char* scene_name, int uid);
 void tuix_free_buffer(char* scene_name, int uid);
+int tuix_set_buffer_parent(char* scene_name, int uid, int parent_uid);
+int tuix_get_buffer_parent(char* scene_name, int uid);
+int tuix_set_buffer_z_index(char* scene_name, int uid, int z_index);
+int tuix_get_buffer_z_index(char* scene_name, int uid);
+
+/* Test-only: get the raw object by UID for testing purposes */
+TuixObject* _tuix_get_object_by_uid(int uid);
 
 #ifdef __cplusplus
 }

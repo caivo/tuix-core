@@ -11,12 +11,6 @@ const TuixBuilder* tuix_choice_init(void);
 /* Set the list of options (deep-copied). Returns 0 on success, -1 on error. */
 int tuix_choice_set_options(TuixObject *obj, const char **labels, int count);
 
-/* ── Input handling (feed + poll pattern) ─────────────────────── */
-
-/* Feed an input snapshot. The builder processes Up/Down/Enter keys.
- * Call this once per frame for the focused choice object. */
-int tuix_choice_feed_input(TuixObject *obj, TuixInputSnapshot snap);
-
 /* ── Result retrieval ─────────────────────────────────────────── */
 
 /* Currently highlighted index (0-based), or -1 on error. */

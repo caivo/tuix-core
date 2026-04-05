@@ -15,6 +15,7 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -491,6 +492,8 @@ TuixInputSnapshot get_input_snapshot(void) {
     } else {
         snap_mouse.has_event = 0;
     }
+    snap.consumed_keyboard = false;
+    snap.consumed_mouse = false;
     UNLOCK();
     return snap;
 }

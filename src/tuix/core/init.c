@@ -1,5 +1,6 @@
 #include "init.h"
 #include "content_builder/builders_registrant.h"
+#include "input/input.h"
 #include <stdio.h>
 #include "tuix_registry.h"
 #include <stdlib.h>
@@ -20,6 +21,7 @@ int tuix_init() {
         printf("Failed to initialize TUIX registry\n");
         return response;
     }
+    listen_input();
     return 0;
 }
 
@@ -38,6 +40,8 @@ int tuix_init_registry() {
     tuix_registry.builders.builders = NULL;
     tuix_registry.builders.count = 0;
     tuix_registry.builders.capacity = 0;
+
+    tuix_registry.frame_counter = 0;
 
     /* initialize lock */
 #ifdef _WIN32
@@ -100,6 +104,7 @@ int tuix_destroy_registry() {
 }
 
 int tuix_shutdown() {
+    stop_input_listening();
     int response = tuix_destroy_registry();
     if (response != 0) {
         printf("Failed to destroy TUIX registry\n");

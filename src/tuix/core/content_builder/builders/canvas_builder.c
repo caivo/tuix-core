@@ -17,6 +17,19 @@ typedef struct {
     int w, h;
 } TuixCachedSprite;
 
+static int canvas_get_dims(TuixObject *obj, int *out_w, int *out_h) {
+    if (!obj || !out_w || !out_h) {
+        return -1;
+    }
+    TuixBuffer snap;
+    if (tuix_get_buffer_snapshot_by_uid(obj->uid, &snap) != 0) {
+        return -1;
+    }
+    *out_w = snap.width;
+    *out_h = snap.height;
+    return 0;
+}
+
 typedef struct {
     TuixCanvasChange *changes;
     int changes_count;
@@ -60,10 +73,8 @@ static void tuix_canvas_destroy_state(void* state) {
 int tuix_canvas_set_pixel(TuixObject *obj, int x, int y, char sym, uint8_t fgr, uint8_t fgg, uint8_t fgb, uint8_t bgr, uint8_t bgg, uint8_t bgb) {
     if (!obj || !obj->state) return -1;
     TuixCanvasState *s = (TuixCanvasState*)obj->state;
-    TuixBuffer *buf = tuix_get_buffer_by_uid(obj->uid);
-    if (!buf) return -1;
-    int width = buf->width;
-    int height = buf->height;
+    int width = 0, height = 0;
+    if (canvas_get_dims(obj, &width, &height) != 0) return -1;
     if (x < 0 || x >= width || y < 0 || y >= height) return -1;
     if (s->changes_count + 1 > s->changes_capacity) {
         int newcap = s->changes_capacity < 64 ? 64 : s->changes_capacity * 2;
@@ -142,9 +153,8 @@ int tuix_canvas_draw_line(TuixObject *obj, int x0, int y0, int x1, int y1,
                           uint8_t bgr, uint8_t bgg, uint8_t bgb) {
     if (!obj || !obj->state) return -1;
     TuixCanvasState *s = (TuixCanvasState*)obj->state;
-    TuixBuffer *buf = tuix_get_buffer_by_uid(obj->uid);
-    if (!buf) return -1;
-    int w = buf->width, h = buf->height;
+    int w = 0, h = 0;
+    if (canvas_get_dims(obj, &w, &h) != 0) return -1;
 
     /* Bresenham's line algorithm */
     int dx = abs(x1 - x0);
@@ -171,9 +181,8 @@ int tuix_canvas_draw_rect(TuixObject *obj, int x, int y, int w, int h,
                           uint8_t bgr, uint8_t bgg, uint8_t bgb) {
     if (!obj || !obj->state) return -1;
     TuixCanvasState *s = (TuixCanvasState*)obj->state;
-    TuixBuffer *buf = tuix_get_buffer_by_uid(obj->uid);
-    if (!buf) return -1;
-    int bw = buf->width, bh = buf->height;
+    int bw = 0, bh = 0;
+    if (canvas_get_dims(obj, &bw, &bh) != 0) return -1;
 
     for (int ry = y; ry < y + h; ry++) {
         for (int rx = x; rx < x + w; rx++) {
@@ -192,9 +201,8 @@ int tuix_canvas_draw_circle(TuixObject *obj, int cx, int cy, int radius,
                             uint8_t bgr, uint8_t bgg, uint8_t bgb) {
     if (!obj || !obj->state) return -1;
     TuixCanvasState *s = (TuixCanvasState*)obj->state;
-    TuixBuffer *buf = tuix_get_buffer_by_uid(obj->uid);
-    if (!buf) return -1;
-    int bw = buf->width, bh = buf->height;
+    int bw = 0, bh = 0;
+    if (canvas_get_dims(obj, &bw, &bh) != 0) return -1;
 
     /* Midpoint ellipse with semi-axes a=2*radius (wide) and b=radius (tall).
        Produces exact outlines with no double pixels or gaps. */
@@ -279,9 +287,8 @@ int tuix_canvas_draw_text(TuixObject *obj, int x, int y, const char *text,
                           uint8_t bgr, uint8_t bgg, uint8_t bgb) {
     if (!obj || !obj->state || !text) return -1;
     TuixCanvasState *s = (TuixCanvasState*)obj->state;
-    TuixBuffer *buf = tuix_get_buffer_by_uid(obj->uid);
-    if (!buf) return -1;
-    int bw = buf->width, bh = buf->height;
+    int bw = 0, bh = 0;
+    if (canvas_get_dims(obj, &bw, &bh) != 0) return -1;
 
     int col = x;
     for (const char *p = text; *p; p++) {
@@ -299,9 +306,8 @@ int tuix_canvas_draw_sprite(TuixObject *obj, int dst_x, int dst_y,
                             const TuixPixel *sprite) {
     if (!obj || !obj->state || !sprite) return -1;
     TuixCanvasState *s = (TuixCanvasState*)obj->state;
-    TuixBuffer *buf = tuix_get_buffer_by_uid(obj->uid);
-    if (!buf) return -1;
-    int bw = buf->width, bh = buf->height;
+    int bw = 0, bh = 0;
+    if (canvas_get_dims(obj, &bw, &bh) != 0) return -1;
 
     for (int sy = 0; sy < sprite_h; sy++) {
         int py = dst_y + sy;
@@ -439,7 +445,10 @@ static TuixPixel* tuix_canvas_build_content(TuixObject *obj, TuixBuffer* buffer)
     return pixels;
 }
 
-static TuixHandlerResponse tuix_canvas_handler(TuixObject *obj) {
+static TuixHandlerResponse tuix_canvas_handler(TuixObject *obj, bool has_event, bool is_focused, TuixInputSnapshot* snap) {
+    (void)has_event;
+    (void)is_focused;
+    (void)snap;
     if (!obj || !obj->state)
         return (TuixHandlerResponse){.requires_redraw = 0};
     TuixCanvasState *s = (TuixCanvasState*)obj->state;
@@ -460,7 +469,7 @@ const TuixBuilder tuix_canvas_builder = {
     .namespace = "tuix",
     .create_state = tuix_canvas_create_state,
     .destroy_state = tuix_canvas_destroy_state,
-    .handler_func = tuix_canvas_handler,
+    .on_event = tuix_canvas_handler,
     .on_resize    = tuix_canvas_on_resize,
     .build_content = tuix_canvas_build_content
 };

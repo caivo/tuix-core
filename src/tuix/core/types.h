@@ -2,6 +2,7 @@
 #define TUIX_types_H
 
 #include <stddef.h>
+#include <stdbool.h>
 
 typedef struct TuixRGBTuple {
     unsigned char r;
@@ -31,6 +32,9 @@ typedef struct TuixPixel {
 
 struct TuixBuffer;
 typedef struct TuixBuilder TuixBuilder;
+typedef struct TuixInputSnapshot TuixInputSnapshot;
+typedef struct TuixMouseKey TuixMouseKey;
+typedef struct TuixKeyboardKey TuixKeyboardKey;
 
 typedef struct TuixHandlerResponse {
     int requires_redraw;
@@ -54,6 +58,8 @@ typedef struct TuixBuffer {
     int required_redraw;
     int margin_left;
     int margin_top;
+    int parent_uid;
+    int z_index;
 } TuixBuffer;
 
 typedef struct TuixFinalBuffer {
@@ -65,13 +71,75 @@ typedef struct TuixFinalBuffer {
 
 typedef void (*TuixRowDoneCallback)(TuixFinalBuffer *buffer, int y, void *user_data);
 
+// Input - mouse event types
+#define TUIX_MOUSE_NONE         0
+#define TUIX_MOUSE_PRESS        1
+#define TUIX_MOUSE_RELEASE      2
+#define TUIX_MOUSE_HOVER        3   /* move, no button held         */
+#define TUIX_MOUSE_DRAG         4   /* move with button(s) held     */
+#define TUIX_MOUSE_SCROLL_UP    5
+#define TUIX_MOUSE_SCROLL_DOWN  6
+#define TUIX_MOUSE_DOUBLE_CLICK 7
+#define TUIX_MOUSE_HSCROLL_LEFT  8  /* horizontal scroll            */
+#define TUIX_MOUSE_HSCROLL_RIGHT 9
+
+// Mouse button identifiers
+#define TUIX_BTN_LEFT   0
+#define TUIX_BTN_MIDDLE 1
+#define TUIX_BTN_RIGHT  2
+#define TUIX_BTN_X1     3
+#define TUIX_BTN_X2     4
+
+struct TuixMouseKey {
+    int event;         /* TUIX_MOUSE_* constant                     */
+    int btn;           /* TUIX_BTN_* - which button (for press/release/drag/dblclick) */
+    int buttons_held;  /* bitmask: bit 0=left, 1=middle, 2=right, 3=x1, 4=x2 */
+    int col;           /* 1-based column                            */
+    int row;           /* 1-based row                               */
+    double timestamp;
+    int has_event;
+};
+
+struct TuixKeyboardKey {
+    int btn;
+    int code;
+    int scancode;
+    int modifiers;
+    int pressed;
+    int repeat;
+    double timestamp;
+    int has_event;
+    char text[8];
+};
+
+struct TuixInputSnapshot {
+    int term_x;
+    int term_y;
+    TuixMouseKey *mouse;
+    TuixKeyboardKey *keyboard;
+    bool consumed_keyboard;
+    bool consumed_mouse;
+};
+
 typedef struct TuixScene {
     TuixBuffer** buffers;
     int count;
     int active;
     int capacity;
     int current_focus;
+    unsigned long long last_active_frame;
+    unsigned long long last_compacted_frame;
 } TuixScene;
+
+typedef struct TuixSceneStats {
+    int buffer_count;
+    int active;
+    int current_focus;
+    unsigned long long last_active_frame;
+    unsigned long long last_compacted_frame;
+    size_t pixel_bytes;
+    size_t approx_heap_bytes;
+} TuixSceneStats;
 
 typedef struct TuixScenes {
     TuixScene** scenes;
@@ -82,7 +150,7 @@ typedef struct TuixScenes {
 
 typedef struct TuixSubcycle {
     TuixObject* obj;
-    TuixHandlerResponse (*handler)(struct TuixObject* obj);
+    TuixHandlerResponse (*on_event)(struct TuixObject* obj, bool has_event, bool is_focused, TuixInputSnapshot* snap);
     int enabled;
 } TuixSubcycle;
 
@@ -111,7 +179,7 @@ struct TuixBuilder {
     const char* namespace;
     create_state_fn create_state;
     destroy_state_fn destroy_state;
-    TuixHandlerResponse (*handler_func)(struct TuixObject* obj);
+    TuixHandlerResponse (*on_event)(struct TuixObject* obj, bool has_event, bool is_focused, TuixInputSnapshot* snap);
     /* Optional callback invoked when buffer geometry changes due to terminal resize.
        Called after `tuix_resolve_geometry` and before `build_content`. */
     resize_fn on_resize;
@@ -129,59 +197,12 @@ typedef struct TuixRegistry {
     TuixSubcycles subcycles;
     TuixBuilders builders;
     char* current_scene_name;
+    unsigned long long frame_counter;
     int next_uid;
     int terminal_width;
     int terminal_height;
     int terminal_height_old;
     int terminal_width_old;
 } TuixRegistry;
-
-// Input - mouse event types
-#define TUIX_MOUSE_NONE         0
-#define TUIX_MOUSE_PRESS        1
-#define TUIX_MOUSE_RELEASE      2
-#define TUIX_MOUSE_HOVER        3   /* move, no button held         */
-#define TUIX_MOUSE_DRAG         4   /* move with button(s) held     */
-#define TUIX_MOUSE_SCROLL_UP    5
-#define TUIX_MOUSE_SCROLL_DOWN  6
-#define TUIX_MOUSE_DOUBLE_CLICK 7
-#define TUIX_MOUSE_HSCROLL_LEFT  8  /* horizontal scroll            */
-#define TUIX_MOUSE_HSCROLL_RIGHT 9
-
-// Mouse button identifiers
-#define TUIX_BTN_LEFT   0
-#define TUIX_BTN_MIDDLE 1
-#define TUIX_BTN_RIGHT  2
-#define TUIX_BTN_X1     3
-#define TUIX_BTN_X2     4
-
-typedef struct {
-    int event;         /* TUIX_MOUSE_* constant                     */
-    int btn;           /* TUIX_BTN_* - which button (for press/release/drag/dblclick) */
-    int buttons_held;  /* bitmask: bit 0=left, 1=middle, 2=right, 3=x1, 4=x2 */
-    int col;           /* 1-based column                            */
-    int row;           /* 1-based row                               */
-    double timestamp;
-    int has_event;
-} TuixMouseKey;
-
-typedef struct {
-    int btn;
-    int code;
-    int scancode;
-    int modifiers;
-    int pressed;
-    int repeat;
-    double timestamp;
-    int has_event;
-    char text[8];
-} TuixKeyboardKey;
-
-typedef struct {
-    int term_x;
-    int term_y;
-    TuixMouseKey *mouse;
-    TuixKeyboardKey *keyboard;
-} TuixInputSnapshot;
 
 #endif

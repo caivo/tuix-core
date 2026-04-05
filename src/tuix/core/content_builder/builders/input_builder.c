@@ -28,6 +28,8 @@ typedef struct {
     int    inserted_buffer_size;
 } TuixInputState;
 
+static int input_ensure_cap(TuixInputState *s, int extra);
+
 
 
 static void* input_create_state(void* params) {
@@ -165,10 +167,62 @@ static TuixPixel* input_build_content(TuixObject *obj, TuixBuffer *buffer) {
 }
 
 
-static TuixHandlerResponse input_handler(TuixObject *obj) {
+static TuixHandlerResponse input_handler(TuixObject *obj, bool has_event, bool is_focused, TuixInputSnapshot* snap) {
     if (!obj || !obj->state)
         return (TuixHandlerResponse){.requires_redraw = 0};
+
     TuixInputState *s = (TuixInputState*)obj->state;
+
+    if (is_focused && has_event && snap && !snap->consumed_keyboard && snap->keyboard && snap->keyboard->has_event && !s->submitted) {
+        int code = snap->keyboard->code;
+
+        if (code == TUIX_VK_LEFT) {
+            if (s->cursor > 0) { s->cursor--; s->needs_redraw = 1; }
+        } else if (code == TUIX_VK_RIGHT) {
+            if (s->cursor < s->text_len) { s->cursor++; s->needs_redraw = 1; }
+        } else if (code == TUIX_VK_HOME) {
+            s->cursor = 0; s->needs_redraw = 1;
+        } else if (code == TUIX_VK_END) {
+            s->cursor = s->text_len; s->needs_redraw = 1;
+        } else if (code == TUIX_VK_BACK || code == 127) {
+            if (s->cursor > 0) {
+                memmove(s->text + s->cursor - 1, s->text + s->cursor,
+                        (size_t)(s->text_len - s->cursor));
+                s->text_len--;
+                s->cursor--;
+                s->text[s->text_len] = '\0';
+                s->needs_redraw = 1;
+            }
+        } else if (code == TUIX_VK_DELETE) {
+            if (s->cursor < s->text_len) {
+                memmove(s->text + s->cursor, s->text + s->cursor + 1,
+                        (size_t)(s->text_len - s->cursor - 1));
+                s->text_len--;
+                s->text[s->text_len] = '\0';
+                s->needs_redraw = 1;
+            }
+        } else if (code == TUIX_VK_ENTER || code == '\n') {
+            s->submitted = 1;
+            s->needs_redraw = 1;
+        } else if (code >= 32 && code < 127) {
+            if (input_ensure_cap(s, 1) == 0) {
+                memmove(s->text + s->cursor + 1, s->text + s->cursor,
+                        (size_t)(s->text_len - s->cursor));
+                s->text[s->cursor] = (char)code;
+                s->text_len++;
+                s->cursor++;
+                s->text[s->text_len] = '\0';
+                s->needs_redraw = 1;
+            }
+        }
+
+        if (code == TUIX_VK_LEFT || code == TUIX_VK_RIGHT || code == TUIX_VK_HOME || code == TUIX_VK_END ||
+            code == TUIX_VK_BACK || code == 127 || code == TUIX_VK_DELETE || code == TUIX_VK_ENTER ||
+            code == '\n' || (code >= 32 && code < 127)) {
+            snap->consumed_keyboard = true;
+        }
+    }
+
     if (s->needs_redraw) {
         s->needs_redraw = 0;
         return (TuixHandlerResponse){.requires_redraw = 1};
@@ -187,7 +241,7 @@ const TuixBuilder tuix_input_builder = {
     .namespace  = "tuix",
     .create_state  = input_create_state,
     .destroy_state = input_destroy_state,
-    .handler_func  = input_handler,
+    .on_event  = input_handler,
     .on_resize     = input_on_resize,
     .build_content = input_build_content
 };
@@ -214,76 +268,6 @@ int tuix_input_set_placeholder(TuixObject *obj, const char *text) {
     free(s->placeholder);
     s->placeholder = text ? strdup(text) : NULL;
     s->needs_redraw = 1;
-    return 0;
-}
-
-int tuix_input_feed_input(TuixObject *obj, TuixInputSnapshot snap) {
-    if (!obj || !obj->state) return -1;
-    TuixInputState *s = (TuixInputState*)obj->state;
-    if (s->submitted) return 0;
-    if (!snap.keyboard || !snap.keyboard->has_event) return 0;
-
-    int code = snap.keyboard->code;
-
-    /* Navigation */
-    if (code == TUIX_VK_LEFT) {
-        if (s->cursor > 0) { s->cursor--; s->needs_redraw = 1; }
-        return 0;
-    }
-    if (code == TUIX_VK_RIGHT) {
-        if (s->cursor < s->text_len) { s->cursor++; s->needs_redraw = 1; }
-        return 0;
-    }
-    if (code == TUIX_VK_HOME) {
-        s->cursor = 0; s->needs_redraw = 1;
-        return 0;
-    }
-    if (code == TUIX_VK_END) {
-        s->cursor = s->text_len; s->needs_redraw = 1;
-        return 0;
-    }
-
-    /* Deletion */
-    if (code == TUIX_VK_BACK || code == 127) {  /* Backspace */
-        if (s->cursor > 0) {
-            memmove(s->text + s->cursor - 1, s->text + s->cursor,
-                    (size_t)(s->text_len - s->cursor));
-            s->text_len--;
-            s->cursor--;
-            s->text[s->text_len] = '\0';
-            s->needs_redraw = 1;
-        }
-        return 0;
-    }
-    if (code == TUIX_VK_DELETE) {
-        if (s->cursor < s->text_len) {
-            memmove(s->text + s->cursor, s->text + s->cursor + 1,
-                    (size_t)(s->text_len - s->cursor - 1));
-            s->text_len--;
-            s->text[s->text_len] = '\0';
-            s->needs_redraw = 1;
-        }
-        return 0;
-    }
-
-    /* Submit */
-    if (code == TUIX_VK_ENTER || code == '\n') {
-        s->submitted = 1;
-        s->needs_redraw = 1;
-        return 0;
-    }
-
-    /* Printable character insertion */
-    if (code >= 32 && code < 127) {
-        if (input_ensure_cap(s, 1)) return -1;
-        memmove(s->text + s->cursor + 1, s->text + s->cursor,
-                (size_t)(s->text_len - s->cursor));
-        s->text[s->cursor] = (char)code;
-        s->text_len++;
-        s->cursor++;
-        s->text[s->text_len] = '\0';
-        s->needs_redraw = 1;
-    }
     return 0;
 }
 

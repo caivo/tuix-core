@@ -1,4 +1,5 @@
 from . import _lib
+from . import _structs
 import ctypes
 
 
@@ -23,6 +24,21 @@ def _obj_addr(obj_ptr):
         return ctypes.addressof(obj_ptr)  # ctypes struct instance
     except Exception:
         return int(obj_ptr)
+
+
+def get_object_by_uid(uid: int):
+    """Return a ctypes TuixObject for a UID, or None if not found."""
+    try:
+        from . import _tuix_cy
+        obj_addr = _tuix_cy._tuix_get_object_addr_by_uid(uid)
+    except (ImportError, AttributeError):
+        return None
+
+    if not obj_addr:
+        return None
+
+    obj_ptr = ctypes.cast(ctypes.c_void_p(obj_addr), ctypes.POINTER(_structs.TuixObject))
+    return obj_ptr.contents
 
 
 # ── Progressbar builder ───────────────────────────────────────────
@@ -113,3 +129,15 @@ def tuix_canvas_free_cached_sprite(obj_ptr, sprite_id):
 
 def tuix_canvas_draw_cached_sprite(obj_ptr, sprite_id, dst_x, dst_y):
     return _lib._mod.tuix_canvas_draw_cached_sprite(_obj_addr(obj_ptr), sprite_id, dst_x, dst_y)
+
+
+def get_object_snapshot_by_uid(uid: int) -> dict:
+    """Get a snapshot (read-only copy) of an object by UID."""
+    try:
+        # Try Cython wrapper first
+        from . import _tuix_cy
+        return _tuix_cy.tuix_get_object_snapshot_by_uid(uid)
+    except (ImportError, AttributeError):
+        # Fallback to ctypes - not easily doable for struct returns, return None
+        return None
+

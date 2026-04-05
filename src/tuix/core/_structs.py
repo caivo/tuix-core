@@ -46,6 +46,8 @@ class TuixBuffer(ctypes.Structure):
         ('required_redraw', ctypes.c_int),
         ('margin_left', ctypes.c_int),
         ('margin_top', ctypes.c_int),
+        ('parent_uid', ctypes.c_int),
+        ('z_index', ctypes.c_int),
     ]
 
 class TuixFinalBuffer(ctypes.Structure):
@@ -62,6 +64,30 @@ class TuixInputSnapshot(ctypes.Structure):
         ('term_y', ctypes.c_int),
         ('mouse', ctypes.c_void_p),
         ('keyboard', ctypes.c_void_p),
+    ]
+
+
+class TuixScene(ctypes.Structure):
+    _fields_ = [
+        ('buffers', ctypes.c_void_p),
+        ('count', ctypes.c_int),
+        ('active', ctypes.c_int),
+        ('capacity', ctypes.c_int),
+        ('current_focus', ctypes.c_int),
+        ('last_active_frame', ctypes.c_ulonglong),
+        ('last_compacted_frame', ctypes.c_ulonglong),
+    ]
+
+
+class TuixSceneStats(ctypes.Structure):
+    _fields_ = [
+        ('buffer_count', ctypes.c_int),
+        ('active', ctypes.c_int),
+        ('current_focus', ctypes.c_int),
+        ('last_active_frame', ctypes.c_ulonglong),
+        ('last_compacted_frame', ctypes.c_ulonglong),
+        ('pixel_bytes', ctypes.c_size_t),
+        ('approx_heap_bytes', ctypes.c_size_t),
     ]
 
 

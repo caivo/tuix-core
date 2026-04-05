@@ -10,6 +10,111 @@
 static TuixFinalBuffer s_final = { NULL, 0, 0, 0 };
 static TuixPixel *s_blank_row  = NULL;
 static int        s_blank_w    = 0;
+static int       *s_draw_order = NULL;
+static unsigned char *s_draw_visited = NULL;
+static int        s_draw_cap   = 0;
+
+static int ensure_draw_capacity(int n) {
+    if (n <= s_draw_cap) return 1;
+    int *new_order = realloc(s_draw_order, sizeof(int) * (size_t)n);
+    if (!new_order) return 0;
+    unsigned char *new_visited = realloc(s_draw_visited, sizeof(unsigned char) * (size_t)n);
+    if (!new_visited) return 0;
+    s_draw_order = new_order;
+    s_draw_visited = new_visited;
+    s_draw_cap = n;
+    return 1;
+}
+
+static int find_index_by_uid(TuixScene *scene, int uid) {
+    for (int i = 0; i < scene->count; i++) {
+        TuixBuffer *b = scene->buffers[i];
+        if (b && b->obj && b->obj->uid == uid) return i;
+    }
+    return -1;
+}
+
+static int is_root_buffer(TuixScene *scene, int idx) {
+    TuixBuffer *b = scene->buffers[idx];
+    if (!b || !b->obj) return 1;
+    if (b->parent_uid < 0) return 1;
+    if (b->parent_uid == b->obj->uid) return 1;
+    return find_index_by_uid(scene, b->parent_uid) < 0;
+}
+
+static void append_subtree(TuixScene *scene, int idx, int *out_count) {
+    if (idx < 0 || idx >= scene->count) return;
+    if (s_draw_visited[idx]) return;
+    TuixBuffer *node = scene->buffers[idx];
+    if (!node || !node->obj) {
+        s_draw_visited[idx] = 1;
+        return;
+    }
+
+    s_draw_visited[idx] = 1;
+    s_draw_order[(*out_count)++] = idx;
+    int uid = node->obj->uid;
+
+    for (int j = 0; j < scene->count; j++) {
+        TuixBuffer *child = scene->buffers[j];
+        if (!child || !child->obj) continue;
+        if (child->parent_uid == uid) {
+            append_subtree(scene, j, out_count);
+        }
+    }
+}
+
+static int build_traversal_order(TuixScene *scene) {
+    if (!scene || scene->count <= 0) return 0;
+    if (!ensure_draw_capacity(scene->count)) return -1;
+
+    memset(s_draw_visited, 0, sizeof(unsigned char) * (size_t)scene->count);
+    int out_count = 0;
+
+    int root_count = 0;
+    for (int i = 0; i < scene->count; i++) {
+        if (is_root_buffer(scene, i)) {
+            s_draw_order[root_count++] = i;
+        }
+    }
+
+    /* Stable insertion sort: low z first (back), high z last (front). */
+    for (int i = 1; i < root_count; i++) {
+        int key_idx = s_draw_order[i];
+        int key_z = 0;
+        if (scene->buffers[key_idx]) {
+            key_z = scene->buffers[key_idx]->z_index;
+        }
+        int j = i - 1;
+        while (j >= 0) {
+            int cur_idx = s_draw_order[j];
+            int cur_z = 0;
+            if (scene->buffers[cur_idx]) {
+                cur_z = scene->buffers[cur_idx]->z_index;
+            }
+            if (cur_z > key_z) {
+                s_draw_order[j + 1] = s_draw_order[j];
+                j--;
+            } else {
+                break;
+            }
+        }
+        s_draw_order[j + 1] = key_idx;
+    }
+
+    for (int i = 0; i < root_count; i++) {
+        append_subtree(scene, s_draw_order[i], &out_count);
+    }
+
+    /* Fallback for cyclic or malformed parent chains: keep deterministic draw order. */
+    for (int i = 0; i < scene->count; i++) {
+        if (!s_draw_visited[i]) {
+            append_subtree(scene, i, &out_count);
+        }
+    }
+
+    return out_count;
+}
 
 static void rebuild_blank_row(int width) {
     if (s_blank_w == width && s_blank_row) return;
@@ -52,7 +157,11 @@ TuixFinalBuffer *tuix_composite_scene(TuixScene *scene) {
     for (int y = 0; y < H; y++)
         memcpy(&s_final.pixels[(size_t)y * W], s_blank_row, sizeof(TuixPixel) * (size_t)W);
 
-    for (int i = 0; i < scene->count; i++) {
+    int ordered_count = build_traversal_order(scene);
+    if (ordered_count < 0) return &s_final;
+
+    for (int oi = 0; oi < ordered_count; oi++) {
+        int i = s_draw_order[oi];
         TuixBuffer *buffer = scene->buffers[i];
         if (!buffer || !buffer->pixels) continue;
 

@@ -11,13 +11,6 @@ const TuixBuilder* tuix_input_init(void);
 /* Set placeholder text shown when the field is empty. */
 int tuix_input_set_placeholder(TuixObject *obj, const char *text);
 
-/* ── Input handling (feed + poll pattern) ─────────────────────── */
-
-/* Feed an input snapshot. Processes typing, Backspace, Delete,
- * Left/Right/Home/End navigation, and Enter to submit.
- * Call once per frame for the focused input object. */
-int tuix_input_feed_input(TuixObject *obj, TuixInputSnapshot snap);
-
 /* ── Result retrieval ─────────────────────────────────────────── */
 
 /* Current text content (never NULL - returns "" on error). */

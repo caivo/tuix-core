@@ -9,6 +9,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+static TuixBuffer* find_scene_buffer_unlocked(TuixScene *scene, int uid) {
+    if (!scene) {
+        return NULL;
+    }
+    for (int i = 0; i < scene->count; i++) {
+        TuixBuffer *b = scene->buffers[i];
+        if (b && b->obj && b->obj->uid == uid) {
+            return b;
+        }
+    }
+    return NULL;
+}
 
 TuixObject tuix_objects_new_object(char* builder_name, char* scene_name, float width_mod, float height_mod, float margin_top_mod, float margin_left_mod) {
     TuixBuilder *builder = tuix_get_builder_by_name(builder_name);
@@ -37,17 +49,41 @@ int tuix_create_object(char* builder_name, char* scene_name, float width_mod, fl
     }
 
     tuix_init_buffer(scene_name, obj);
-    TuixBuffer* buffer = tuix_get_buffer(scene_name, obj.uid);
+    tuix_lock();
+    TuixScene *scene = tuix_get_scene(scene_name);
+    TuixBuffer* buffer = find_scene_buffer_unlocked(scene, obj.uid);
     if (buffer == NULL) {
+        tuix_unlock();
         return -1;
     }
 
     /* Use the heap-allocated obj copy stored in the buffer, not the stack copy. */
-        if (tuix_subcycle_init(scene_name, buffer->obj) != 0) {
+    if (tuix_subcycle_init(scene_name, buffer->obj) != 0) {
+        tuix_unlock();
         tuix_free_buffer(scene_name, obj.uid);
         return -1;
     }
+    int created_uid = buffer->obj->uid;
+    tuix_unlock();
     tuix_scene_set_focus(scene_name, obj.uid);
 
-    return buffer->obj->uid;
+    return created_uid;
+}
+
+int tuix_get_object_snapshot_by_uid(int uid, TuixObject *out_obj) {
+    if (!out_obj) {
+        return -1;
+    }
+    tuix_lock();
+    for (int i = 0; i < tuix_registry.scenes.count; i++) {
+        TuixScene *scene = tuix_registry.scenes.scenes[i];
+        TuixBuffer *buffer = find_scene_buffer_unlocked(scene, uid);
+        if (buffer && buffer->obj) {
+            *out_obj = *buffer->obj;
+            tuix_unlock();
+            return 0;
+        }
+    }
+    tuix_unlock();
+    return -1;
 }

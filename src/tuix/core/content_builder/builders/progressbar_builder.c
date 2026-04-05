@@ -150,7 +150,10 @@ static TuixPixel* progressbar_build_content(TuixObject *obj, TuixBuffer *buffer)
 }
 
 
-static TuixHandlerResponse progressbar_handler(TuixObject *obj) {
+static TuixHandlerResponse progressbar_handler(TuixObject *obj, bool has_event, bool is_focused, TuixInputSnapshot* snap) {
+    (void)has_event;
+    (void)is_focused;
+    (void)snap;
     if (!obj || !obj->state)
         return (TuixHandlerResponse){.requires_redraw = 0};
     TuixProgressBarState *s = (TuixProgressBarState*)obj->state;
@@ -172,7 +175,7 @@ const TuixBuilder tuix_progressbar_builder = {
     .namespace  = "tuix",
     .create_state  = progressbar_create_state,
     .destroy_state = progressbar_destroy_state,
-    .handler_func  = progressbar_handler,
+    .on_event  = progressbar_handler,
     .on_resize     = progressbar_on_resize,
     .build_content = progressbar_build_content
 };

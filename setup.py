@@ -35,7 +35,6 @@ sources = [
     "src/tuix/core/content_builder/builders/progressbar_builder.c",
     "src/tuix/core/input/input.c",
     "src/tuix/core/subcycles/subcycle_registrant.c",
-    "src/tuix/core/subcycles/subcycles_manager.c",
     "src/tuix/core/batch_executor.c",
 ]
 

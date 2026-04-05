@@ -73,6 +73,8 @@ cdef extern from "types.h":
         int required_redraw
         int margin_left
         int margin_top
+        int parent_uid
+        int z_index
 
     ctypedef struct TuixFinalBuffer:
         TuixPixel* pixels
@@ -112,6 +114,17 @@ cdef extern from "types.h":
         int active
         int capacity
         int current_focus
+        unsigned long long last_active_frame
+        unsigned long long last_compacted_frame
+
+    ctypedef struct TuixSceneStats:
+        int buffer_count
+        int active
+        int current_focus
+        unsigned long long last_active_frame
+        unsigned long long last_compacted_frame
+        size_t pixel_bytes
+        size_t approx_heap_bytes
 
     ctypedef struct TuixScenes:
         TuixScene** scenes
@@ -137,7 +150,7 @@ cdef extern from "types.h":
 
     ctypedef struct TuixSubcycle:
         TuixObject* obj
-        TuixHandlerResponse (*handler)(TuixObject* obj) nogil
+        TuixHandlerResponse (*on_event)(TuixObject* obj, bint has_event, bint is_focused, TuixInputSnapshot* snap) nogil
         int enabled
 
     ctypedef struct TuixSceneSubcycles:
@@ -193,13 +206,20 @@ cdef extern from "buffers.h":
     int c_tuix_select_scene "tuix_select_scene"(char* name) nogil
     int c_tuix_scene_set_focus "tuix_scene_set_focus"(const char* scene_name, int uid) nogil
     int c_tuix_scene_set_previous_focus "tuix_scene_set_previous_focus"(const char* scene_name) nogil
+    int c_tuix_scene_get_stats "tuix_scene_get_stats"(const char* scene_name, TuixSceneStats* out_stats) nogil
+    size_t c_tuix_compact_scene_pixels "tuix_compact_scene_pixels"(const char* scene_name) nogil
+    int c_tuix_compact_cold_scenes "tuix_compact_cold_scenes"(unsigned long long cold_frames, size_t min_pixel_bytes, int keep_active_scene) nogil
 
 cdef extern from "buffer_manager.h":
     void c_tuix_init_buffer "tuix_init_buffer"(char* scene_name, TuixObject obj) nogil
-    TuixBuffer* c_tuix_get_buffer "tuix_get_buffer"(char* scene_name, int uid) nogil
-    TuixBuffer* c_tuix_get_buffer_by_uid "tuix_get_buffer_by_uid"(int uid) nogil
     void c_tuix_clear_buffer "tuix_clear_buffer"(char* scene_name, int uid) nogil
     void c_tuix_free_buffer "tuix_free_buffer"(char* scene_name, int uid) nogil
+    int c_tuix_set_buffer_parent "tuix_set_buffer_parent"(char* scene_name, int uid, int parent_uid) nogil
+    int c_tuix_get_buffer_z_index "tuix_get_buffer_z_index"(char* scene_name, int uid) nogil
+    int c_tuix_set_buffer_z_index "tuix_set_buffer_z_index"(char* scene_name, int uid, int z_index) nogil
+    int c_tuix_get_buffer_snapshot "tuix_get_buffer_snapshot"(char* scene_name, int uid, TuixBuffer* out_buffer) nogil
+    int c_tuix_get_buffer_snapshot_by_uid "tuix_get_buffer_snapshot_by_uid"(int uid, TuixBuffer* out_buffer) nogil
+    TuixObject* c_tuix_get_object_by_uid "_tuix_get_object_by_uid"(int uid) nogil
 
 # ═══════════════════════════════════════════════════════════════════
 #  Object management
@@ -207,6 +227,7 @@ cdef extern from "buffer_manager.h":
 cdef extern from "object_manager.h":
     TuixObject c_tuix_objects_new_object "tuix_objects_new_object"(char* builder_name, char* scene_name, float width_mod, float height_mod, float margin_top_mod, float margin_left_mod) nogil
     int c_tuix_create_object "tuix_create_object"(char* builder_name, char* scene_name, float width_mod, float height_mod, float margin_top_mod, float margin_left_mod) nogil
+    int c_tuix_get_object_snapshot_by_uid "tuix_get_object_snapshot_by_uid"(int uid, TuixObject* out_obj) nogil
 
 # ═══════════════════════════════════════════════════════════════════
 #  Subcycles
@@ -257,7 +278,6 @@ cdef extern from "content_builder/builders/canvas_builder.h":
 # ═══════════════════════════════════════════════════════════════════
 cdef extern from "content_builder/builders/choice_builder.h":
     int c_tuix_choice_set_options "tuix_choice_set_options"(TuixObject* obj, const char** labels, int count) nogil
-    int c_tuix_choice_feed_input "tuix_choice_feed_input"(TuixObject* obj, TuixInputSnapshot snap) nogil
     int c_tuix_choice_get_selected "tuix_choice_get_selected"(TuixObject* obj) nogil
     int c_tuix_choice_is_confirmed "tuix_choice_is_confirmed"(TuixObject* obj) nogil
     int c_tuix_choice_get_result "tuix_choice_get_result"(TuixObject* obj) nogil
@@ -268,7 +288,6 @@ cdef extern from "content_builder/builders/choice_builder.h":
 # ═══════════════════════════════════════════════════════════════════
 cdef extern from "content_builder/builders/input_builder.h":
     int c_tuix_input_set_placeholder "tuix_input_set_placeholder"(TuixObject* obj, const char* text) nogil
-    int c_tuix_input_feed_input "tuix_input_feed_input"(TuixObject* obj, TuixInputSnapshot snap) nogil
     const char* c_tuix_input_get_text "tuix_input_get_text"(TuixObject* obj) nogil
     int c_tuix_input_is_submitted "tuix_input_is_submitted"(TuixObject* obj) nogil
     const char* c_tuix_input_get_result "tuix_input_get_result"(TuixObject* obj) nogil
@@ -514,18 +533,12 @@ cpdef void tuix_init_buffer(bytes scene_name, uintptr_t obj_addr):
         c_tuix_init_buffer(sn, obj)
 
 cpdef uintptr_t tuix_get_buffer_by_uid(int uid):
-    """Return raw pointer to TuixBuffer (as uintptr_t) for the given UID."""
-    cdef TuixBuffer* buf
-    with nogil:
-        buf = c_tuix_get_buffer_by_uid(uid)
-    return <uintptr_t>buf
+    """DEPRECATED: Use tuix_get_buffer_snapshot_by_uid() instead (v0.3 moved to snapshot-based API)."""
+    return 0
 
 cpdef uintptr_t tuix_get_buffer(bytes scene_name, int uid):
-    cdef char* sn = scene_name
-    cdef TuixBuffer* buf
-    with nogil:
-        buf = c_tuix_get_buffer(sn, uid)
-    return <uintptr_t>buf
+    """DEPRECATED: Use tuix_get_buffer_snapshot() instead (v0.3 moved to snapshot-based API)."""
+    return 0
 
 cpdef void tuix_free_buffer(bytes scene_name, int uid):
     cdef char* sn = scene_name
@@ -552,6 +565,128 @@ cpdef uintptr_t buffer_obj(uintptr_t buf_ptr):
     if buf_ptr == 0:
         return 0
     return <uintptr_t>((<TuixBuffer*>buf_ptr).obj)
+
+cpdef int tuix_set_buffer_parent(bytes scene_name, int uid, int parent_uid):
+    """Set the parent buffer for a given buffer (for hierarchy)."""
+    cdef char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_set_buffer_parent(sn, uid, parent_uid)
+    return r
+
+cpdef int tuix_get_buffer_z_index(bytes scene_name, int uid):
+    """Get the z-index of a buffer."""
+    cdef char* sn = scene_name
+    cdef int z
+    with nogil:
+        z = c_tuix_get_buffer_z_index(sn, uid)
+    return z
+
+cpdef int tuix_set_buffer_z_index(bytes scene_name, int uid, int z_index):
+    """Set the z-index of a buffer."""
+    cdef char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_set_buffer_z_index(sn, uid, z_index)
+    return r
+
+cpdef dict tuix_get_buffer_snapshot(bytes scene_name, int uid):
+    """Get a snapshot (read-only copy) of a buffer."""
+    cdef char* sn = scene_name
+    cdef TuixBuffer buf_copy
+    cdef int r
+    with nogil:
+        r = c_tuix_get_buffer_snapshot(sn, uid, &buf_copy)
+    if r != 0:
+        return None
+    return {
+        'uid': buf_copy.obj.uid if buf_copy.obj else -1,
+        'width': buf_copy.width,
+        'height': buf_copy.height,
+        'required_redraw': buf_copy.required_redraw,
+        'margin_left': buf_copy.margin_left,
+        'margin_top': buf_copy.margin_top,
+        'parent_uid': buf_copy.parent_uid,
+        'z_index': buf_copy.z_index,
+    }
+
+cpdef dict tuix_get_buffer_snapshot_by_uid(int uid):
+    """Get a snapshot (read-only copy) of a buffer by UID."""
+    cdef TuixBuffer buf_copy
+    cdef int r
+    with nogil:
+        r = c_tuix_get_buffer_snapshot_by_uid(uid, &buf_copy)
+    if r != 0:
+        return None
+    return {
+        'uid': buf_copy.obj.uid if buf_copy.obj else -1,
+        'width': buf_copy.width,
+        'height': buf_copy.height,
+        'required_redraw': buf_copy.required_redraw,
+        'margin_left': buf_copy.margin_left,
+        'margin_top': buf_copy.margin_top,
+        'parent_uid': buf_copy.parent_uid,
+        'z_index': buf_copy.z_index,
+    }
+
+cpdef dict tuix_get_object_snapshot_by_uid(int uid):
+    """Get a snapshot (read-only copy) of an object by UID."""
+    cdef TuixObject obj_copy
+    cdef int r
+    with nogil:
+        r = c_tuix_get_object_snapshot_by_uid(uid, &obj_copy)
+    if r != 0:
+        return None
+    return {
+        'uid': obj_copy.uid,
+        'width_mod': obj_copy.width_mod,
+        'height_mod': obj_copy.height_mod,
+        'margin_top_mod': obj_copy.margin_top_mod,
+        'margin_left_mod': obj_copy.margin_left_mod,
+    }
+
+cpdef uintptr_t _tuix_get_object_addr_by_uid(int uid):
+    """Test-only: Get the memory address of an object by UID. For testing object methods."""
+    cdef TuixObject* obj_ptr
+    with nogil:
+        obj_ptr = c_tuix_get_object_by_uid(uid)
+    if obj_ptr == NULL:
+        return 0
+    return <uintptr_t>obj_ptr
+
+cpdef dict tuix_scene_get_stats(bytes scene_name):
+    """Get statistics for a scene (buffer count, memory usage, activity)."""
+    cdef char* sn = scene_name
+    cdef TuixSceneStats stats
+    cdef int r
+    with nogil:
+        r = c_tuix_scene_get_stats(sn, &stats)
+    if r != 0:
+        return None
+    return {
+        'buffer_count': stats.buffer_count,
+        'active': stats.active,
+        'current_focus': stats.current_focus,
+        'last_active_frame': stats.last_active_frame,
+        'last_compacted_frame': stats.last_compacted_frame,
+        'pixel_bytes': stats.pixel_bytes,
+        'approx_heap_bytes': stats.approx_heap_bytes,
+    }
+
+cpdef size_t tuix_compact_scene_pixels(bytes scene_name):
+    """Compact (defragment) pixels in a scene. Returns bytes freed."""
+    cdef char* sn = scene_name
+    cdef size_t freed
+    with nogil:
+        freed = c_tuix_compact_scene_pixels(sn)
+    return freed
+
+cpdef int tuix_compact_cold_scenes(unsigned long long cold_frames, size_t min_pixel_bytes, int keep_active_scene):
+    """Compact cold (inactive) scenes. Returns number of scenes compacted."""
+    cdef int r
+    with nogil:
+        r = c_tuix_compact_cold_scenes(cold_frames, min_pixel_bytes, keep_active_scene)
+    return r
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -738,40 +873,8 @@ cpdef void tuix_choice_reset(uintptr_t obj_addr):
         c_tuix_choice_reset(p)
 
 cpdef int tuix_choice_feed_input(uintptr_t obj_addr, object snap):
-    cdef TuixObject* p = <TuixObject*>obj_addr
-    cdef TuixKeyboardKey kb_val
-    cdef TuixMouseKey ms_val
-    cdef TuixInputSnapshot c_snap
-    cdef int r
-    c_snap.term_x = snap.term_x
-    c_snap.term_y = snap.term_y
-    c_snap.keyboard = NULL
-    c_snap.mouse = NULL
-    kb = getattr(snap, '_keyboard', None)
-    if kb is not None:
-        kb_val.btn = kb.btn
-        kb_val.code = kb.code
-        kb_val.scancode = kb.scancode
-        kb_val.modifiers = kb.modifiers
-        kb_val.pressed = kb.pressed
-        kb_val.repeat = kb.repeat
-        kb_val.has_event = kb.has_event
-        kb_val.timestamp = 0.0
-        kb_val.text[0] = 0
-        c_snap.keyboard = &kb_val
-    ms = getattr(snap, '_mouse', None)
-    if ms is not None:
-        ms_val.event = ms.event
-        ms_val.btn = ms.btn
-        ms_val.buttons_held = ms.buttons_held
-        ms_val.col = ms.col
-        ms_val.row = ms.row
-        ms_val.has_event = ms.has_event
-        ms_val.timestamp = 0.0
-        c_snap.mouse = &ms_val
-    with nogil:
-        r = c_tuix_choice_feed_input(p, c_snap)
-    return r
+    """DEPRECATED: Input handling is now automatic in v0.3. This is a no-op."""
+    return 0
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -812,40 +915,8 @@ cpdef bytes tuix_input_get_result(uintptr_t obj_addr):
     return r
 
 cpdef int tuix_input_feed_input(uintptr_t obj_addr, object snap):
-    cdef TuixObject* p = <TuixObject*>obj_addr
-    cdef TuixKeyboardKey kb_val
-    cdef TuixMouseKey ms_val
-    cdef TuixInputSnapshot c_snap
-    cdef int r
-    c_snap.term_x = snap.term_x
-    c_snap.term_y = snap.term_y
-    c_snap.keyboard = NULL
-    c_snap.mouse = NULL
-    kb = getattr(snap, '_keyboard', None)
-    if kb is not None:
-        kb_val.btn = kb.btn
-        kb_val.code = kb.code
-        kb_val.scancode = kb.scancode
-        kb_val.modifiers = kb.modifiers
-        kb_val.pressed = kb.pressed
-        kb_val.repeat = kb.repeat
-        kb_val.has_event = kb.has_event
-        kb_val.timestamp = 0.0
-        kb_val.text[0] = 0
-        c_snap.keyboard = &kb_val
-    ms = getattr(snap, '_mouse', None)
-    if ms is not None:
-        ms_val.event = ms.event
-        ms_val.btn = ms.btn
-        ms_val.buttons_held = ms.buttons_held
-        ms_val.col = ms.col
-        ms_val.row = ms.row
-        ms_val.has_event = ms.has_event
-        ms_val.timestamp = 0.0
-        c_snap.mouse = &ms_val
-    with nogil:
-        r = c_tuix_input_feed_input(p, c_snap)
-    return r
+    """DEPRECATED: Input handling is now automatic in v0.3. This is a no-op."""
+    return 0
 
 cpdef void tuix_input_reset(uintptr_t obj_addr):
     cdef TuixObject* p = <TuixObject*>obj_addr
@@ -1626,24 +1697,30 @@ cpdef void pipeline_tick(bytes scene_name):
     cdef TuixFinalBuffer* fb
     cdef TuixPixel* new_px
     cdef int i, j
+    cdef TuixInputSnapshot snap
+    cdef bint has_keyboard_event, has_mouse_event, has_input_event, has_event, is_focused
 
     with nogil:
+        snap = c_get_input_snapshot()
+        has_keyboard_event = snap.keyboard != NULL and snap.keyboard[0].has_event != 0
+        has_mouse_event = snap.mouse != NULL and snap.mouse[0].has_event != 0
+        has_input_event = has_keyboard_event or has_mouse_event
+        has_event = has_input_event
+
         # 1. Subcycle handlers
+        scene = c_tuix_get_scene(sn)
         for i in range(tuix_registry.subcycles.count):
             ss = tuix_registry.subcycles.subcycles[i]
             if strcmp(ss.scene_name, sn) != 0:
                 continue
             for j in range(ss.count):
                 sc = ss.subcycles[j]
-                if sc.handler != NULL:
-                    ans = sc.handler(sc.obj)
-                    buf = c_tuix_get_buffer_by_uid(sc.obj.uid)
-                    if buf != NULL:
-                        buf.required_redraw = buf.required_redraw | ans.requires_redraw
+                if sc.on_event != NULL:
+                    is_focused = (scene != NULL and scene.current_focus == sc.obj.uid)
+                    ans = sc.on_event(sc.obj, has_event, is_focused, &snap)
             break
 
         # 2. Geometry + build_content
-        scene = c_tuix_get_scene(sn)
         if scene == NULL:
             return
         for i in range(scene.count):

@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
+static size_t scene_pixel_bytes(const TuixScene* scene);
+static size_t compact_scene_pixels_locked(TuixScene* scene);
+
 static void* safe_realloc(void* ptr, size_t size) {
     void* tmp = realloc(ptr, size);
     if (!tmp && size != 0) {
@@ -94,6 +97,8 @@ int tuix_init_scene(const char* name) {
         exit(1);
     }
     sc->current_focus = -1;
+    sc->last_active_frame = tuix_registry.frame_counter;
+    sc->last_compacted_frame = 0;
 
     TuixSceneSubcycles* scene_subcycles = calloc(1, sizeof(TuixSceneSubcycles));
     if (!scene_subcycles) {
@@ -238,6 +243,7 @@ int tuix_select_scene(const char* name) {
     for (int i = 0; i < tuix_registry.scenes.count; i++) {
         if (strcmp(tuix_registry.scenes.names[i], name) == 0) {
             tuix_registry.scenes.scenes[i]->active = 1;
+            tuix_registry.scenes.scenes[i]->last_active_frame = tuix_registry.frame_counter;
             tuix_registry.current_scene_name = tuix_registry.scenes.names[i];
             return 0;
         } else {
@@ -295,4 +301,117 @@ int tuix_scene_set_previous_focus(const char* scene_name) {
     scene->current_focus = scene->buffers[new_idx]->obj->uid;
     tuix_unlock();
     return 0;
+}
+
+int tuix_scene_get_stats(const char* scene_name, TuixSceneStats* out_stats) {
+    if (!scene_name || !out_stats) {
+        return -1;
+    }
+    tuix_lock();
+    int scene_idx = find_scene_index(scene_name);
+    if (scene_idx == -1) {
+        tuix_unlock();
+        return -1;
+    }
+    TuixScene* scene = tuix_registry.scenes.scenes[scene_idx];
+    memset(out_stats, 0, sizeof(*out_stats));
+    out_stats->buffer_count = scene->count;
+    out_stats->active = scene->active;
+    out_stats->current_focus = scene->current_focus;
+    out_stats->last_active_frame = scene->last_active_frame;
+    out_stats->last_compacted_frame = scene->last_compacted_frame;
+    out_stats->pixel_bytes = scene_pixel_bytes(scene);
+    out_stats->approx_heap_bytes = out_stats->pixel_bytes +
+                                   (size_t)scene->count * (sizeof(TuixBuffer) + sizeof(TuixObject));
+    tuix_unlock();
+    return 0;
+}
+
+size_t tuix_compact_scene_pixels(const char* scene_name) {
+    if (!scene_name) {
+        return 0;
+    }
+    tuix_lock();
+    int scene_idx = find_scene_index(scene_name);
+    if (scene_idx == -1) {
+        tuix_unlock();
+        return 0;
+    }
+    size_t freed = compact_scene_pixels_locked(tuix_registry.scenes.scenes[scene_idx]);
+    tuix_unlock();
+    return freed;
+}
+
+int tuix_compact_cold_scenes(unsigned long long cold_frames, size_t min_pixel_bytes, int keep_active_scene) {
+    int compacted = 0;
+    tuix_lock();
+    for (int i = 0; i < tuix_registry.scenes.count; i++) {
+        TuixScene* scene = tuix_registry.scenes.scenes[i];
+        const char* scene_name = tuix_registry.scenes.names[i];
+        if (!scene) {
+            continue;
+        }
+        if (keep_active_scene && tuix_registry.current_scene_name && scene_name &&
+            strcmp(scene_name, tuix_registry.current_scene_name) == 0) {
+            continue;
+        }
+
+        unsigned long long age = 0;
+        if (tuix_registry.frame_counter >= scene->last_active_frame) {
+            age = tuix_registry.frame_counter - scene->last_active_frame;
+        }
+        if (age < cold_frames) {
+            continue;
+        }
+
+        size_t px_bytes = scene_pixel_bytes(scene);
+        if (px_bytes < min_pixel_bytes) {
+            continue;
+        }
+
+        if (compact_scene_pixels_locked(scene) > 0) {
+            compacted++;
+        }
+    }
+    tuix_unlock();
+    return compacted;
+}
+
+static size_t scene_pixel_bytes(const TuixScene* scene) {
+    size_t bytes = 0;
+    if (!scene) {
+        return 0;
+    }
+    for (int i = 0; i < scene->count; i++) {
+        TuixBuffer* buf = scene->buffers[i];
+        if (!buf || !buf->pixels) {
+            continue;
+        }
+        if (buf->width <= 0 || buf->height <= 0) {
+            continue;
+        }
+        bytes += (size_t)buf->width * (size_t)buf->height * sizeof(TuixPixel);
+    }
+    return bytes;
+}
+
+static size_t compact_scene_pixels_locked(TuixScene* scene) {
+    size_t freed = 0;
+    if (!scene) {
+        return 0;
+    }
+    for (int i = 0; i < scene->count; i++) {
+        TuixBuffer* buf = scene->buffers[i];
+        if (!buf || !buf->pixels) {
+            continue;
+        }
+        if (buf->width > 0 && buf->height > 0) {
+            freed += (size_t)buf->width * (size_t)buf->height * sizeof(TuixPixel);
+        }
+        free(buf->pixels);
+        buf->pixels = NULL;
+        buf->required_redraw = 1;
+    }
+    scene->last_compacted_frame = tuix_registry.frame_counter;
+    return freed;
 }

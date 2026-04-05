@@ -21,7 +21,7 @@ int tuix_subcycle_init(char* scene_name, TuixObject *obj) {
     if (!obj || !is_registered_builder_ptr(obj->builder)) {
         return -1;
     }
-    if (!obj->builder->create_state || !obj->builder->destroy_state || !obj->builder->handler_func || !obj->builder->build_content) {
+    if (!obj->builder->create_state || !obj->builder->destroy_state || !obj->builder->on_event || !obj->builder->build_content) {
         return -1;
     }
     if (obj->state != NULL) {
@@ -48,7 +48,7 @@ int tuix_subcycle_init(char* scene_name, TuixObject *obj) {
             memset(subcycle, 0, sizeof(TuixSubcycle));
 
             subcycle->obj = obj;
-            subcycle->handler = obj->builder->handler_func;
+            subcycle->on_event = obj->builder->on_event;
             subcycle->enabled = 1;
             scene_subcycles->subcycles[scene_subcycles->count - 1] = subcycle;
             subcycle->obj->state = subcycle->obj->builder->create_state(NULL);

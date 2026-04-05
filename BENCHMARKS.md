@@ -1,6 +1,6 @@
 # Benchmark Results
 
-> 2026-04-03T17:55:20.531Z | Node v22.19.0 | Windows_NT 10.0.26200 | win32 x64 | 12th Gen Intel(R) Core(TM) i5-12450HX (12 cores) | RAM 24352MB
+> 2026-04-05T22:19:42.505Z | Node v22.19.0 | Windows_NT 10.0.26200 | win32 x64 | 12th Gen Intel(R) Core(TM) i5-12450HX (12 cores) | RAM 24352MB
 > Libraries tested: blessed, terminal-kit, Ink, ReziTUI, Bubble Tea, Ratatui, OpenTUI.Core, OpenTUI.React, TUIX.Renderer, TUIX.Core, TUIX.Python, Rich, Urwid, PromptToolkit
 > Byte columns: "Bytes(local)" = bytes produced per frame (framework counter); "Bytes(pty)" = observed PTY bytes (cross-framework comparable).
 
@@ -8,476 +8,476 @@
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 176µs | 27.4% | 167µs–185µs | 5.7K ops/s | 17.61ms | 4.0MB | 4.0KB | 6.0MB | 61.7KB |
-| tuix-python | 1 | 177µs | 5.1% | 175µs–178µs | 5.7K ops/s | 17.71ms | 18.2MB | 4.0KB | 6.7MB | 68.3KB |
-| TUIX.Renderer | 1 | 195µs | 32.3% | 183µs–207µs | 5.1K ops/s | 19.51ms | 3.9MB | 4.0KB | 6.3MB | 64.4KB |
-| rezitui | 1 | 201µs | 180.2% | 130µs–272µs | 5.0K ops/s | 20.26ms | 78.4MB | 13.4MB | 133.7KB | 1.3KB |
-| ratatui | 1 | 258µs | 15.5% | 250µs–266µs | 3.9K ops/s | 28.36ms | 27.0KB | 0.00KB | 1.6MB | 16.0KB |
-| bubbletea | 1 | 333µs | 75.5% | 284µs–383µs | 3.0K ops/s | 33.40ms | 16.0MB | 5.5MB | 1.6MB | 16.0KB |
-| terminal-kit | 1 | 478µs | 10.8% | 468µs–489µs | 2.1K ops/s | 48.00ms | 43.4MB | 28.0KB | 190.0KB | 1.9KB |
-| opentui-react | 1 | 589µs | 63.7% | 516µs–663µs | 1.7K ops/s | 59.03ms | 35.9MB | 412.0KB | 7.4MB | 76.0KB |
-| opentui-core | 1 | 635µs | 46.5% | 577µs–693µs | 1.6K ops/s | 63.58ms | 33.3MB | 412.0KB | 6.7MB | 68.5KB |
-| prompt-toolkit | 1 | 1.02ms | 20.9% | 980µs–1.06ms | 979 ops/s | 102.17ms | 36.2MB | 24.0KB | 189.7KB | 1.9KB |
-| urwid | 1 | 1.42ms | 12.7% | 1.39ms–1.46ms | 703 ops/s | 142.38ms | 42.0MB | 24.0KB | 187.5KB | 1.9KB |
-| rich | 1 | 1.43ms | 15.5% | 1.38ms–1.47ms | 701 ops/s | 142.67ms | 31.5MB | 492.0KB | 189.7KB | 1.9KB |
-| ink | 1 | 3.74ms | 28.8% | 3.53ms–3.95ms | 268 ops/s | 373.88ms | 62.3MB | 2.7MB | 189.7KB | 1.9KB |
-| blessed | 1 | 31.80ms | 26.2% | 30.16ms–33.43ms | 31 ops/s | 3.18s | 149.5MB | 74.4MB | 229.2KB | 2.3KB |
+| ratatui | 1 | 195µs | 26.3% | 185µs–205µs | 5.1K ops/s | 21.49ms | 27.0KB | 0.00KB | 1.6MB | 16.0KB |
+| rezitui | 1 | 197µs | 164.8% | 133µs–261µs | 5.1K ops/s | 19.83ms | 81.7MB | 13.9MB | 133.7KB | 1.3KB |
+| tuix-python | 1 | 229µs | 39.9% | 211µs–247µs | 4.4K ops/s | 22.95ms | 18.4MB | 52.0KB | 6.7MB | 68.3KB |
+| TUIX.Core | 1 | 257µs | 22.3% | 246µs–269µs | 3.9K ops/s | 25.75ms | 4.0MB | 4.0KB | 6.0MB | 61.7KB |
+| TUIX.Renderer | 1 | 258µs | 37.8% | 239µs–277µs | 3.9K ops/s | 25.80ms | 3.9MB | 4.0KB | 6.3MB | 64.4KB |
+| bubbletea | 1 | 279µs | 50.7% | 251µs–307µs | 3.6K ops/s | 27.94ms | 11.7MB | 904.0KB | 1.6MB | 16.0KB |
+| opentui-react | 1 | 385µs | 47.2% | 350µs–421µs | 2.6K ops/s | 38.57ms | 35.8MB | 416.0KB | 7.4MB | 76.0KB |
+| terminal-kit | 1 | 527µs | 19.4% | 507µs–547µs | 1.9K ops/s | 52.88ms | 46.4MB | 0.00KB | 190.0KB | 1.9KB |
+| opentui-core | 1 | 755µs | 42.1% | 693µs–818µs | 1.3K ops/s | 75.62ms | 33.3MB | 412.0KB | 6.7MB | 68.5KB |
+| prompt-toolkit | 1 | 1.09ms | 29.6% | 1.03ms–1.15ms | 918 ops/s | 108.99ms | 36.1MB | 16.0KB | 189.7KB | 1.9KB |
+| rich | 1 | 1.42ms | 18.4% | 1.37ms–1.47ms | 706 ops/s | 141.75ms | 32.0MB | 620.0KB | 189.7KB | 1.9KB |
+| urwid | 1 | 1.69ms | 32.2% | 1.58ms–1.79ms | 593 ops/s | 168.58ms | 41.8MB | 24.0KB | 187.5KB | 1.9KB |
+| ink | 1 | 2.51ms | 28.8% | 2.37ms–2.65ms | 398 ops/s | 251.31ms | 65.0MB | 6.7MB | 189.7KB | 1.9KB |
+| blessed | 1 | 25.64ms | 16.4% | 24.81ms–26.46ms | 39 ops/s | 2.56s | 152.1MB | 74.5MB | 229.2KB | 2.3KB |
 
 ## tree-construction (items=10)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 35µs | 54.5% | 34µs–37µs | 28.3K ops/s | 17.68ms | 4.0MB | 0.00KB | 555.7KB | 1.1KB |
-| TUIX.Renderer | 1 | 47µs | 30.6% | 45µs–48µs | 21.5K ops/s | 23.30ms | 3.9MB | 0.00KB | 1.1MB | 2.3KB |
-| opentui-react | 1 | 58µs | 55.7% | 55µs–61µs | 17.3K ops/s | 29.88ms | 36.0MB | 44.0KB | 3.6MB | 7.5KB |
-| ratatui | 1 | 65µs | 32.6% | 64µs–67µs | 15.3K ops/s | 32.77ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
-| tuix-python | 1 | 77µs | 16.6% | 75µs–78µs | 13.1K ops/s | 38.52ms | 18.2MB | 16.0KB | 7.7MB | 15.7KB |
-| blessed | 1 | 101µs | 272.3% | 77µs–126µs | 9.9K ops/s | 50.96ms | 157.9MB | 6.4MB | 126.0KB | 258B |
-| rezitui | 1 | 115µs | 192.7% | 96µs–135µs | 8.7K ops/s | 57.88ms | 98.1MB | 18.7MB | 668.5KB | 1.3KB |
-| bubbletea | 1 | 220µs | 72.5% | 206µs–234µs | 4.5K ops/s | 110.08ms | 16.6MB | 296.0KB | 7.8MB | 16.0KB |
-| terminal-kit | 1 | 290µs | 21.0% | 285µs–296µs | 3.4K ops/s | 145.46ms | 43.7MB | 36.0KB | 950.2KB | 1.9KB |
-| opentui-core | 1 | 325µs | 56.0% | 309µs–341µs | 3.1K ops/s | 166.69ms | 33.3MB | 0.00KB | 33.4MB | 68.3KB |
-| ink | 1 | 707µs | 61.0% | 670µs–745µs | 1.4K ops/s | 354.41ms | 66.1MB | 2.7MB | 23.9KB | 49B |
-| prompt-toolkit | 1 | 921µs | 32.9% | 895µs–948µs | 1.1K ops/s | 460.93ms | 36.2MB | 32.0KB | 948.7KB | 1.9KB |
-| rich | 1 | 971µs | 34.1% | 942µs–1.00ms | 1.0K ops/s | 486.08ms | 31.5MB | 24.0KB | 948.7KB | 1.9KB |
-| urwid | 1 | 1.61ms | 34.7% | 1.56ms–1.66ms | 622 ops/s | 803.96ms | 42.1MB | 76.0KB | 937.5KB | 1.9KB |
+| TUIX.Core | 1 | 54µs | 16.0% | 53µs–54µs | 18.7K ops/s | 26.82ms | 4.0MB | 0.00KB | 555.7KB | 1.1KB |
+| opentui-react | 1 | 55µs | 31.3% | 54µs–57µs | 18.0K ops/s | 28.45ms | 35.9MB | 92.0KB | 3.6MB | 7.5KB |
+| TUIX.Renderer | 1 | 66µs | 20.2% | 65µs–67µs | 15.1K ops/s | 33.14ms | 3.9MB | 0.00KB | 1.1MB | 2.3KB |
+| blessed | 1 | 92µs | 275.4% | 70µs–114µs | 10.9K ops/s | 46.29ms | 161.1MB | 6.9MB | 126.0KB | 258B |
+| ratatui | 1 | 96µs | 37.0% | 93µs–99µs | 10.5K ops/s | 47.88ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
+| rezitui | 1 | 98µs | 259.8% | 76µs–121µs | 10.2K ops/s | 49.39ms | 100.4MB | 17.1MB | 668.5KB | 1.3KB |
+| tuix-python | 1 | 104µs | 35.0% | 101µs–108µs | 9.6K ops/s | 52.62ms | 18.5MB | 52.0KB | 7.7MB | 15.7KB |
+| bubbletea | 1 | 159µs | 40.4% | 153µs–165µs | 6.3K ops/s | 79.59ms | 16.2MB | 4.5MB | 7.8MB | 16.0KB |
+| terminal-kit | 1 | 286µs | 21.7% | 281µs–292µs | 3.5K ops/s | 143.33ms | 46.7MB | 32.0KB | 950.2KB | 1.9KB |
+| opentui-core | 1 | 304µs | 85.0% | 282µs–327µs | 3.3K ops/s | 157.03ms | 34.2MB | 944.0KB | 33.4MB | 68.3KB |
+| ink | 1 | 510µs | 46.1% | 489µs–530µs | 2.0K ops/s | 255.13ms | 69.1MB | 3.1MB | 23.9KB | 49B |
+| rich | 1 | 783µs | 26.1% | 765µs–801µs | 1.3K ops/s | 391.71ms | 32.1MB | 28.0KB | 948.7KB | 1.9KB |
+| prompt-toolkit | 1 | 847µs | 19.7% | 832µs–861µs | 1.2K ops/s | 423.47ms | 36.1MB | 16.0KB | 948.7KB | 1.9KB |
+| urwid | 1 | 1.25ms | 28.1% | 1.22ms–1.28ms | 801 ops/s | 624.83ms | 41.9MB | 76.0KB | 937.5KB | 1.9KB |
 
 ## tree-construction (items=100)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 49µs | 12.7% | 49µs–50µs | 20.2K ops/s | 24.73ms | 4.0MB | 0.00KB | 1.2MB | 2.5KB |
-| TUIX.Renderer | 1 | 68µs | 17.8% | 67µs–70µs | 14.6K ops/s | 34.26ms | 3.9MB | 0.00KB | 1.3MB | 2.7KB |
-| opentui-react | 1 | 105µs | 18.3% | 103µs–107µs | 9.5K ops/s | 57.54ms | 36.1MB | 104.0KB | 8.9MB | 18.3KB |
-| rezitui | 1 | 122µs | 258.0% | 94µs–150µs | 8.2K ops/s | 61.29ms | 107.5MB | 11.3MB | 668.5KB | 1.3KB |
-| tuix-python | 1 | 125µs | 20.0% | 123µs–127µs | 8.0K ops/s | 62.62ms | 18.3MB | 16.0KB | 17.2MB | 35.2KB |
-| opentui-core | 1 | 136µs | 35.8% | 132µs–141µs | 7.3K ops/s | 101.14ms | 34.0MB | 736.0KB | 33.8MB | 69.2KB |
-| ratatui | 1 | 173µs | 24.9% | 169µs–177µs | 5.8K ops/s | 86.63ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
-| bubbletea | 1 | 239µs | 52.8% | 228µs–250µs | 4.2K ops/s | 119.64ms | 16.6MB | 16.0KB | 7.8MB | 16.0KB |
-| blessed | 1 | 484µs | 126.2% | 430µs–537µs | 2.1K ops/s | 242.13ms | 240.9MB | 79.6MB | 490.2KB | 1004B |
-| rich | 1 | 879µs | 32.7% | 854µs–904µs | 1.1K ops/s | 439.96ms | 31.6MB | 28.0KB | 948.7KB | 1.9KB |
-| prompt-toolkit | 1 | 894µs | 27.8% | 872µs–916µs | 1.1K ops/s | 447.30ms | 36.3MB | 72.0KB | 948.7KB | 1.9KB |
-| terminal-kit | 1 | 1.27ms | 29.1% | 1.24ms–1.30ms | 786 ops/s | 636.64ms | 43.7MB | 80.0KB | 950.2KB | 1.9KB |
-| urwid | 1 | 1.71ms | 31.1% | 1.66ms–1.75ms | 586 ops/s | 853.34ms | 42.1MB | 16.0KB | 937.5KB | 1.9KB |
-| ink | 1 | 7.43ms | 37.7% | 7.19ms–7.68ms | 135 ops/s | 3.72s | 101.3MB | 19.2MB | 287.6KB | 589B |
+| TUIX.Core | 1 | 92µs | 26.4% | 90µs–94µs | 10.9K ops/s | 45.98ms | 4.0MB | 0.00KB | 1.2MB | 2.5KB |
+| TUIX.Renderer | 1 | 96µs | 42.8% | 93µs–100µs | 10.4K ops/s | 48.20ms | 3.9MB | 0.00KB | 1.3MB | 2.7KB |
+| rezitui | 1 | 111µs | 158.1% | 96µs–127µs | 9.0K ops/s | 55.87ms | 110.6MB | 11.8MB | 668.5KB | 1.3KB |
+| opentui-react | 1 | 140µs | 32.2% | 136µs–144µs | 7.1K ops/s | 77.10ms | 36.1MB | 104.0KB | 8.9MB | 18.3KB |
+| opentui-core | 1 | 148µs | 194.8% | 123µs–173µs | 6.8K ops/s | 108.91ms | 34.9MB | 440.0KB | 33.8MB | 69.2KB |
+| tuix-python | 1 | 180µs | 46.6% | 173µs–188µs | 5.5K ops/s | 90.65ms | 18.6MB | 16.0KB | 17.2MB | 35.2KB |
+| ratatui | 1 | 185µs | 31.1% | 180µs–190µs | 5.4K ops/s | 92.76ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
+| bubbletea | 1 | 205µs | 31.0% | 200µs–211µs | 4.9K ops/s | 102.76ms | 16.2MB | 8.0KB | 7.8MB | 16.0KB |
+| blessed | 1 | 515µs | 126.0% | 458µs–572µs | 1.9K ops/s | 257.99ms | 244.4MB | 79.3MB | 490.2KB | 1004B |
+| rich | 1 | 815µs | 27.2% | 796µs–835µs | 1.2K ops/s | 407.92ms | 32.1MB | 16.0KB | 948.7KB | 1.9KB |
+| prompt-toolkit | 1 | 914µs | 33.0% | 888µs–941µs | 1.1K ops/s | 457.20ms | 36.1MB | 16.0KB | 948.7KB | 1.9KB |
+| urwid | 1 | 1.16ms | 25.4% | 1.14ms–1.19ms | 860 ops/s | 581.76ms | 41.9MB | 20.0KB | 937.5KB | 1.9KB |
+| terminal-kit | 1 | 1.42ms | 26.4% | 1.39ms–1.46ms | 702 ops/s | 712.53ms | 46.5MB | 0.00KB | 950.2KB | 1.9KB |
+| ink | 1 | 4.56ms | 28.1% | 4.45ms–4.67ms | 219 ops/s | 2.28s | 106.4MB | 32.7MB | 287.6KB | 589B |
 
 ## tree-construction (items=500)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Renderer | 1 | 46µs | 34.4% | 44µs–47µs | 22.0K ops/s | 22.77ms | 3.9MB | 48.0KB | 1.3MB | 2.7KB |
-| TUIX.Core | 1 | 48µs | 9.2% | 48µs–49µs | 20.6K ops/s | 24.25ms | 4.0MB | 0.00KB | 1.2MB | 2.5KB |
-| tuix-python | 1 | 128µs | 21.1% | 126µs–130µs | 7.8K ops/s | 64.23ms | 18.3MB | 16.0KB | 17.2MB | 35.2KB |
-| opentui-core | 1 | 159µs | 195.5% | 132µs–186µs | 6.3K ops/s | 250.29ms | 34.3MB | 244.0KB | 33.7MB | 68.9KB |
-| opentui-react | 1 | 217µs | 29.1% | 211µs–222µs | 4.6K ops/s | 132.23ms | 36.3MB | 208.0KB | 8.9MB | 18.2KB |
-| rezitui | 1 | 318µs | 276.3% | 241µs–395µs | 3.1K ops/s | 159.20ms | 166.2MB | 55.6MB | 668.5KB | 1.3KB |
-| ratatui | 1 | 600µs | 26.1% | 586µs–614µs | 1.7K ops/s | 300.08ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
-| bubbletea | 1 | 670µs | 30.6% | 652µs–688µs | 1.5K ops/s | 335.11ms | 16.6MB | 0.00KB | 7.8MB | 16.0KB |
-| prompt-toolkit | 1 | 859µs | 18.8% | 844µs–873µs | 1.2K ops/s | 429.48ms | 36.3MB | 32.0KB | 948.7KB | 1.9KB |
-| rich | 1 | 1.07ms | 35.3% | 1.04ms–1.10ms | 934 ops/s | 535.86ms | 31.6MB | 12.0KB | 948.7KB | 1.9KB |
-| urwid | 1 | 1.46ms | 28.4% | 1.43ms–1.50ms | 683 ops/s | 732.39ms | 42.1MB | 32.0KB | 937.5KB | 1.9KB |
-| blessed | 1 | 1.93ms | 57.4% | 1.83ms–2.03ms | 518 ops/s | 966.67ms | 450.9MB | 193.3MB | 508.8KB | 1.0KB |
-| terminal-kit | 1 | 9.01ms | 48.8% | 8.62ms–9.39ms | 111 ops/s | 4.51s | 43.6MB | 0.00KB | 950.2KB | 1.9KB |
-| ink | 1 | 44.24ms | 17.7% | 43.55ms–44.93ms | 23 ops/s | 22.12s | 194.4MB | 90.7MB | 1.6MB | 3.3KB |
+| TUIX.Renderer | 1 | 58µs | 28.4% | 56µs–59µs | 17.3K ops/s | 28.85ms | 3.9MB | 48.0KB | 1.3MB | 2.7KB |
+| TUIX.Core | 1 | 110µs | 34.7% | 107µs–114µs | 9.1K ops/s | 55.25ms | 4.0MB | 0.00KB | 1.2MB | 2.5KB |
+| tuix-python | 1 | 127µs | 26.3% | 124µs–130µs | 7.9K ops/s | 63.67ms | 18.6MB | 16.0KB | 17.2MB | 35.2KB |
+| opentui-core | 1 | 145µs | 62.6% | 137µs–153µs | 6.9K ops/s | 252.87ms | 34.9MB | 0.00KB | 33.7MB | 68.9KB |
+| rezitui | 1 | 324µs | 288.9% | 242µs–406µs | 3.1K ops/s | 162.27ms | 167.8MB | 54.6MB | 668.5KB | 1.3KB |
+| opentui-react | 1 | 325µs | 32.5% | 315µs–334µs | 3.1K ops/s | 211.48ms | 37.1MB | 1.0MB | 8.9MB | 18.2KB |
+| ratatui | 1 | 508µs | 5.2% | 506µs–510µs | 2.0K ops/s | 253.99ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
+| bubbletea | 1 | 723µs | 26.8% | 706µs–740µs | 1.4K ops/s | 361.54ms | 16.2MB | 0.00KB | 7.8MB | 16.0KB |
+| rich | 1 | 861µs | 27.6% | 841µs–882µs | 1.2K ops/s | 431.00ms | 32.1MB | 12.0KB | 948.7KB | 1.9KB |
+| prompt-toolkit | 1 | 964µs | 26.5% | 942µs–987µs | 1.0K ops/s | 482.34ms | 36.1MB | 16.0KB | 948.7KB | 1.9KB |
+| urwid | 1 | 1.30ms | 30.1% | 1.26ms–1.33ms | 770 ops/s | 649.27ms | 42.0MB | 32.0KB | 937.5KB | 1.9KB |
+| blessed | 1 | 2.09ms | 61.2% | 1.98ms–2.20ms | 478 ops/s | 1.05s | 454.1MB | 193.2MB | 508.8KB | 1.0KB |
+| terminal-kit | 1 | 6.45ms | 26.6% | 6.30ms–6.60ms | 155 ops/s | 3.23s | 46.8MB | 308.0KB | 950.2KB | 1.9KB |
+| ink | 1 | 22.20ms | 21.4% | 21.78ms–22.62ms | 45 ops/s | 11.10s | 188.1MB | 81.2MB | 1.6MB | 3.3KB |
 
 ## tree-construction (items=1000)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 49µs | 11.6% | 49µs–50µs | 20.2K ops/s | 24.73ms | 4.0MB | 0.00KB | 1.2MB | 2.5KB |
-| TUIX.Renderer | 1 | 59µs | 19.5% | 58µs–60µs | 17.0K ops/s | 29.46ms | 3.9MB | 0.00KB | 1.3MB | 2.7KB |
-| opentui-core | 1 | 103µs | 48.5% | 99µs–108µs | 9.7K ops/s | 408.58ms | 34.8MB | 236.0KB | 33.8MB | 69.3KB |
-| tuix-python | 1 | 140µs | 29.8% | 137µs–144µs | 7.1K ops/s | 70.47ms | 18.4MB | 16.0KB | 17.2MB | 35.2KB |
-| opentui-react | 1 | 278µs | 154.4% | 241µs–316µs | 3.6K ops/s | 207.10ms | 38.0MB | 1.5MB | 8.9MB | 18.2KB |
-| rezitui | 1 | 449µs | 219.4% | 363µs–536µs | 2.2K ops/s | 224.71ms | 184.0MB | 17.6MB | 668.5KB | 1.3KB |
-| rich | 1 | 894µs | 31.5% | 869µs–918µs | 1.1K ops/s | 447.13ms | 31.6MB | 12.0KB | 948.7KB | 1.9KB |
-| prompt-toolkit | 1 | 984µs | 29.0% | 959µs–1.01ms | 1.0K ops/s | 492.18ms | 36.4MB | 116.0KB | 948.7KB | 1.9KB |
-| ratatui | 1 | 1.18ms | 31.5% | 1.15ms–1.21ms | 847 ops/s | 590.10ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
-| bubbletea | 1 | 1.23ms | 20.7% | 1.21ms–1.25ms | 811 ops/s | 616.41ms | 16.6MB | 0.00KB | 7.8MB | 16.0KB |
-| urwid | 1 | 1.64ms | 29.6% | 1.59ms–1.68ms | 612 ops/s | 818.05ms | 42.1MB | 16.0KB | 937.5KB | 1.9KB |
-| blessed | 1 | 4.02ms | 43.9% | 3.87ms–4.18ms | 249 ops/s | 2.01s | 516.7MB | 65.0MB | 508.8KB | 1.0KB |
-| terminal-kit | 1 | 24.72ms | 13.6% | 24.43ms–25.02ms | 40 ops/s | 12.36s | 51.8MB | 8.1MB | 950.2KB | 1.9KB |
-| ink | 1 | 79.91ms | 19.2% | 78.57ms–81.26ms | 13 ops/s | 39.96s | 347.0MB | 140.4MB | 3.3MB | 6.7KB |
+| TUIX.Core | 1 | 72µs | 28.4% | 70µs–74µs | 13.9K ops/s | 35.97ms | 4.0MB | 48.0KB | 1.2MB | 2.5KB |
+| TUIX.Renderer | 1 | 84µs | 45.5% | 80µs–87µs | 12.0K ops/s | 41.84ms | 3.9MB | 48.0KB | 1.3MB | 2.7KB |
+| opentui-core | 1 | 97µs | 43.3% | 93µs–100µs | 10.4K ops/s | 400.25ms | 35.0MB | 96.0KB | 33.8MB | 69.3KB |
+| tuix-python | 1 | 125µs | 15.4% | 123µs–126µs | 8.0K ops/s | 62.56ms | 18.7MB | 72.0KB | 17.2MB | 35.2KB |
+| opentui-react | 1 | 278µs | 166.5% | 238µs–319µs | 3.6K ops/s | 179.38ms | 38.0MB | 848.0KB | 8.9MB | 18.2KB |
+| rezitui | 1 | 473µs | 199.5% | 390µs–555µs | 2.1K ops/s | 236.39ms | 185.9MB | 18.1MB | 668.5KB | 1.3KB |
+| ratatui | 1 | 986µs | 12.4% | 975µs–997µs | 1.0K ops/s | 492.93ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
+| prompt-toolkit | 1 | 1.00ms | 29.1% | 977µs–1.03ms | 998 ops/s | 501.35ms | 36.2MB | 16.0KB | 948.7KB | 1.9KB |
+| rich | 1 | 1.03ms | 26.5% | 1.00ms–1.05ms | 974 ops/s | 513.53ms | 32.1MB | 16.0KB | 948.7KB | 1.9KB |
+| bubbletea | 1 | 1.05ms | 26.3% | 1.02ms–1.07ms | 955 ops/s | 523.51ms | 16.2MB | 0.00KB | 7.8MB | 16.0KB |
+| urwid | 1 | 1.30ms | 26.5% | 1.27ms–1.33ms | 768 ops/s | 651.48ms | 42.0MB | 16.0KB | 937.5KB | 1.9KB |
+| blessed | 1 | 3.93ms | 40.3% | 3.79ms–4.06ms | 255 ops/s | 1.96s | 521.4MB | 67.6MB | 508.8KB | 1.0KB |
+| terminal-kit | 1 | 12.54ms | 22.1% | 12.30ms–12.79ms | 80 ops/s | 6.27s | 55.1MB | 8.2MB | 950.2KB | 1.9KB |
+| ink | 1 | 42.86ms | 20.0% | 42.11ms–43.61ms | 23 ops/s | 21.43s | 355.0MB | 136.3MB | 3.3MB | 6.7KB |
 
 ## rerender
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| tuix-python | 1 | 11µs | 16.3% | 11µs–11µs | 88.6K ops/s | 11.81ms | 18.4MB | 32.0KB | 1.8MB | 1.9KB |
-| TUIX.Renderer | 1 | 11µs | 158.3% | 10µs–12µs | 88.0K ops/s | 11.40ms | 3.9MB | 0.00KB | 15.6KB | 16B |
-| TUIX.Core | 1 | 13µs | 49.0% | 13µs–14µs | 75.6K ops/s | 13.25ms | 4.1MB | 0.00KB | 15.6KB | 16B |
-| blessed | 1 | 30µs | 272.5% | 25µs–35µs | 33.6K ops/s | 29.90ms | 516.4MB | 0.00KB | 0.00KB | 0.00KB |
-| opentui-react | 1 | 42µs | 46.3% | 40µs–43µs | 24.1K ops/s | 41.67ms | 38.0MB | 0.00KB | 3.9KB | 4B |
-| rezitui | 1 | 51µs | 333.7% | 41µs–62µs | 19.6K ops/s | 51.28ms | 191.6MB | 7.6MB | 1.3MB | 1.3KB |
-| ratatui | 1 | 66µs | 44.3% | 65µs–68µs | 15.1K ops/s | 66.48ms | 27.0KB | 0.00KB | 15.6MB | 16.0KB |
-| opentui-core | 1 | 111µs | 51.8% | 107µs–114µs | 9.0K ops/s | 110.92ms | 34.8MB | 0.00KB | 66.9MB | 68.5KB |
-| bubbletea | 1 | 121µs | 50.6% | 117µs–124µs | 8.3K ops/s | 120.87ms | 16.6MB | 0.00KB | 15.6MB | 16.0KB |
-| terminal-kit | 1 | 455µs | 26.5% | 447µs–462µs | 2.2K ops/s | 455.22ms | 52.0MB | 112.0KB | 1.9MB | 1.9KB |
-| ink | 1 | 1.03ms | 36.3% | 1.01ms–1.06ms | 966 ops/s | 1.04s | 346.5MB | 0.00KB | 1.9MB | 1.9KB |
-| prompt-toolkit | 1 | 1.31ms | 36.4% | 1.28ms–1.34ms | 764 ops/s | 1.31s | 36.6MB | 160.0KB | 1.9MB | 1.9KB |
-| rich | 1 | 1.54ms | 34.0% | 1.51ms–1.57ms | 650 ops/s | 1.54s | 31.6MB | 32.0KB | 1.9MB | 1.9KB |
-| urwid | 1 | 1.89ms | 30.6% | 1.86ms–1.93ms | 529 ops/s | 1.89s | 42.2MB | 68.0KB | 1.8MB | 1.9KB |
+| TUIX.Renderer | 1 | 10µs | 14.5% | 10µs–11µs | 95.9K ops/s | 10.45ms | 3.9MB | 0.00KB | 15.6KB | 16B |
+| tuix-python | 1 | 13µs | 32.7% | 12µs–13µs | 79.9K ops/s | 13.06ms | 18.7MB | 0.00KB | 1.8MB | 1.9KB |
+| TUIX.Core | 1 | 23µs | 45.9% | 22µs–23µs | 44.0K ops/s | 22.76ms | 4.1MB | 0.00KB | 15.6KB | 16B |
+| blessed | 1 | 26µs | 27.3% | 25µs–26µs | 39.1K ops/s | 25.69ms | 520.5MB | 0.00KB | 0.00KB | 0.00KB |
+| opentui-react | 1 | 40µs | 43.9% | 39µs–42µs | 24.8K ops/s | 40.49ms | 38.0MB | 44.0KB | 3.9KB | 4B |
+| rezitui | 1 | 43µs | 416.3% | 32µs–54µs | 23.3K ops/s | 43.12ms | 191.9MB | 6.0MB | 1.3MB | 1.3KB |
+| ratatui | 1 | 57µs | 36.7% | 56µs–58µs | 17.6K ops/s | 56.90ms | 27.0KB | 0.00KB | 15.6MB | 16.0KB |
+| bubbletea | 1 | 91µs | 58.5% | 88µs–94µs | 11.0K ops/s | 91.39ms | 16.2MB | 0.00KB | 15.6MB | 16.0KB |
+| opentui-core | 1 | 133µs | 51.3% | 129µs–137µs | 7.5K ops/s | 133.37ms | 35.0MB | 0.00KB | 66.9MB | 68.5KB |
+| terminal-kit | 1 | 213µs | 35.2% | 208µs–218µs | 4.7K ops/s | 213.11ms | 54.9MB | 0.00KB | 1.9MB | 1.9KB |
+| ink | 1 | 647µs | 51.1% | 627µs–668µs | 1.5K ops/s | 647.60ms | 354.9MB | 208.0KB | 1.9MB | 1.9KB |
+| prompt-toolkit | 1 | 1.07ms | 26.8% | 1.05ms–1.09ms | 933 ops/s | 1.07s | 36.2MB | 32.0KB | 1.9MB | 1.9KB |
+| rich | 1 | 1.29ms | 29.1% | 1.26ms–1.31ms | 778 ops/s | 1.29s | 32.1MB | 32.0KB | 1.9MB | 1.9KB |
+| urwid | 1 | 1.46ms | 26.4% | 1.44ms–1.48ms | 685 ops/s | 1.46s | 42.1MB | 72.0KB | 1.8MB | 1.9KB |
 
 ## content-update
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 13µs | 7.6% | 13µs–13µs | 78.4K ops/s | 6.39ms | 4.0MB | 0.00KB | 6.5MB | 13.4KB |
-| rezitui | 1 | 68µs | 429.6% | 42µs–94µs | 14.7K ops/s | 34.04ms | 184.9MB | 0.00KB | 668.5KB | 1.3KB |
-| tuix-python | 1 | 79µs | 29.4% | 77µs–81µs | 12.6K ops/s | 45.59ms | 18.5MB | 72.0KB | 17.1MB | 35.0KB |
-| TUIX.Renderer | 1 | 81µs | 35.3% | 79µs–84µs | 12.3K ops/s | 46.12ms | 3.9MB | 0.00KB | 5.8MB | 11.9KB |
-| opentui-react | 1 | 92µs | 42.7% | 88µs–95µs | 10.9K ops/s | 49.40ms | 38.9MB | 880.0KB | 15.3MB | 31.3KB |
-| ratatui | 1 | 104µs | 39.7% | 101µs–108µs | 9.6K ops/s | 52.23ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
-| opentui-core | 1 | 147µs | 51.6% | 140µs–153µs | 6.8K ops/s | 77.27ms | 34.8MB | 0.00KB | 33.4MB | 68.5KB |
-| bubbletea | 1 | 247µs | 36.8% | 239µs–255µs | 4.1K ops/s | 123.41ms | 16.6MB | 8.0KB | 7.8MB | 16.0KB |
-| blessed | 1 | 325µs | 58.7% | 308µs–341µs | 3.1K ops/s | 162.36ms | 516.9MB | 0.00KB | 1.1MB | 2.3KB |
-| terminal-kit | 1 | 617µs | 34.9% | 598µs–636µs | 1.6K ops/s | 308.84ms | 52.1MB | 56.0KB | 950.2KB | 1.9KB |
-| prompt-toolkit | 1 | 1.08ms | 28.9% | 1.05ms–1.11ms | 925 ops/s | 541.12ms | 36.6MB | 72.0KB | 948.7KB | 1.9KB |
-| rich | 1 | 1.38ms | 27.8% | 1.34ms–1.41ms | 726 ops/s | 688.72ms | 32.1MB | 420.0KB | 948.7KB | 1.9KB |
-| urwid | 1 | 1.85ms | 28.7% | 1.80ms–1.89ms | 541 ops/s | 924.54ms | 42.2MB | 0.00KB | 937.5KB | 1.9KB |
-| ink | 1 | 5.86ms | 22.8% | 5.74ms–5.98ms | 171 ops/s | 2.93s | 346.9MB | 160.0KB | 953.1KB | 1.9KB |
+| TUIX.Core | 1 | 25µs | 22.1% | 25µs–26µs | 39.5K ops/s | 12.67ms | 4.1MB | 0.00KB | 6.5MB | 13.4KB |
+| rezitui | 1 | 62µs | 302.3% | 46µs–79µs | 16.1K ops/s | 31.17ms | 188.0MB | 0.00KB | 668.5KB | 1.3KB |
+| ratatui | 1 | 84µs | 32.6% | 81µs–86µs | 11.9K ops/s | 41.96ms | 27.0KB | 0.00KB | 7.8MB | 16.0KB |
+| tuix-python | 1 | 110µs | 37.2% | 106µs–113µs | 9.1K ops/s | 63.16ms | 18.7MB | 0.00KB | 17.1MB | 35.0KB |
+| TUIX.Renderer | 1 | 120µs | 11.6% | 119µs–121µs | 8.3K ops/s | 68.71ms | 3.9MB | 0.00KB | 5.8MB | 11.9KB |
+| opentui-react | 1 | 134µs | 61.3% | 127µs–142µs | 7.4K ops/s | 72.43ms | 38.9MB | 900.0KB | 15.3MB | 31.3KB |
+| opentui-core | 1 | 215µs | 48.5% | 206µs–224µs | 4.7K ops/s | 113.12ms | 35.0MB | 0.00KB | 33.4MB | 68.5KB |
+| bubbletea | 1 | 236µs | 38.1% | 228µs–244µs | 4.2K ops/s | 118.06ms | 16.2MB | 0.00KB | 7.8MB | 16.0KB |
+| terminal-kit | 1 | 268µs | 28.6% | 261µs–275µs | 3.7K ops/s | 134.04ms | 55.1MB | 68.0KB | 950.2KB | 1.9KB |
+| blessed | 1 | 286µs | 56.7% | 272µs–300µs | 3.5K ops/s | 142.98ms | 520.8MB | 0.00KB | 1.1MB | 2.3KB |
+| prompt-toolkit | 1 | 1.08ms | 26.8% | 1.06ms–1.11ms | 924 ops/s | 541.25ms | 36.2MB | 16.0KB | 948.7KB | 1.9KB |
+| rich | 1 | 1.27ms | 25.3% | 1.24ms–1.30ms | 788 ops/s | 634.79ms | 32.7MB | 460.0KB | 948.7KB | 1.9KB |
+| urwid | 1 | 1.29ms | 23.4% | 1.26ms–1.31ms | 778 ops/s | 642.90ms | 42.1MB | 0.00KB | 937.5KB | 1.9KB |
+| ink | 1 | 3.07ms | 27.0% | 2.99ms–3.14ms | 326 ops/s | 1.53s | 355.0MB | 0.00KB | 953.1KB | 1.9KB |
 
 ## layout-stress (cols=4,rows=10)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Renderer | 1 | 41µs | 7.3% | 41µs–42µs | 24.2K ops/s | 13.97ms | 3.9MB | 0.00KB | 1.1MB | 3.7KB |
-| opentui-react | 1 | 50µs | 20.0% | 49µs–51µs | 20.1K ops/s | 16.69ms | 38.9MB | 0.00KB | 1.2KB | 4B |
-| tuix-python | 1 | 51µs | 21.3% | 49µs–52µs | 19.7K ops/s | 17.08ms | 18.5MB | 0.00KB | 1.1MB | 3.6KB |
-| TUIX.Core | 1 | 54µs | 25.9% | 53µs–56µs | 18.4K ops/s | 16.32ms | 4.1MB | 0.00KB | 1.1MB | 3.6KB |
-| opentui-core | 1 | 88µs | 58.3% | 82µs–94µs | 11.4K ops/s | 34.79ms | 34.8MB | 0.00KB | 19.8MB | 67.7KB |
-| ratatui | 1 | 92µs | 25.7% | 89µs–94µs | 10.9K ops/s | 27.56ms | 27.0KB | 0.00KB | 4.7MB | 16.0KB |
-| bubbletea | 1 | 164µs | 35.8% | 157µs–171µs | 6.1K ops/s | 49.25ms | 16.6MB | 0.00KB | 4.7MB | 16.0KB |
-| blessed | 1 | 194µs | 148.6% | 162µs–227µs | 5.1K ops/s | 58.37ms | 517.0MB | 0.00KB | 0.00KB | 0.00KB |
-| rich | 1 | 804µs | 20.1% | 785µs–822µs | 1.2K ops/s | 241.24ms | 32.1MB | 12.0KB | 569.2KB | 1.9KB |
-| terminal-kit | 1 | 1.12ms | 21.4% | 1.09ms–1.15ms | 892 ops/s | 336.78ms | 52.1MB | 0.00KB | 570.1KB | 1.9KB |
-| prompt-toolkit | 1 | 1.14ms | 35.6% | 1.10ms–1.19ms | 874 ops/s | 343.39ms | 36.7MB | 56.0KB | 569.2KB | 1.9KB |
-| rezitui | 1 | 1.38ms | 52.7% | 1.29ms–1.46ms | 727 ops/s | 412.78ms | 187.1MB | 2.0MB | 1.6MB | 5.6KB |
-| urwid | 1 | 1.63ms | 31.8% | 1.57ms–1.69ms | 613 ops/s | 489.49ms | 42.2MB | 0.00KB | 562.5KB | 1.9KB |
-| ink | 1 | 11.21ms | 20.4% | 10.95ms–11.47ms | 89 ops/s | 3.36s | 347.3MB | 640.0KB | 1.2MB | 4.2KB |
+| opentui-react | 1 | 48µs | 24.0% | 46µs–49µs | 21.0K ops/s | 15.99ms | 38.9MB | 0.00KB | 1.2KB | 4B |
+| tuix-python | 1 | 61µs | 27.2% | 59µs–63µs | 16.3K ops/s | 20.66ms | 18.7MB | 0.00KB | 1.1MB | 3.6KB |
+| TUIX.Renderer | 1 | 76µs | 11.8% | 75µs–77µs | 13.2K ops/s | 25.56ms | 3.9MB | 0.00KB | 1.1MB | 3.7KB |
+| opentui-core | 1 | 80µs | 29.4% | 77µs–83µs | 12.5K ops/s | 31.84ms | 35.0MB | 0.00KB | 19.8MB | 67.7KB |
+| TUIX.Core | 1 | 102µs | 30.3% | 98µs–105µs | 9.8K ops/s | 30.55ms | 4.1MB | 0.00KB | 1.1MB | 3.6KB |
+| ratatui | 1 | 109µs | 18.0% | 107µs–111µs | 9.2K ops/s | 32.77ms | 27.0KB | 0.00KB | 4.7MB | 16.0KB |
+| bubbletea | 1 | 161µs | 34.1% | 155µs–167µs | 6.2K ops/s | 48.41ms | 16.2MB | 0.00KB | 4.7MB | 16.0KB |
+| blessed | 1 | 198µs | 141.0% | 166µs–229µs | 5.1K ops/s | 59.35ms | 521.4MB | 0.00KB | 0.00KB | 0.00KB |
+| terminal-kit | 1 | 549µs | 26.0% | 533µs–565µs | 1.8K ops/s | 164.80ms | 55.1MB | 4.0KB | 570.1KB | 1.9KB |
+| rich | 1 | 855µs | 26.2% | 830µs–880µs | 1.2K ops/s | 256.66ms | 32.8MB | 8.0KB | 569.2KB | 1.9KB |
+| prompt-toolkit | 1 | 934µs | 26.9% | 906µs–962µs | 1.1K ops/s | 280.29ms | 36.2MB | 8.0KB | 569.2KB | 1.9KB |
+| rezitui | 1 | 1.27ms | 56.5% | 1.19ms–1.35ms | 788 ops/s | 380.93ms | 188.7MB | 1.0MB | 1.6MB | 5.6KB |
+| urwid | 1 | 1.36ms | 24.9% | 1.33ms–1.40ms | 733 ops/s | 409.45ms | 42.1MB | 0.00KB | 562.5KB | 1.9KB |
+| ink | 1 | 5.56ms | 26.3% | 5.39ms–5.72ms | 180 ops/s | 1.67s | 355.7MB | 488.0KB | 1.2MB | 4.2KB |
 
 ## scroll-stress (items=2000)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 13µs | 14.1% | 12µs–13µs | 77.5K ops/s | 0.65ms | 4.0MB | 0.00KB | 800B | 16B |
-| opentui-react | 1 | 45µs | 39.5% | 40µs–49µs | 22.5K ops/s | 2.30ms | 38.9MB | 0.00KB | 135.6KB | 2.7KB |
-| rezitui | 1 | 65µs | 50.2% | 56µs–74µs | 15.5K ops/s | 3.24ms | 187.2MB | 56.0KB | 66.8KB | 1.3KB |
-| opentui-core | 1 | 93µs | 59.4% | 78µs–108µs | 10.8K ops/s | 5.19ms | 34.9MB | 100.0KB | 3.1MB | 62.8KB |
-| TUIX.Renderer | 1 | 100µs | 31.3% | 91µs–108µs | 10.0K ops/s | 5.11ms | 3.9MB | 0.00KB | 1.5MB | 30.8KB |
-| bubbletea | 1 | 103µs | 35.5% | 93µs–113µs | 9.7K ops/s | 5.17ms | 16.6MB | 0.00KB | 798.0KB | 16.0KB |
-| tuix-python | 1 | 121µs | 40.0% | 107µs–134µs | 8.3K ops/s | 6.21ms | 18.5MB | 0.00KB | 1.6MB | 32.4KB |
-| ratatui | 1 | 125µs | 14.6% | 120µs–130µs | 8.0K ops/s | 6.26ms | 27.0KB | 0.00KB | 798.0KB | 16.0KB |
-| prompt-toolkit | 1 | 670µs | 31.5% | 612µs–729µs | 1.5K ops/s | 33.53ms | 36.7MB | 0.00KB | 94.9KB | 1.9KB |
-| rich | 1 | 705µs | 29.8% | 647µs–763µs | 1.4K ops/s | 35.30ms | 32.2MB | 80.0KB | 94.9KB | 1.9KB |
-| urwid | 1 | 855µs | 14.2% | 821µs–889µs | 1.2K ops/s | 42.78ms | 42.2MB | 0.00KB | 93.8KB | 1.9KB |
-| terminal-kit | 1 | 1.23ms | 11.9% | 1.19ms–1.27ms | 812 ops/s | 61.63ms | 52.1MB | 0.00KB | 95.0KB | 1.9KB |
-| ink | 1 | 2.99ms | 57.5% | 2.52ms–3.47ms | 334 ops/s | 149.89ms | 347.3MB | 4.0KB | 93.2KB | 1.9KB |
-| blessed | 1 | 3.84ms | 21.5% | 3.61ms–4.07ms | 260 ops/s | 192.14ms | 516.9MB | 0.00KB | 115.5KB | 2.3KB |
+| TUIX.Core | 1 | 24µs | 14.3% | 23µs–25µs | 41.7K ops/s | 1.20ms | 4.1MB | 0.00KB | 800B | 16B |
+| opentui-react | 1 | 45µs | 46.9% | 39µs–51µs | 22.4K ops/s | 2.32ms | 38.9MB | 0.00KB | 135.6KB | 2.7KB |
+| rezitui | 1 | 51µs | 24.5% | 48µs–55µs | 19.5K ops/s | 2.57ms | 188.9MB | 236.0KB | 66.8KB | 1.3KB |
+| opentui-core | 1 | 92µs | 50.7% | 79µs–105µs | 10.9K ops/s | 5.18ms | 35.1MB | 100.0KB | 3.1MB | 62.8KB |
+| bubbletea | 1 | 98µs | 69.7% | 79µs–117µs | 10.2K ops/s | 4.90ms | 16.2MB | 0.00KB | 798.0KB | 16.0KB |
+| ratatui | 1 | 114µs | 3.5% | 113µs–115µs | 8.8K ops/s | 5.70ms | 27.0KB | 0.00KB | 798.0KB | 16.0KB |
+| TUIX.Renderer | 1 | 166µs | 14.1% | 160µs–173µs | 6.0K ops/s | 8.51ms | 3.9MB | 0.00KB | 1.5MB | 30.8KB |
+| tuix-python | 1 | 195µs | 29.9% | 179µs–212µs | 5.1K ops/s | 10.03ms | 18.7MB | 4.0KB | 1.6MB | 32.4KB |
+| prompt-toolkit | 1 | 492µs | 17.2% | 468µs–515µs | 2.0K ops/s | 24.61ms | 36.2MB | 4.0KB | 94.9KB | 1.9KB |
+| rich | 1 | 615µs | 25.2% | 572µs–658µs | 1.6K ops/s | 30.76ms | 32.9MB | 80.0KB | 94.9KB | 1.9KB |
+| urwid | 1 | 806µs | 17.6% | 767µs–846µs | 1.2K ops/s | 40.34ms | 42.1MB | 0.00KB | 93.8KB | 1.9KB |
+| terminal-kit | 1 | 993µs | 16.2% | 949µs–1.04ms | 1.0K ops/s | 49.68ms | 55.2MB | 0.00KB | 95.0KB | 1.9KB |
+| ink | 1 | 1.27ms | 62.9% | 1.05ms–1.49ms | 789 ops/s | 63.40ms | 355.7MB | 4.0KB | 93.2KB | 1.9KB |
+| blessed | 1 | 3.69ms | 18.2% | 3.51ms–3.88ms | 271 ops/s | 184.78ms | 521.2MB | 212.0KB | 115.5KB | 2.3KB |
 
 ## virtual-list (items=100000,viewport=40)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 13µs | 7.5% | 12µs–13µs | 80.0K ops/s | 12.53ms | 4.1MB | 0.00KB | 2.2MB | 2.2KB |
-| opentui-react | 1 | 42µs | 23.4% | 41µs–42µs | 24.0K ops/s | 43.21ms | 38.9MB | 0.00KB | 1.8MB | 1.8KB |
-| TUIX.Renderer | 1 | 62µs | 49.6% | 60µs–64µs | 16.1K ops/s | 67.91ms | 4.0MB | 0.00KB | 2.3MB | 2.3KB |
-| tuix-python | 1 | 62µs | 27.3% | 61µs–64µs | 16.0K ops/s | 68.15ms | 18.5MB | 4.0KB | 2.2MB | 2.3KB |
-| ratatui | 1 | 82µs | 25.9% | 81µs–83µs | 12.2K ops/s | 82.22ms | 27.0KB | 0.00KB | 15.6MB | 16.0KB |
-| rezitui | 1 | 85µs | 216.9% | 74µs–97µs | 11.7K ops/s | 85.62ms | 189.4MB | 2.0MB | 2.4MB | 2.5KB |
-| bubbletea | 1 | 107µs | 62.4% | 103µs–111µs | 9.3K ops/s | 107.24ms | 20.8MB | 256.0KB | 15.6MB | 16.0KB |
-| blessed | 1 | 118µs | 303.9% | 96µs–141µs | 8.4K ops/s | 118.67ms | 520.0MB | 148.0KB | 616.2KB | 631B |
-| opentui-core | 1 | 126µs | 56.9% | 121µs–130µs | 8.0K ops/s | 152.40ms | 34.9MB | 0.00KB | 66.1MB | 67.7KB |
-| prompt-toolkit | 1 | 598µs | 30.3% | 587µs–609µs | 1.7K ops/s | 598.59ms | 36.7MB | 0.00KB | 1.9MB | 1.9KB |
-| rich | 1 | 610µs | 39.8% | 595µs–625µs | 1.6K ops/s | 610.55ms | 32.5MB | 308.0KB | 1.9MB | 1.9KB |
-| terminal-kit | 1 | 1.07ms | 43.9% | 1.04ms–1.10ms | 938 ops/s | 1.07s | 93.4MB | 4.3MB | 1.9MB | 1.9KB |
-| urwid | 1 | 1.07ms | 31.8% | 1.05ms–1.09ms | 935 ops/s | 1.07s | 42.3MB | 64.0KB | 1.8MB | 1.9KB |
-| ink | 1 | 1.54ms | 28.5% | 1.51ms–1.56ms | 651 ops/s | 1.54s | 347.4MB | 0.00KB | 153.3KB | 157B |
+| TUIX.Core | 1 | 19µs | 71.1% | 18µs–20µs | 53.1K ops/s | 18.89ms | 4.1MB | 0.00KB | 2.2MB | 2.2KB |
+| opentui-react | 1 | 41µs | 35.6% | 40µs–41µs | 24.7K ops/s | 42.13ms | 38.9MB | 0.00KB | 1.8MB | 1.8KB |
+| TUIX.Renderer | 1 | 62µs | 35.2% | 61µs–63µs | 16.1K ops/s | 67.76ms | 4.0MB | 0.00KB | 2.3MB | 2.3KB |
+| rezitui | 1 | 83µs | 177.7% | 74µs–92µs | 12.1K ops/s | 82.76ms | 190.4MB | 1.2MB | 2.4MB | 2.5KB |
+| tuix-python | 1 | 88µs | 27.3% | 86µs–89µs | 11.4K ops/s | 94.98ms | 18.7MB | 32.0KB | 2.2MB | 2.3KB |
+| ratatui | 1 | 97µs | 32.5% | 95µs–99µs | 10.3K ops/s | 97.21ms | 27.0KB | 0.00KB | 15.6MB | 16.0KB |
+| blessed | 1 | 108µs | 147.3% | 98µs–117µs | 9.3K ops/s | 107.72ms | 522.6MB | 360.0KB | 616.2KB | 631B |
+| bubbletea | 1 | 108µs | 66.2% | 104µs–112µs | 9.3K ops/s | 108.25ms | 20.2MB | 4.0MB | 15.6MB | 16.0KB |
+| opentui-core | 1 | 109µs | 50.9% | 106µs–113µs | 9.2K ops/s | 132.39ms | 35.1MB | 0.00KB | 66.1MB | 67.7KB |
+| terminal-kit | 1 | 463µs | 31.1% | 454µs–472µs | 2.2K ops/s | 463.40ms | 96.1MB | 4.3MB | 1.9MB | 1.9KB |
+| rich | 1 | 567µs | 30.8% | 556µs–578µs | 1.8K ops/s | 567.27ms | 32.9MB | 12.0KB | 1.9MB | 1.9KB |
+| prompt-toolkit | 1 | 587µs | 29.4% | 576µs–597µs | 1.7K ops/s | 586.94ms | 36.3MB | 72.0KB | 1.9MB | 1.9KB |
+| ink | 1 | 704µs | 41.9% | 686µs–722µs | 1.4K ops/s | 704.45ms | 356.7MB | 4.0KB | 153.3KB | 157B |
+| urwid | 1 | 970µs | 29.2% | 953µs–988µs | 1.0K ops/s | 970.75ms | 42.1MB | 64.0KB | 1.8MB | 1.9KB |
 
 ## tables (cols=8,rows=100)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 13µs | 19.2% | 13µs–13µs | 77.5K ops/s | 3.88ms | 4.1MB | 0.00KB | 1.5MB | 5.2KB |
-| TUIX.Renderer | 1 | 44µs | 9.8% | 43µs–44µs | 22.8K ops/s | 14.83ms | 4.0MB | 0.00KB | 1.6MB | 5.4KB |
-| tuix-python | 1 | 57µs | 29.0% | 55µs–59µs | 17.6K ops/s | 20.05ms | 18.5MB | 0.00KB | 4.2MB | 14.3KB |
-| opentui-core | 1 | 109µs | 53.6% | 103µs–116µs | 9.1K ops/s | 41.92ms | 34.9MB | 0.00KB | 19.8MB | 67.7KB |
-| bubbletea | 1 | 131µs | 46.3% | 124µs–138µs | 7.6K ops/s | 39.41ms | 20.8MB | 0.00KB | 4.7MB | 16.0KB |
-| ratatui | 1 | 149µs | 15.8% | 146µs–152µs | 6.7K ops/s | 44.77ms | 27.0KB | 0.00KB | 4.7MB | 16.0KB |
-| opentui-react | 1 | 183µs | 43.1% | 174µs–192µs | 5.5K ops/s | 60.43ms | 38.9MB | 0.00KB | 20.6MB | 70.4KB |
-| blessed | 1 | 333µs | 44.3% | 317µs–350µs | 3.0K ops/s | 100.05ms | 519.5MB | 68.0KB | 821.5KB | 2.7KB |
-| rich | 1 | 746µs | 24.2% | 726µs–766µs | 1.3K ops/s | 223.94ms | 32.5MB | 8.0KB | 569.2KB | 1.9KB |
-| rezitui | 1 | 832µs | 84.7% | 752µs–911µs | 1.2K ops/s | 249.60ms | 187.5MB | 0.00KB | 2.4MB | 8.0KB |
-| prompt-toolkit | 1 | 897µs | 28.9% | 867µs–926µs | 1.1K ops/s | 269.17ms | 36.7MB | 0.00KB | 569.2KB | 1.9KB |
-| terminal-kit | 1 | 1.11ms | 28.8% | 1.07ms–1.14ms | 905 ops/s | 331.91ms | 93.3MB | 0.00KB | 570.1KB | 1.9KB |
-| ink | 1 | 1.58ms | 23.3% | 1.53ms–1.62ms | 635 ops/s | 473.20ms | 348.0MB | 0.00KB | 569.2KB | 1.9KB |
-| urwid | 1 | 1.61ms | 31.1% | 1.55ms–1.67ms | 621 ops/s | 482.94ms | 42.3MB | 0.00KB | 562.5KB | 1.9KB |
+| TUIX.Core | 1 | 15µs | 28.2% | 14µs–15µs | 68.9K ops/s | 4.37ms | 4.1MB | 0.00KB | 1.5MB | 5.2KB |
+| tuix-python | 1 | 60µs | 43.7% | 57µs–63µs | 16.5K ops/s | 21.24ms | 18.7MB | 8.0KB | 4.2MB | 14.3KB |
+| ratatui | 1 | 82µs | 40.5% | 78µs–86µs | 12.2K ops/s | 24.60ms | 27.0KB | 0.00KB | 4.7MB | 16.0KB |
+| TUIX.Renderer | 1 | 85µs | 8.3% | 85µs–86µs | 11.7K ops/s | 28.78ms | 4.0MB | 0.00KB | 1.6MB | 5.4KB |
+| bubbletea | 1 | 134µs | 49.1% | 127µs–142µs | 7.5K ops/s | 40.32ms | 20.2MB | 0.00KB | 4.7MB | 16.0KB |
+| opentui-core | 1 | 193µs | 48.2% | 182µs–203µs | 5.2K ops/s | 73.42ms | 35.1MB | 0.00KB | 19.8MB | 67.7KB |
+| opentui-react | 1 | 252µs | 49.2% | 238µs–266µs | 4.0K ops/s | 82.79ms | 38.9MB | 0.00KB | 20.6MB | 70.4KB |
+| blessed | 1 | 312µs | 46.8% | 296µs–329µs | 3.2K ops/s | 93.68ms | 523.4MB | 0.00KB | 821.5KB | 2.7KB |
+| terminal-kit | 1 | 521µs | 30.8% | 503µs–539µs | 1.9K ops/s | 156.29ms | 96.1MB | 32.0KB | 570.1KB | 1.9KB |
+| ink | 1 | 611µs | 22.1% | 596µs–626µs | 1.6K ops/s | 183.43ms | 356.7MB | 0.00KB | 569.2KB | 1.9KB |
+| rezitui | 1 | 737µs | 66.6% | 682µs–793µs | 1.4K ops/s | 221.26ms | 189.8MB | 256.0KB | 2.4MB | 8.0KB |
+| prompt-toolkit | 1 | 783µs | 18.7% | 767µs–800µs | 1.3K ops/s | 235.09ms | 36.3MB | 8.0KB | 569.2KB | 1.9KB |
+| rich | 1 | 823µs | 30.8% | 794µs–851µs | 1.2K ops/s | 246.93ms | 32.9MB | 0.00KB | 569.2KB | 1.9KB |
+| urwid | 1 | 1.13ms | 22.3% | 1.11ms–1.16ms | 882 ops/s | 340.28ms | 42.1MB | 0.00KB | 562.5KB | 1.9KB |
 
 ## memory-profile
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| ratatui | 1 | 98µs | 30.8% | 96µs–99µs | 10.3K ops/s | 195.22ms | 27.0KB | 0.00KB | 31.2MB | 16.0KB |
-| rezitui | 1 | 136µs | 461.4% | 108µs–163µs | 7.4K ops/s | 271.49ms | 187.8MB | 76.0KB | 2.6MB | 1.3KB |
-| TUIX.Renderer | 1 | 139µs | 19.7% | 138µs–140µs | 7.2K ops/s | 322.53ms | 4.0MB | 0.00KB | 125.9MB | 64.4KB |
-| bubbletea | 1 | 143µs | 59.8% | 139µs–147µs | 7.0K ops/s | 286.13ms | 20.8MB | 0.00KB | 31.2MB | 16.0KB |
-| opentui-core | 1 | 168µs | 46.2% | 164µs–171µs | 6.0K ops/s | 392.92ms | 34.9MB | 36.0KB | 133.8MB | 68.5KB |
-| TUIX.Core | 1 | 171µs | 28.1% | 169µs–173µs | 5.8K ops/s | 342.42ms | 4.1MB | 0.00KB | 120.6MB | 61.7KB |
-| tuix-python | 1 | 173µs | 31.9% | 171µs–176µs | 5.8K ops/s | 396.56ms | 18.6MB | 60.0KB | 133.5MB | 68.3KB |
-| opentui-react | 1 | 188µs | 41.1% | 185µs–192µs | 5.3K ops/s | 398.64ms | 39.1MB | 228.0KB | 147.0MB | 75.3KB |
-| blessed | 1 | 402µs | 44.4% | 394µs–410µs | 2.5K ops/s | 804.82ms | 519.3MB | 0.00KB | 4.6MB | 2.3KB |
-| terminal-kit | 1 | 1.31ms | 21.8% | 1.30ms–1.32ms | 764 ops/s | 2.62s | 93.3MB | 44.0KB | 3.7MB | 1.9KB |
-| prompt-toolkit | 1 | 1.35ms | 29.8% | 1.34ms–1.37ms | 738 ops/s | 2.71s | 36.8MB | 84.0KB | 3.7MB | 1.9KB |
-| ink | 1 | 1.61ms | 23.0% | 1.60ms–1.63ms | 620 ops/s | 3.23s | 348.0MB | 12.0KB | 3.7MB | 1.9KB |
-| rich | 1 | 1.89ms | 30.6% | 1.86ms–1.92ms | 529 ops/s | 3.78s | 32.4MB | 0.00KB | 3.7MB | 1.9KB |
-| urwid | 1 | 1.93ms | 30.3% | 1.90ms–1.95ms | 518 ops/s | 3.86s | 42.3MB | 64.0KB | 3.7MB | 1.9KB |
+| ratatui | 1 | 82µs | 20.4% | 82µs–83µs | 12.1K ops/s | 164.93ms | 27.0KB | 0.00KB | 31.2MB | 16.0KB |
+| rezitui | 1 | 111µs | 473.3% | 88µs–134µs | 9.0K ops/s | 222.89ms | 190.9MB | 940.0KB | 2.6MB | 1.3KB |
+| bubbletea | 1 | 137µs | 62.0% | 133µs–141µs | 7.3K ops/s | 274.22ms | 20.2MB | 0.00KB | 31.2MB | 16.0KB |
+| opentui-react | 1 | 146µs | 28.3% | 145µs–148µs | 6.8K ops/s | 306.18ms | 39.2MB | 272.0KB | 147.0MB | 75.3KB |
+| TUIX.Renderer | 1 | 160µs | 32.9% | 158µs–162µs | 6.2K ops/s | 372.74ms | 4.0MB | 0.00KB | 125.9MB | 64.4KB |
+| opentui-core | 1 | 177µs | 44.7% | 174µs–181µs | 5.6K ops/s | 417.18ms | 35.1MB | 52.0KB | 133.8MB | 68.5KB |
+| tuix-python | 1 | 189µs | 31.0% | 187µs–192µs | 5.3K ops/s | 435.24ms | 18.9MB | 84.0KB | 133.5MB | 68.3KB |
+| TUIX.Core | 1 | 211µs | 32.3% | 208µs–214µs | 4.7K ops/s | 423.04ms | 4.1MB | 0.00KB | 120.6MB | 61.7KB |
+| blessed | 1 | 376µs | 45.2% | 368µs–383µs | 2.7K ops/s | 751.44ms | 522.6MB | 0.00KB | 4.6MB | 2.3KB |
+| terminal-kit | 1 | 542µs | 29.3% | 535µs–549µs | 1.8K ops/s | 1.08s | 95.9MB | 76.0KB | 3.7MB | 1.9KB |
+| ink | 1 | 785µs | 30.7% | 774µs–796µs | 1.3K ops/s | 1.57s | 356.7MB | 12.0KB | 3.7MB | 1.9KB |
+| prompt-toolkit | 1 | 1.03ms | 24.6% | 1.02ms–1.05ms | 967 ops/s | 2.07s | 36.6MB | 320.0KB | 3.7MB | 1.9KB |
+| urwid | 1 | 1.53ms | 28.4% | 1.51ms–1.55ms | 654 ops/s | 3.06s | 42.2MB | 84.0KB | 3.7MB | 1.9KB |
+| rich | 1 | 1.64ms | 28.7% | 1.62ms–1.67ms | 608 ops/s | 3.29s | 32.9MB | 40.0KB | 3.7MB | 1.9KB |
 
 ## terminal-rerender
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Renderer | 1 | 25µs | 18.7% | 25µs–26µs | 39.5K ops/s | 25.33ms | 4.2MB | 0.00KB | 15.6KB | 16B |
-| tuix-python | 1 | 28µs | 69.0% | 27µs–29µs | 35.9K ops/s | 28.70ms | 18.7MB | 68.0KB | 4.6MB | 4.7KB |
-| TUIX.Core | 1 | 32µs | 31.6% | 31µs–32µs | 31.7K ops/s | 31.57ms | 4.4MB | 0.00KB | 15.6KB | 16B |
-| rezitui | 1 | 40µs | 299.9% | 33µs–48µs | 24.9K ops/s | 40.36ms | 187.3MB | 0.00KB | 2.2MB | 2.2KB |
-| opentui-react | 1 | 103µs | 21.2% | 102µs–104µs | 9.7K ops/s | 103.21ms | 39.1MB | 0.00KB | 3.9KB | 4B |
-| ratatui | 1 | 120µs | 43.8% | 117µs–124µs | 8.3K ops/s | 120.31ms | 27.0KB | 0.00KB | 40.6MB | 41.6KB |
-| bubbletea | 1 | 125µs | 59.1% | 121µs–130µs | 8.0K ops/s | 125.51ms | 24.8MB | 4.0MB | 40.6MB | 41.6KB |
-| blessed | 1 | 196µs | 29.1% | 193µs–200µs | 5.1K ops/s | 196.58ms | 519.3MB | 4.0KB | 0.00KB | 0.00KB |
-| opentui-core | 1 | 382µs | 43.9% | 372µs–393µs | 2.6K ops/s | 382.64ms | 35.7MB | 24.0KB | 167.1MB | 171.1KB |
-| terminal-kit | 1 | 1.33ms | 20.9% | 1.31ms–1.35ms | 751 ops/s | 1.33s | 93.4MB | 8.0KB | 4.6MB | 4.7KB |
-| rich | 1 | 2.82ms | 25.0% | 2.78ms–2.86ms | 355 ops/s | 2.82s | 32.2MB | 84.0KB | 4.6MB | 4.7KB |
-| ink | 1 | 2.85ms | 24.1% | 2.81ms–2.89ms | 351 ops/s | 2.85s | 347.6MB | 0.00KB | 4.6MB | 4.7KB |
-| prompt-toolkit | 1 | 3.55ms | 27.9% | 3.48ms–3.61ms | 282 ops/s | 3.55s | 37.0MB | 0.00KB | 4.6MB | 4.7KB |
-| urwid | 1 | 4.55ms | 28.0% | 4.47ms–4.63ms | 220 ops/s | 4.55s | 42.4MB | 64.0KB | 4.6MB | 4.7KB |
+| tuix-python | 1 | 27µs | 33.5% | 26µs–27µs | 37.5K ops/s | 27.19ms | 19.1MB | 64.0KB | 4.6MB | 4.7KB |
+| TUIX.Renderer | 1 | 30µs | 31.5% | 30µs–31µs | 33.1K ops/s | 30.27ms | 4.1MB | 0.00KB | 15.6KB | 16B |
+| TUIX.Core | 1 | 34µs | 28.4% | 34µs–35µs | 29.3K ops/s | 34.14ms | 4.3MB | 0.00KB | 15.6KB | 16B |
+| rezitui | 1 | 37µs | 310.2% | 30µs–44µs | 27.0K ops/s | 37.18ms | 189.1MB | 0.00KB | 2.2MB | 2.2KB |
+| ratatui | 1 | 112µs | 26.9% | 111µs–114µs | 8.9K ops/s | 112.53ms | 27.0KB | 0.00KB | 40.6MB | 41.6KB |
+| bubbletea | 1 | 120µs | 62.6% | 116µs–125µs | 8.3K ops/s | 120.45ms | 20.2MB | 0.00KB | 40.6MB | 41.6KB |
+| opentui-react | 1 | 123µs | 41.9% | 119µs–126µs | 8.2K ops/s | 122.80ms | 39.2MB | 0.00KB | 3.9KB | 4B |
+| blessed | 1 | 222µs | 30.4% | 218µs–226µs | 4.5K ops/s | 221.92ms | 522.6MB | 0.00KB | 0.00KB | 0.00KB |
+| opentui-core | 1 | 400µs | 41.5% | 390µs–410µs | 2.5K ops/s | 400.26ms | 35.9MB | 24.0KB | 167.1MB | 171.1KB |
+| terminal-kit | 1 | 476µs | 29.0% | 468µs–485µs | 2.1K ops/s | 476.46ms | 96.1MB | 128.0KB | 4.6MB | 4.7KB |
+| ink | 1 | 1.52ms | 29.3% | 1.49ms–1.55ms | 659 ops/s | 1.52s | 356.7MB | 4.0KB | 4.6MB | 4.7KB |
+| rich | 1 | 2.45ms | 23.6% | 2.41ms–2.49ms | 408 ops/s | 2.45s | 33.0MB | 16.0KB | 4.6MB | 4.7KB |
+| prompt-toolkit | 1 | 2.90ms | 27.9% | 2.85ms–2.95ms | 344 ops/s | 2.90s | 37.2MB | 284.0KB | 4.6MB | 4.7KB |
+| urwid | 1 | 3.29ms | 24.8% | 3.24ms–3.34ms | 304 ops/s | 3.29s | 42.3MB | 64.0KB | 4.6MB | 4.7KB |
 
 ## terminal-frame-fill (cols=120,dirtyLines=1,rows=40)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Renderer | 1 | 32µs | 35.1% | 31µs–33µs | 31.6K ops/s | 16.23ms | 4.1MB | 0.00KB | 7.8KB | 16B |
-| TUIX.Core | 1 | 34µs | 45.2% | 33µs–36µs | 29.2K ops/s | 17.16ms | 4.4MB | 0.00KB | 1.2MB | 2.4KB |
-| tuix-python | 1 | 38µs | 58.1% | 36µs–40µs | 26.2K ops/s | 20.07ms | 18.7MB | 0.00KB | 22.6MB | 46.2KB |
-| rezitui | 1 | 54µs | 207.7% | 44µs–64µs | 18.4K ops/s | 27.19ms | 188.9MB | 1.6MB | 1.1MB | 2.2KB |
-| opentui-react | 1 | 132µs | 34.4% | 128µs–136µs | 7.6K ops/s | 69.40ms | 39.1MB | 0.00KB | 4.6MB | 9.5KB |
-| bubbletea | 1 | 144µs | 76.9% | 135µs–154µs | 6.9K ops/s | 72.23ms | 24.8MB | 0.00KB | 20.3MB | 41.6KB |
-| ratatui | 1 | 144µs | 27.8% | 141µs–148µs | 6.9K ops/s | 72.19ms | 27.0KB | 0.00KB | 20.3MB | 41.6KB |
-| opentui-core | 1 | 274µs | 33.3% | 266µs–282µs | 3.6K ops/s | 138.17ms | 36.7MB | 0.00KB | 83.5MB | 171.0KB |
-| blessed | 1 | 431µs | 37.7% | 417µs–445µs | 2.3K ops/s | 215.66ms | 519.6MB | 8.0KB | 0.00KB | 0.00KB |
-| rich | 1 | 855µs | 51.2% | 817µs–893µs | 1.2K ops/s | 427.86ms | 32.4MB | 172.0KB | 2.3MB | 4.7KB |
-| terminal-kit | 1 | 1.35ms | 27.2% | 1.32ms–1.38ms | 741 ops/s | 675.69ms | 93.2MB | 0.00KB | 2.3MB | 4.7KB |
-| prompt-toolkit | 1 | 1.60ms | 32.3% | 1.55ms–1.64ms | 627 ops/s | 798.33ms | 37.1MB | 104.0KB | 2.3MB | 4.7KB |
-| urwid | 1 | 2.41ms | 29.7% | 2.35ms–2.48ms | 414 ops/s | 1.21s | 42.4MB | 0.00KB | 2.3MB | 4.7KB |
-| ink | 1 | 3.36ms | 17.3% | 3.31ms–3.41ms | 298 ops/s | 1.68s | 348.1MB | 384.0KB | 77.6KB | 159B |
+| TUIX.Renderer | 1 | 33µs | 55.2% | 31µs–34µs | 30.6K ops/s | 16.76ms | 4.1MB | 0.00KB | 7.8KB | 16B |
+| TUIX.Core | 1 | 37µs | 22.4% | 36µs–38µs | 27.0K ops/s | 18.52ms | 4.5MB | 0.00KB | 1.2MB | 2.4KB |
+| tuix-python | 1 | 43µs | 39.0% | 41µs–44µs | 23.5K ops/s | 22.30ms | 19.1MB | 0.00KB | 22.6MB | 46.2KB |
+| rezitui | 1 | 67µs | 213.0% | 55µs–80µs | 14.9K ops/s | 33.72ms | 191.0MB | 1.8MB | 1.1MB | 2.2KB |
+| ratatui | 1 | 123µs | 50.4% | 117µs–128µs | 8.1K ops/s | 61.40ms | 27.0KB | 0.00KB | 20.3MB | 41.6KB |
+| bubbletea | 1 | 139µs | 84.8% | 129µs–149µs | 7.2K ops/s | 69.53ms | 20.7MB | 264.0KB | 20.3MB | 41.6KB |
+| opentui-react | 1 | 145µs | 37.2% | 140µs–150µs | 6.9K ops/s | 76.02ms | 39.2MB | 0.00KB | 4.6MB | 9.5KB |
+| opentui-core | 1 | 285µs | 32.4% | 277µs–293µs | 3.5K ops/s | 143.40ms | 36.9MB | 0.00KB | 83.5MB | 171.0KB |
+| blessed | 1 | 468µs | 46.1% | 449µs–487µs | 2.1K ops/s | 234.17ms | 522.7MB | 80.0KB | 0.00KB | 0.00KB |
+| terminal-kit | 1 | 516µs | 30.5% | 502µs–530µs | 1.9K ops/s | 258.15ms | 96.1MB | 0.00KB | 2.3MB | 4.7KB |
+| rich | 1 | 826µs | 29.5% | 805µs–848µs | 1.2K ops/s | 413.53ms | 33.1MB | 112.0KB | 2.3MB | 4.7KB |
+| prompt-toolkit | 1 | 1.40ms | 24.0% | 1.37ms–1.43ms | 716 ops/s | 698.42ms | 37.2MB | 0.00KB | 2.3MB | 4.7KB |
+| ink | 1 | 1.65ms | 28.6% | 1.61ms–1.69ms | 605 ops/s | 826.83ms | 356.7MB | 4.0KB | 77.6KB | 159B |
+| urwid | 1 | 1.87ms | 24.0% | 1.83ms–1.91ms | 536 ops/s | 933.23ms | 42.3MB | 0.00KB | 2.3MB | 4.7KB |
 
 ## terminal-frame-fill (cols=120,dirtyLines=40,rows=40)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 32µs | 11.8% | 32µs–33µs | 30.9K ops/s | 16.19ms | 4.4MB | 0.00KB | 41.8MB | 85.5KB |
-| rezitui | 1 | 174µs | 349.5% | 121µs–227µs | 5.7K ops/s | 87.15ms | 200.4MB | 11.5MB | 1.1MB | 2.2KB |
-| TUIX.Renderer | 1 | 263µs | 19.3% | 259µs–268µs | 3.8K ops/s | 147.27ms | 4.2MB | 0.00KB | 42.8MB | 87.8KB |
-| ratatui | 1 | 273µs | 32.2% | 265µs–280µs | 3.7K ops/s | 136.31ms | 27.0KB | 0.00KB | 20.3MB | 41.6KB |
-| tuix-python | 1 | 339µs | 28.8% | 331µs–348µs | 2.9K ops/s | 188.69ms | 18.7MB | 0.00KB | 42.9MB | 87.8KB |
-| opentui-core | 1 | 341µs | 35.7% | 330µs–351µs | 2.9K ops/s | 192.96ms | 36.7MB | 0.00KB | 83.5MB | 171.0KB |
-| bubbletea | 1 | 365µs | 62.1% | 345µs–385µs | 2.7K ops/s | 182.80ms | 24.8MB | 0.00KB | 20.3MB | 41.6KB |
-| opentui-react | 1 | 451µs | 32.1% | 438µs–464µs | 2.2K ops/s | 239.20ms | 39.1MB | 0.00KB | 92.3MB | 189.0KB |
-| blessed | 1 | 890µs | 48.3% | 852µs–928µs | 1.1K ops/s | 445.29ms | 520.0MB | 312.0KB | 2.7MB | 5.5KB |
-| terminal-kit | 1 | 3.03ms | 16.5% | 2.98ms–3.07ms | 330 ops/s | 1.51s | 93.3MB | 4.0KB | 2.3MB | 4.7KB |
-| prompt-toolkit | 1 | 3.10ms | 28.0% | 3.03ms–3.18ms | 322 ops/s | 1.55s | 37.0MB | 0.00KB | 2.3MB | 4.7KB |
-| ink | 1 | 3.31ms | 19.7% | 3.25ms–3.37ms | 302 ops/s | 1.66s | 348.1MB | 0.00KB | 2.3MB | 4.7KB |
-| urwid | 1 | 4.25ms | 33.3% | 4.12ms–4.37ms | 236 ops/s | 2.12s | 42.4MB | 4.0KB | 2.3MB | 4.7KB |
-| rich | 1 | 4.35ms | 29.8% | 4.23ms–4.46ms | 230 ops/s | 2.17s | 33.0MB | 308.0KB | 2.3MB | 4.7KB |
+| TUIX.Core | 1 | 65µs | 28.1% | 63µs–66µs | 15.4K ops/s | 32.47ms | 4.5MB | 0.00KB | 41.8MB | 85.5KB |
+| ratatui | 1 | 196µs | 8.8% | 195µs–198µs | 5.1K ops/s | 98.04ms | 27.0KB | 0.00KB | 20.3MB | 41.6KB |
+| rezitui | 1 | 253µs | 377.7% | 169µs–336µs | 4.0K ops/s | 126.45ms | 220.6MB | 29.6MB | 1.1MB | 2.2KB |
+| bubbletea | 1 | 305µs | 47.7% | 293µs–318µs | 3.3K ops/s | 152.79ms | 20.7MB | 0.00KB | 20.3MB | 41.6KB |
+| opentui-core | 1 | 327µs | 34.6% | 317µs–337µs | 3.1K ops/s | 185.39ms | 36.9MB | 0.00KB | 83.5MB | 171.0KB |
+| TUIX.Renderer | 1 | 353µs | 30.4% | 343µs–362µs | 2.8K ops/s | 198.25ms | 4.2MB | 0.00KB | 42.8MB | 87.8KB |
+| opentui-react | 1 | 416µs | 29.5% | 405µs–427µs | 2.4K ops/s | 220.68ms | 39.2MB | 0.00KB | 92.3MB | 189.0KB |
+| tuix-python | 1 | 432µs | 26.4% | 422µs–442µs | 2.3K ops/s | 240.60ms | 19.0MB | 0.00KB | 42.9MB | 87.8KB |
+| blessed | 1 | 823µs | 35.8% | 797µs–849µs | 1.2K ops/s | 411.67ms | 522.9MB | 188.0KB | 2.7MB | 5.5KB |
+| terminal-kit | 1 | 1.15ms | 26.0% | 1.12ms–1.17ms | 873 ops/s | 573.13ms | 96.4MB | 4.0KB | 2.3MB | 4.7KB |
+| ink | 1 | 1.92ms | 27.2% | 1.87ms–1.96ms | 522 ops/s | 958.22ms | 356.7MB | 0.00KB | 2.3MB | 4.7KB |
+| prompt-toolkit | 1 | 2.94ms | 25.6% | 2.88ms–3.01ms | 340 ops/s | 1.47s | 37.2MB | 0.00KB | 2.3MB | 4.7KB |
+| urwid | 1 | 3.38ms | 27.8% | 3.29ms–3.46ms | 296 ops/s | 1.69s | 42.3MB | 36.0KB | 2.3MB | 4.7KB |
+| rich | 1 | 3.66ms | 24.2% | 3.59ms–3.74ms | 273 ops/s | 1.83s | 33.0MB | 0.00KB | 2.3MB | 4.7KB |
 
 ## terminal-screen-transition (cols=120,rows=40)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| rezitui | 1 | 182µs | 382.7% | 139µs–225µs | 5.5K ops/s | 182.35ms | 206.7MB | 6.1MB | 2.2MB | 2.2KB |
-| bubbletea | 1 | 218µs | 57.4% | 210µs–225µs | 4.6K ops/s | 217.75ms | 24.8MB | 0.00KB | 40.6MB | 41.6KB |
-| TUIX.Renderer | 1 | 253µs | 45.3% | 246µs–260µs | 4.0K ops/s | 288.46ms | 4.3MB | 0.00KB | 157.1MB | 160.9KB |
-| ratatui | 1 | 254µs | 101.2% | 238µs–270µs | 3.9K ops/s | 253.92ms | 27.0KB | 0.00KB | 40.6MB | 41.6KB |
-| tuix-python | 1 | 293µs | 45.0% | 285µs–301µs | 3.4K ops/s | 328.65ms | 18.8MB | 64.0KB | 166.7MB | 170.8KB |
-| TUIX.Core | 1 | 329µs | 45.0% | 320µs–338µs | 3.0K ops/s | 329.25ms | 4.6MB | 0.00KB | 153.2MB | 156.8KB |
-| opentui-core | 1 | 445µs | 55.1% | 430µs–460µs | 2.2K ops/s | 519.12ms | 36.7MB | 0.00KB | 171.1MB | 175.2KB |
-| opentui-react | 1 | 500µs | 40.2% | 488µs–513µs | 2.0K ops/s | 519.15ms | 39.1MB | 0.00KB | 187.1MB | 191.6KB |
-| blessed | 1 | 863µs | 33.7% | 845µs–881µs | 1.2K ops/s | 863.65ms | 519.8MB | 4.0KB | 5.3MB | 5.4KB |
-| rich | 1 | 2.16ms | 31.0% | 2.11ms–2.20ms | 464 ops/s | 2.16s | 33.0MB | 0.00KB | 4.6MB | 4.7KB |
-| prompt-toolkit | 1 | 2.52ms | 29.3% | 2.48ms–2.57ms | 397 ops/s | 2.52s | 37.1MB | 68.0KB | 4.6MB | 4.7KB |
-| terminal-kit | 1 | 2.71ms | 20.3% | 2.68ms–2.75ms | 369 ops/s | 2.71s | 93.4MB | 0.00KB | 4.6MB | 4.7KB |
-| ink | 1 | 3.05ms | 21.3% | 3.01ms–3.09ms | 328 ops/s | 3.05s | 348.0MB | 28.0KB | 4.6MB | 4.7KB |
-| urwid | 1 | 3.17ms | 30.5% | 3.11ms–3.23ms | 316 ops/s | 3.17s | 42.4MB | 8.0KB | 4.6MB | 4.7KB |
+| rezitui | 1 | 196µs | 403.8% | 147µs–244µs | 5.1K ops/s | 195.71ms | 219.0MB | 0.00KB | 2.2MB | 2.2KB |
+| bubbletea | 1 | 209µs | 58.6% | 202µs–217µs | 4.8K ops/s | 209.32ms | 20.7MB | 0.00KB | 40.6MB | 41.6KB |
+| ratatui | 1 | 222µs | 28.7% | 218µs–226µs | 4.5K ops/s | 222.20ms | 27.0KB | 0.00KB | 40.6MB | 41.6KB |
+| opentui-core | 1 | 317µs | 43.2% | 308µs–325µs | 3.2K ops/s | 375.42ms | 36.9MB | 0.00KB | 171.1MB | 175.2KB |
+| TUIX.Renderer | 1 | 319µs | 52.0% | 309µs–330µs | 3.1K ops/s | 366.68ms | 4.3MB | 0.00KB | 157.1MB | 160.9KB |
+| tuix-python | 1 | 348µs | 50.2% | 337µs–358µs | 2.9K ops/s | 390.13ms | 19.5MB | 28.0KB | 166.7MB | 170.8KB |
+| TUIX.Core | 1 | 399µs | 50.3% | 386µs–411µs | 2.5K ops/s | 398.71ms | 4.6MB | 0.00KB | 153.2MB | 156.8KB |
+| opentui-react | 1 | 449µs | 34.7% | 440µs–459µs | 2.2K ops/s | 465.69ms | 39.2MB | 0.00KB | 187.1MB | 191.6KB |
+| blessed | 1 | 744µs | 33.5% | 729µs–760µs | 1.3K ops/s | 744.64ms | 522.9MB | 0.00KB | 5.3MB | 5.4KB |
+| terminal-kit | 1 | 1.17ms | 26.1% | 1.15ms–1.19ms | 856 ops/s | 1.17s | 96.4MB | 104.0KB | 4.6MB | 4.7KB |
+| ink | 1 | 1.52ms | 29.0% | 1.50ms–1.55ms | 656 ops/s | 1.52s | 356.7MB | 0.00KB | 4.6MB | 4.7KB |
+| rich | 1 | 1.79ms | 27.5% | 1.76ms–1.82ms | 559 ops/s | 1.79s | 33.1MB | 0.00KB | 4.6MB | 4.7KB |
+| prompt-toolkit | 1 | 1.99ms | 27.3% | 1.95ms–2.02ms | 503 ops/s | 1.99s | 37.2MB | 64.0KB | 4.6MB | 4.7KB |
+| urwid | 1 | 2.53ms | 28.7% | 2.49ms–2.58ms | 395 ops/s | 2.53s | 42.4MB | 16.0KB | 4.6MB | 4.7KB |
 
 ## terminal-fps-stream (channels=12,cols=120,rows=40)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 32µs | 15.0% | 31µs–32µs | 31.5K ops/s | 38.14ms | 4.5MB | 0.00KB | 2.3MB | 2.0KB |
-| TUIX.Renderer | 1 | 49µs | 5.8% | 49µs–49µs | 20.3K ops/s | 59.64ms | 4.3MB | 0.00KB | 2.3MB | 2.0KB |
-| tuix-python | 1 | 61µs | 35.8% | 59µs–62µs | 16.5K ops/s | 75.32ms | 18.8MB | 16.0KB | 8.4MB | 7.2KB |
-| bubbletea | 1 | 182µs | 56.9% | 177µs–188µs | 5.5K ops/s | 219.14ms | 24.8MB | 0.00KB | 48.8MB | 41.6KB |
-| ratatui | 1 | 226µs | 25.5% | 223µs–230µs | 4.4K ops/s | 271.78ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
-| opentui-react | 1 | 251µs | 31.7% | 247µs–256µs | 4.0K ops/s | 320.76ms | 39.1MB | 0.00KB | 202.0MB | 172.3KB |
-| blessed | 1 | 466µs | 45.1% | 454µs–478µs | 2.1K ops/s | 559.04ms | 519.6MB | 12.0KB | 5.7MB | 4.8KB |
-| opentui-core | 1 | 608µs | 35.6% | 596µs–620µs | 1.6K ops/s | 837.23ms | 36.7MB | 0.00KB | 193.0MB | 164.7KB |
-| rezitui | 1 | 835µs | 143.1% | 768µs–903µs | 1.2K ops/s | 1.00s | 207.6MB | 1.2MB | 4.2MB | 3.6KB |
-| rich | 1 | 2.10ms | 29.8% | 2.06ms–2.13ms | 477 ops/s | 2.52s | 33.0MB | 0.00KB | 5.5MB | 4.7KB |
-| prompt-toolkit | 1 | 2.60ms | 30.7% | 2.55ms–2.64ms | 385 ops/s | 3.12s | 37.1MB | 0.00KB | 5.5MB | 4.7KB |
-| terminal-kit | 1 | 2.91ms | 18.3% | 2.88ms–2.94ms | 344 ops/s | 3.50s | 93.4MB | 0.00KB | 5.5MB | 4.7KB |
-| ink | 1 | 3.00ms | 23.3% | 2.96ms–3.04ms | 334 ops/s | 3.60s | 348.2MB | 8.0KB | 2.5MB | 2.1KB |
-| urwid | 1 | 3.28ms | 30.1% | 3.22ms–3.33ms | 305 ops/s | 3.93s | 42.5MB | 64.0KB | 5.5MB | 4.7KB |
+| TUIX.Core | 1 | 40µs | 27.9% | 40µs–41µs | 24.7K ops/s | 48.55ms | 4.6MB | 0.00KB | 2.3MB | 2.0KB |
+| TUIX.Renderer | 1 | 68µs | 39.1% | 67µs–70µs | 14.6K ops/s | 82.90ms | 4.3MB | 0.00KB | 2.3MB | 2.0KB |
+| tuix-python | 1 | 71µs | 32.3% | 70µs–72µs | 14.1K ops/s | 88.20ms | 19.2MB | 36.0KB | 8.4MB | 7.2KB |
+| bubbletea | 1 | 182µs | 61.1% | 176µs–189µs | 5.5K ops/s | 219.12ms | 20.7MB | 0.00KB | 48.8MB | 41.6KB |
+| ratatui | 1 | 215µs | 23.8% | 212µs–218µs | 4.7K ops/s | 257.75ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
+| opentui-core | 1 | 237µs | 38.8% | 231µs–242µs | 4.2K ops/s | 349.94ms | 36.9MB | 0.00KB | 193.0MB | 164.7KB |
+| opentui-react | 1 | 277µs | 35.9% | 272µs–283µs | 3.6K ops/s | 354.90ms | 39.2MB | 0.00KB | 202.0MB | 172.3KB |
+| rezitui | 1 | 485µs | 124.2% | 451µs–519µs | 2.1K ops/s | 581.99ms | 222.1MB | 2.2MB | 4.2MB | 3.6KB |
+| blessed | 1 | 498µs | 46.9% | 485µs–511µs | 2.0K ops/s | 597.65ms | 522.2MB | 28.0KB | 5.7MB | 4.8KB |
+| terminal-kit | 1 | 1.17ms | 26.6% | 1.15ms–1.18ms | 858 ops/s | 1.40s | 96.6MB | 0.00KB | 5.5MB | 4.7KB |
+| ink | 1 | 1.62ms | 29.7% | 1.59ms–1.65ms | 618 ops/s | 1.94s | 356.8MB | 0.00KB | 2.5MB | 2.1KB |
+| rich | 1 | 1.83ms | 28.1% | 1.80ms–1.86ms | 547 ops/s | 2.19s | 33.1MB | 4.0KB | 5.5MB | 4.7KB |
+| prompt-toolkit | 1 | 2.01ms | 28.6% | 1.97ms–2.04ms | 498 ops/s | 2.41s | 37.2MB | 0.00KB | 5.5MB | 4.7KB |
+| urwid | 1 | 2.47ms | 23.3% | 2.43ms–2.50ms | 405 ops/s | 2.96s | 42.4MB | 68.0KB | 5.5MB | 4.7KB |
 
 ## terminal-input-latency (cols=120,rows=40)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| tuix-python | 1 | 27µs | 8.2% | 27µs–27µs | 36.6K ops/s | 28.17ms | 18.9MB | 32.0KB | 4.6MB | 4.7KB |
-| TUIX.Renderer | 1 | 29µs | 57.3% | 28µs–30µs | 34.3K ops/s | 29.19ms | 4.3MB | 0.00KB | 15.6KB | 16B |
-| TUIX.Core | 1 | 33µs | 55.9% | 32µs–34µs | 30.1K ops/s | 33.29ms | 4.5MB | 0.00KB | 52.7KB | 54B |
-| ratatui | 1 | 115µs | 26.7% | 113µs–116µs | 8.7K ops/s | 114.61ms | 27.0KB | 0.00KB | 40.6MB | 41.6KB |
-| opentui-react | 1 | 129µs | 45.3% | 125µs–132µs | 7.8K ops/s | 153.18ms | 39.1MB | 0.00KB | 833.0KB | 853B |
-| rezitui | 1 | 185µs | 306.7% | 150µs–220µs | 5.4K ops/s | 185.65ms | 208.4MB | 824.0KB | 2.2MB | 2.2KB |
-| blessed | 1 | 432µs | 42.0% | 420µs–443µs | 2.3K ops/s | 431.93ms | 520.0MB | 336.0KB | 0.00KB | 0.00KB |
-| bubbletea | 1 | 561µs | 99.1% | 527µs–596µs | 1.8K ops/s | 561.61ms | 24.8MB | 0.00KB | 40.6MB | 41.6KB |
-| opentui-core | 1 | 772µs | 66.5% | 740µs–803µs | 1.3K ops/s | 773.15ms | 36.7MB | 0.00KB | 166.6MB | 170.6KB |
-| terminal-kit | 1 | 1.30ms | 21.5% | 1.28ms–1.31ms | 772 ops/s | 1.30s | 93.4MB | 24.0KB | 4.6MB | 4.7KB |
-| rich | 1 | 1.52ms | 29.5% | 1.49ms–1.54ms | 660 ops/s | 1.52s | 33.4MB | 412.0KB | 4.6MB | 4.7KB |
-| prompt-toolkit | 1 | 2.31ms | 29.7% | 2.27ms–2.35ms | 433 ops/s | 2.31s | 37.4MB | 224.0KB | 4.6MB | 4.7KB |
-| urwid | 1 | 3.02ms | 27.8% | 2.96ms–3.07ms | 331 ops/s | 3.02s | 42.5MB | 36.0KB | 4.6MB | 4.7KB |
-| ink | 1 | 3.72ms | 20.7% | 3.67ms–3.77ms | 269 ops/s | 3.72s | 348.3MB | 0.00KB | 4.6MB | 4.7KB |
+| TUIX.Renderer | 1 | 32µs | 67.2% | 30µs–33µs | 31.6K ops/s | 31.70ms | 4.3MB | 0.00KB | 15.6KB | 16B |
+| tuix-python | 1 | 38µs | 27.7% | 37µs–39µs | 26.4K ops/s | 39.00ms | 19.3MB | 64.0KB | 4.6MB | 4.7KB |
+| TUIX.Core | 1 | 40µs | 40.8% | 39µs–41µs | 24.9K ops/s | 40.26ms | 4.5MB | 0.00KB | 52.7KB | 54B |
+| rezitui | 1 | 66µs | 297.5% | 54µs–78µs | 15.2K ops/s | 65.96ms | 220.6MB | 0.00KB | 2.2MB | 2.2KB |
+| ratatui | 1 | 119µs | 28.5% | 117µs–122µs | 8.4K ops/s | 119.53ms | 27.0KB | 0.00KB | 40.6MB | 41.6KB |
+| opentui-react | 1 | 147µs | 42.1% | 144µs–151µs | 6.8K ops/s | 177.17ms | 39.2MB | 0.00KB | 833.0KB | 853B |
+| opentui-core | 1 | 293µs | 28.8% | 288µs–298µs | 3.4K ops/s | 293.63ms | 36.9MB | 0.00KB | 166.6MB | 170.6KB |
+| bubbletea | 1 | 309µs | 56.7% | 298µs–320µs | 3.2K ops/s | 308.99ms | 20.7MB | 8.0KB | 40.6MB | 41.6KB |
+| blessed | 1 | 419µs | 41.7% | 408µs–430µs | 2.4K ops/s | 419.02ms | 522.4MB | 216.0KB | 0.00KB | 0.00KB |
+| terminal-kit | 1 | 503µs | 31.2% | 493µs–512µs | 2.0K ops/s | 502.87ms | 96.5MB | 48.0KB | 4.6MB | 4.7KB |
+| rich | 1 | 1.26ms | 25.1% | 1.24ms–1.28ms | 792 ops/s | 1.26s | 33.5MB | 412.0KB | 4.6MB | 4.7KB |
+| ink | 1 | 1.84ms | 28.4% | 1.81ms–1.88ms | 543 ops/s | 1.84s | 356.7MB | 28.0KB | 4.6MB | 4.7KB |
+| prompt-toolkit | 1 | 1.95ms | 27.9% | 1.92ms–1.99ms | 512 ops/s | 1.95s | 37.3MB | 68.0KB | 4.6MB | 4.7KB |
+| urwid | 1 | 2.32ms | 24.4% | 2.29ms–2.36ms | 430 ops/s | 2.32s | 42.5MB | 4.0KB | 4.6MB | 4.7KB |
 
 ## terminal-memory-soak (cols=120,rows=40)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| ratatui | 1 | 318µs | 43.0% | 311µs–326µs | 3.1K ops/s | 382.07ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
-| TUIX.Renderer | 1 | 358µs | 20.3% | 354µs–362µs | 2.8K ops/s | 497.20ms | 4.3MB | 0.00KB | 188.5MB | 160.9KB |
-| tuix-python | 1 | 392µs | 11.1% | 389µs–394µs | 2.6K ops/s | 539.77ms | 19.0MB | 80.0KB | 200.1MB | 170.8KB |
-| rezitui | 1 | 434µs | 361.8% | 346µs–523µs | 2.3K ops/s | 522.51ms | 208.4MB | 8.0KB | 2.6MB | 2.2KB |
-| TUIX.Core | 1 | 441µs | 19.1% | 436µs–445µs | 2.3K ops/s | 528.68ms | 4.6MB | 124.0KB | 183.8MB | 156.8KB |
-| bubbletea | 1 | 458µs | 128.5% | 425µs–492µs | 2.2K ops/s | 550.27ms | 24.8MB | 8.0KB | 48.8MB | 41.6KB |
-| opentui-react | 1 | 846µs | 52.6% | 821µs–871µs | 1.2K ops/s | 1.04s | 39.1MB | 0.00KB | 222.5MB | 189.9KB |
-| opentui-core | 1 | 863µs | 35.2% | 846µs–880µs | 1.2K ops/s | 1.13s | 36.7MB | 0.00KB | 200.4MB | 171.0KB |
-| blessed | 1 | 1.01ms | 32.3% | 996µs–1.03ms | 986 ops/s | 1.22s | 520.0MB | 0.00KB | 6.5MB | 5.5KB |
-| terminal-kit | 1 | 3.00ms | 18.3% | 2.97ms–3.03ms | 334 ops/s | 3.60s | 93.5MB | 0.00KB | 5.5MB | 4.7KB |
-| prompt-toolkit | 1 | 3.47ms | 26.6% | 3.42ms–3.52ms | 288 ops/s | 4.17s | 37.2MB | 0.00KB | 5.5MB | 4.7KB |
-| ink | 1 | 3.49ms | 20.9% | 3.45ms–3.54ms | 286 ops/s | 4.20s | 348.4MB | 40.0KB | 5.5MB | 4.7KB |
-| rich | 1 | 4.43ms | 29.0% | 4.36ms–4.50ms | 226 ops/s | 5.32s | 33.4MB | 360.0KB | 5.5MB | 4.7KB |
-| urwid | 1 | 4.67ms | 26.0% | 4.60ms–4.74ms | 214 ops/s | 5.60s | 42.5MB | 20.0KB | 5.5MB | 4.7KB |
+| ratatui | 1 | 213µs | 20.1% | 211µs–216µs | 4.7K ops/s | 255.89ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
+| bubbletea | 1 | 215µs | 56.3% | 208µs–222µs | 4.6K ops/s | 258.34ms | 20.7MB | 0.00KB | 48.8MB | 41.6KB |
+| rezitui | 1 | 229µs | 399.2% | 177µs–281µs | 4.4K ops/s | 275.27ms | 220.7MB | 80.0KB | 2.6MB | 2.2KB |
+| TUIX.Renderer | 1 | 362µs | 23.2% | 358µs–367µs | 2.8K ops/s | 506.53ms | 4.3MB | 0.00KB | 188.5MB | 160.9KB |
+| opentui-core | 1 | 370µs | 30.4% | 363µs–376µs | 2.7K ops/s | 497.81ms | 36.9MB | 0.00KB | 200.4MB | 171.0KB |
+| opentui-react | 1 | 403µs | 32.1% | 396µs–411µs | 2.5K ops/s | 494.89ms | 39.2MB | 0.00KB | 222.5MB | 189.9KB |
+| tuix-python | 1 | 441µs | 27.4% | 434µs–448µs | 2.3K ops/s | 608.44ms | 19.3MB | 64.0KB | 200.1MB | 170.8KB |
+| TUIX.Core | 1 | 481µs | 30.9% | 472µs–489µs | 2.1K ops/s | 576.83ms | 4.6MB | 0.00KB | 183.8MB | 156.8KB |
+| blessed | 1 | 799µs | 34.9% | 783µs–814µs | 1.3K ops/s | 958.69ms | 522.4MB | 24.0KB | 6.5MB | 5.5KB |
+| terminal-kit | 1 | 1.41ms | 27.9% | 1.38ms–1.43ms | 711 ops/s | 1.69s | 96.6MB | 0.00KB | 5.5MB | 4.7KB |
+| ink | 1 | 1.79ms | 29.0% | 1.76ms–1.82ms | 558 ops/s | 2.15s | 356.7MB | 0.00KB | 5.5MB | 4.7KB |
+| prompt-toolkit | 1 | 2.69ms | 26.0% | 2.65ms–2.73ms | 371 ops/s | 3.23s | 37.3MB | 8.0KB | 5.5MB | 4.7KB |
+| urwid | 1 | 3.38ms | 26.2% | 3.33ms–3.43ms | 296 ops/s | 4.05s | 42.5MB | 32.0KB | 5.5MB | 4.7KB |
+| rich | 1 | 3.68ms | 27.2% | 3.63ms–3.74ms | 271 ops/s | 4.42s | 33.7MB | 272.0KB | 5.5MB | 4.7KB |
 
 ## terminal-full-ui (cols=120,rows=40,services=24)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 33µs | 18.7% | 32µs–33µs | 30.5K ops/s | 39.42ms | 4.6MB | 0.00KB | 3.9MB | 3.3KB |
-| TUIX.Renderer | 1 | 72µs | 24.4% | 71µs–73µs | 13.8K ops/s | 94.56ms | 4.3MB | 0.00KB | 3.9MB | 3.3KB |
-| tuix-python | 1 | 82µs | 23.8% | 81µs–83µs | 12.1K ops/s | 105.80ms | 19.0MB | 0.00KB | 6.5MB | 5.6KB |
-| ratatui | 1 | 393µs | 45.7% | 383µs–403µs | 2.5K ops/s | 472.09ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
-| bubbletea | 1 | 608µs | 123.0% | 565µs–650µs | 1.6K ops/s | 729.45ms | 24.8MB | 0.00KB | 48.8MB | 41.6KB |
-| opentui-react | 1 | 646µs | 32.5% | 634µs–658µs | 1.5K ops/s | 809.73ms | 39.1MB | 0.00KB | 149.5MB | 127.6KB |
-| blessed | 1 | 675µs | 38.6% | 660µs–690µs | 1.5K ops/s | 810.18ms | 520.1MB | 24.0KB | 3.8MB | 3.2KB |
-| opentui-core | 1 | 689µs | 37.1% | 675µs–704µs | 1.5K ops/s | 895.95ms | 36.7MB | 0.00KB | 204.3MB | 174.4KB |
-| rich | 1 | 1.95ms | 32.9% | 1.91ms–1.99ms | 513 ops/s | 2.34s | 33.7MB | 212.0KB | 5.5MB | 4.7KB |
-| rezitui | 1 | 2.08ms | 76.1% | 1.99ms–2.17ms | 481 ops/s | 2.50s | 208.3MB | 0.00KB | 4.3MB | 3.7KB |
-| terminal-kit | 1 | 2.44ms | 20.9% | 2.41ms–2.47ms | 409 ops/s | 2.93s | 93.9MB | 8.0KB | 5.5MB | 4.7KB |
-| prompt-toolkit | 1 | 2.55ms | 29.2% | 2.51ms–2.60ms | 391 ops/s | 3.07s | 37.2MB | 16.0KB | 5.5MB | 4.7KB |
-| ink | 1 | 2.60ms | 20.9% | 2.57ms–2.63ms | 385 ops/s | 3.12s | 348.7MB | 184.0KB | 3.4MB | 2.9KB |
-| urwid | 1 | 3.49ms | 29.8% | 3.43ms–3.55ms | 287 ops/s | 4.19s | 42.6MB | 48.0KB | 5.5MB | 4.7KB |
+| TUIX.Core | 1 | 41µs | 47.9% | 40µs–43µs | 24.2K ops/s | 49.72ms | 4.5MB | 0.00KB | 3.9MB | 3.3KB |
+| TUIX.Renderer | 1 | 93µs | 36.8% | 91µs–95µs | 10.8K ops/s | 124.61ms | 4.3MB | 0.00KB | 3.9MB | 3.3KB |
+| tuix-python | 1 | 118µs | 31.6% | 116µs–120µs | 8.5K ops/s | 151.90ms | 19.3MB | 0.00KB | 6.5MB | 5.6KB |
+| ratatui | 1 | 170µs | 18.2% | 168µs–172µs | 5.9K ops/s | 204.02ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
+| opentui-core | 1 | 278µs | 36.5% | 272µs–284µs | 3.6K ops/s | 370.49ms | 36.9MB | 0.00KB | 204.3MB | 174.4KB |
+| opentui-react | 1 | 300µs | 34.2% | 294µs–306µs | 3.3K ops/s | 379.34ms | 39.2MB | 0.00KB | 149.5MB | 127.6KB |
+| bubbletea | 1 | 497µs | 46.5% | 484µs–510µs | 2.0K ops/s | 596.53ms | 20.7MB | 0.00KB | 48.8MB | 41.6KB |
+| blessed | 1 | 633µs | 38.8% | 619µs–647µs | 1.6K ops/s | 759.63ms | 522.5MB | 28.0KB | 3.8MB | 3.2KB |
+| rezitui | 1 | 780µs | 78.3% | 745µs–815µs | 1.3K ops/s | 936.72ms | 221.3MB | 0.00KB | 4.3MB | 3.7KB |
+| terminal-kit | 1 | 983µs | 34.1% | 964µs–1.00ms | 1.0K ops/s | 1.18s | 97.0MB | 4.0KB | 5.5MB | 4.7KB |
+| ink | 1 | 1.61ms | 29.8% | 1.58ms–1.64ms | 622 ops/s | 1.93s | 357.1MB | 184.0KB | 3.4MB | 2.9KB |
+| rich | 1 | 1.71ms | 27.0% | 1.69ms–1.74ms | 584 ops/s | 2.06s | 33.6MB | 0.00KB | 5.5MB | 4.7KB |
+| prompt-toolkit | 1 | 2.06ms | 29.9% | 2.03ms–2.10ms | 485 ops/s | 2.48s | 37.4MB | 64.0KB | 5.5MB | 4.7KB |
+| urwid | 1 | 2.45ms | 24.4% | 2.42ms–2.49ms | 408 ops/s | 2.94s | 42.6MB | 104.0KB | 5.5MB | 4.7KB |
 
 ## terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 43µs | 60.8% | 42µs–45µs | 23.2K ops/s | 51.70ms | 4.5MB | 0.00KB | 69.9MB | 59.7KB |
-| TUIX.Renderer | 1 | 93µs | 53.4% | 90µs–95µs | 10.8K ops/s | 127.98ms | 4.3MB | 0.00KB | 69.9MB | 59.7KB |
-| tuix-python | 1 | 101µs | 55.2% | 98µs–104µs | 9.9K ops/s | 136.73ms | 19.0MB | 32.0KB | 74.7MB | 63.7KB |
-| ratatui | 1 | 337µs | 100.4% | 318µs–356µs | 3.0K ops/s | 404.10ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
-| bubbletea | 1 | 611µs | 97.2% | 578µs–645µs | 1.6K ops/s | 733.92ms | 24.8MB | 0.00KB | 48.8MB | 41.6KB |
-| blessed | 1 | 662µs | 39.6% | 647µs–677µs | 1.5K ops/s | 794.45ms | 519.5MB | 300.0KB | 3.8MB | 3.2KB |
-| opentui-react | 1 | 721µs | 33.9% | 707µs–734µs | 1.4K ops/s | 891.33ms | 39.1MB | 0.00KB | 149.5MB | 127.6KB |
-| opentui-core | 1 | 774µs | 64.9% | 746µs–802µs | 1.3K ops/s | 991.23ms | 36.7MB | 0.00KB | 204.3MB | 174.4KB |
-| rezitui | 1 | 1.93ms | 80.3% | 1.84ms–2.02ms | 517 ops/s | 2.32s | 210.8MB | 3.2MB | 4.4MB | 3.7KB |
-| rich | 1 | 2.15ms | 31.8% | 2.11ms–2.18ms | 466 ops/s | 2.58s | 33.7MB | 76.0KB | 5.5MB | 4.7KB |
-| prompt-toolkit | 1 | 2.30ms | 30.9% | 2.26ms–2.34ms | 435 ops/s | 2.76s | 37.6MB | 456.0KB | 5.5MB | 4.7KB |
-| terminal-kit | 1 | 2.41ms | 18.7% | 2.38ms–2.44ms | 415 ops/s | 2.89s | 94.0MB | 48.0KB | 5.5MB | 4.7KB |
-| ink | 1 | 2.93ms | 26.1% | 2.88ms–2.97ms | 342 ops/s | 3.51s | 349.0MB | 0.00KB | 5.4MB | 4.6KB |
-| urwid | 1 | 3.53ms | 26.0% | 3.48ms–3.58ms | 283 ops/s | 4.23s | 42.6MB | 40.0KB | 5.5MB | 4.7KB |
+| TUIX.Core | 1 | 43µs | 32.4% | 42µs–43µs | 23.4K ops/s | 51.28ms | 4.6MB | 0.00KB | 69.9MB | 59.7KB |
+| TUIX.Renderer | 1 | 113µs | 54.0% | 109µs–116µs | 8.9K ops/s | 161.13ms | 4.3MB | 0.00KB | 69.9MB | 59.7KB |
+| tuix-python | 1 | 118µs | 54.1% | 114µs–122µs | 8.5K ops/s | 160.39ms | 19.4MB | 64.0KB | 74.7MB | 63.7KB |
+| ratatui | 1 | 179µs | 31.8% | 176µs–182µs | 5.6K ops/s | 214.81ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
+| opentui-react | 1 | 321µs | 38.5% | 314µs–328µs | 3.1K ops/s | 396.51ms | 39.2MB | 0.00KB | 149.5MB | 127.6KB |
+| opentui-core | 1 | 330µs | 51.6% | 321µs–340µs | 3.0K ops/s | 428.69ms | 36.9MB | 0.00KB | 204.3MB | 174.4KB |
+| bubbletea | 1 | 502µs | 44.0% | 489µs–514µs | 2.0K ops/s | 602.72ms | 20.7MB | 0.00KB | 48.8MB | 41.6KB |
+| blessed | 1 | 610µs | 43.2% | 595µs–625µs | 1.6K ops/s | 732.33ms | 522.5MB | 0.00KB | 3.8MB | 3.2KB |
+| rezitui | 1 | 662µs | 91.5% | 628µs–696µs | 1.5K ops/s | 795.05ms | 226.5MB | 5.2MB | 4.4MB | 3.7KB |
+| terminal-kit | 1 | 970µs | 29.0% | 955µs–986µs | 1.0K ops/s | 1.17s | 97.0MB | 0.00KB | 5.5MB | 4.7KB |
+| rich | 1 | 1.57ms | 26.0% | 1.55ms–1.59ms | 636 ops/s | 1.89s | 33.7MB | 60.0KB | 5.5MB | 4.7KB |
+| ink | 1 | 1.74ms | 29.1% | 1.71ms–1.76ms | 576 ops/s | 2.08s | 357.2MB | 8.0KB | 5.4MB | 4.6KB |
+| prompt-toolkit | 1 | 1.94ms | 29.5% | 1.91ms–1.98ms | 515 ops/s | 2.33s | 37.4MB | 64.0KB | 5.5MB | 4.7KB |
+| urwid | 1 | 2.29ms | 22.9% | 2.26ms–2.32ms | 437 ops/s | 2.75s | 42.7MB | 52.0KB | 5.5MB | 4.7KB |
 
 ## terminal-strict-ui (cols=120,rows=40,services=24)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 33µs | 25.7% | 33µs–33µs | 30.3K ops/s | 39.64ms | 4.6MB | 0.00KB | 3.9MB | 3.3KB |
-| TUIX.Renderer | 1 | 79µs | 37.8% | 77µs–81µs | 12.7K ops/s | 103.41ms | 4.3MB | 0.00KB | 3.9MB | 3.3KB |
-| tuix-python | 1 | 83µs | 20.6% | 82µs–84µs | 12.1K ops/s | 106.69ms | 19.2MB | 96.0KB | 6.5MB | 5.6KB |
-| ratatui | 1 | 355µs | 57.1% | 344µs–367µs | 2.8K ops/s | 426.71ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
-| bubbletea | 1 | 620µs | 112.4% | 581µs–660µs | 1.6K ops/s | 744.60ms | 24.8MB | 0.00KB | 48.8MB | 41.6KB |
-| opentui-core | 1 | 625µs | 32.8% | 613µs–637µs | 1.6K ops/s | 750.52ms | 36.7MB | 0.00KB | 186.1MB | 158.8KB |
-| blessed | 1 | 690µs | 39.9% | 674µs–705µs | 1.5K ops/s | 827.91ms | 519.7MB | 68.0KB | 3.8MB | 3.2KB |
-| opentui-react | 1 | 1.20ms | 100.1% | 1.13ms–1.27ms | 833 ops/s | 1.44s | 56.6MB | 17.5MB | 240.6MB | 205.3KB |
-| rezitui | 1 | 1.83ms | 114.5% | 1.71ms–1.95ms | 546 ops/s | 2.20s | 210.8MB | 4.0KB | 4.3MB | 3.7KB |
-| rich | 1 | 2.05ms | 31.4% | 2.02ms–2.09ms | 487 ops/s | 2.47s | 33.8MB | 36.0KB | 5.5MB | 4.7KB |
-| terminal-kit | 1 | 2.32ms | 22.4% | 2.29ms–2.35ms | 430 ops/s | 2.79s | 94.0MB | 0.00KB | 5.5MB | 4.7KB |
-| prompt-toolkit | 1 | 2.40ms | 29.3% | 2.36ms–2.44ms | 417 ops/s | 2.88s | 37.3MB | 0.00KB | 5.5MB | 4.7KB |
-| ink | 1 | 2.60ms | 17.9% | 2.57ms–2.62ms | 385 ops/s | 3.12s | 349.0MB | 0.00KB | 3.4MB | 2.9KB |
-| urwid | 1 | 3.42ms | 30.3% | 3.36ms–3.47ms | 293 ops/s | 4.10s | 42.7MB | 84.0KB | 5.5MB | 4.7KB |
+| TUIX.Core | 1 | 38µs | 51.8% | 37µs–39µs | 26.2K ops/s | 45.86ms | 4.7MB | 0.00KB | 3.9MB | 3.3KB |
+| tuix-python | 1 | 83µs | 14.5% | 83µs–84µs | 12.0K ops/s | 107.08ms | 19.4MB | 4.0KB | 6.5MB | 5.6KB |
+| TUIX.Renderer | 1 | 84µs | 29.0% | 83µs–85µs | 11.9K ops/s | 112.05ms | 4.3MB | 0.00KB | 3.9MB | 3.3KB |
+| ratatui | 1 | 171µs | 14.7% | 170µs–173µs | 5.8K ops/s | 205.46ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
+| opentui-core | 1 | 294µs | 36.7% | 288µs–300µs | 3.4K ops/s | 353.44ms | 36.9MB | 0.00KB | 186.1MB | 158.8KB |
+| bubbletea | 1 | 464µs | 47.7% | 451µs–476µs | 2.2K ops/s | 556.85ms | 20.7MB | 0.00KB | 48.8MB | 41.6KB |
+| opentui-react | 1 | 495µs | 35.4% | 485µs–505µs | 2.0K ops/s | 594.49ms | 39.2MB | 0.00KB | 240.6MB | 205.3KB |
+| blessed | 1 | 618µs | 38.3% | 605µs–631µs | 1.6K ops/s | 741.84ms | 522.5MB | 0.00KB | 3.8MB | 3.2KB |
+| rezitui | 1 | 708µs | 82.8% | 675µs–741µs | 1.4K ops/s | 850.40ms | 219.6MB | 0.00KB | 4.3MB | 3.7KB |
+| terminal-kit | 1 | 975µs | 27.5% | 959µs–990µs | 1.0K ops/s | 1.17s | 97.1MB | 0.00KB | 5.5MB | 4.7KB |
+| ink | 1 | 1.59ms | 29.6% | 1.57ms–1.62ms | 628 ops/s | 1.91s | 357.2MB | 0.00KB | 3.4MB | 2.9KB |
+| rich | 1 | 1.65ms | 26.7% | 1.62ms–1.67ms | 607 ops/s | 1.98s | 33.7MB | 40.0KB | 5.5MB | 4.7KB |
+| prompt-toolkit | 1 | 2.01ms | 27.6% | 1.98ms–2.05ms | 496 ops/s | 2.42s | 37.4MB | 20.0KB | 5.5MB | 4.7KB |
+| urwid | 1 | 2.48ms | 27.3% | 2.44ms–2.52ms | 403 ops/s | 2.98s | 42.5MB | 0.00KB | 5.5MB | 4.7KB |
 
 ## terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 36µs | 53.4% | 34µs–37µs | 28.1K ops/s | 42.71ms | 4.6MB | 0.00KB | 69.9MB | 59.7KB |
-| TUIX.Renderer | 1 | 86µs | 48.9% | 84µs–89µs | 11.6K ops/s | 119.62ms | 4.3MB | 0.00KB | 69.9MB | 59.7KB |
-| tuix-python | 1 | 102µs | 51.2% | 99µs–105µs | 9.8K ops/s | 138.13ms | 19.1MB | 0.00KB | 74.7MB | 63.7KB |
-| ratatui | 1 | 359µs | 48.1% | 349µs–369µs | 2.8K ops/s | 431.08ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
-| opentui-core | 1 | 594µs | 27.2% | 585µs–603µs | 1.7K ops/s | 713.77ms | 36.7MB | 0.00KB | 186.1MB | 158.8KB |
-| bubbletea | 1 | 624µs | 101.7% | 588µs–660µs | 1.6K ops/s | 749.64ms | 24.8MB | 0.00KB | 48.8MB | 41.6KB |
-| blessed | 1 | 670µs | 40.2% | 655µs–685µs | 1.5K ops/s | 804.22ms | 519.8MB | 48.0KB | 3.8MB | 3.2KB |
-| opentui-react | 1 | 1.21ms | 75.5% | 1.15ms–1.26ms | 830 ops/s | 1.45s | 58.0MB | 1.4MB | 240.6MB | 205.3KB |
-| rezitui | 1 | 1.88ms | 90.9% | 1.79ms–1.98ms | 531 ops/s | 2.26s | 210.8MB | 20.0KB | 4.4MB | 3.7KB |
-| rich | 1 | 2.17ms | 36.4% | 2.13ms–2.22ms | 460 ops/s | 2.61s | 33.8MB | 36.0KB | 5.5MB | 4.7KB |
-| terminal-kit | 1 | 2.30ms | 22.1% | 2.27ms–2.33ms | 434 ops/s | 2.77s | 94.1MB | 0.00KB | 5.5MB | 4.7KB |
-| prompt-toolkit | 1 | 2.54ms | 28.1% | 2.50ms–2.58ms | 393 ops/s | 3.05s | 37.6MB | 228.0KB | 5.5MB | 4.7KB |
-| ink | 1 | 3.06ms | 23.7% | 3.01ms–3.10ms | 327 ops/s | 3.67s | 349.0MB | 0.00KB | 5.4MB | 4.6KB |
-| urwid | 1 | 3.60ms | 28.8% | 3.54ms–3.65ms | 278 ops/s | 4.32s | 42.8MB | 64.0KB | 5.5MB | 4.7KB |
+| TUIX.Core | 1 | 42µs | 43.3% | 41µs–43µs | 23.9K ops/s | 50.30ms | 4.5MB | 0.00KB | 69.9MB | 59.7KB |
+| TUIX.Renderer | 1 | 85µs | 51.4% | 83µs–88µs | 11.7K ops/s | 120.36ms | 4.3MB | 0.00KB | 69.9MB | 59.7KB |
+| tuix-python | 1 | 111µs | 53.5% | 108µs–115µs | 9.0K ops/s | 151.60ms | 19.4MB | 32.0KB | 74.7MB | 63.7KB |
+| ratatui | 1 | 166µs | 19.4% | 164µs–167µs | 6.0K ops/s | 198.88ms | 27.0KB | 0.00KB | 48.8MB | 41.6KB |
+| opentui-core | 1 | 259µs | 33.6% | 254µs–264µs | 3.9K ops/s | 310.80ms | 36.9MB | 0.00KB | 186.1MB | 158.8KB |
+| opentui-react | 1 | 508µs | 77.3% | 486µs–530µs | 2.0K ops/s | 610.28ms | 39.2MB | 0.00KB | 240.6MB | 205.3KB |
+| bubbletea | 1 | 617µs | 42.9% | 602µs–632µs | 1.6K ops/s | 741.06ms | 20.7MB | 0.00KB | 48.8MB | 41.6KB |
+| rezitui | 1 | 642µs | 83.4% | 612µs–672µs | 1.6K ops/s | 771.24ms | 220.8MB | 1.2MB | 4.4MB | 3.7KB |
+| blessed | 1 | 686µs | 37.9% | 671µs–701µs | 1.5K ops/s | 823.91ms | 522.5MB | 0.00KB | 3.8MB | 3.2KB |
+| terminal-kit | 1 | 919µs | 24.9% | 906µs–932µs | 1.1K ops/s | 1.10s | 97.1MB | 56.0KB | 5.5MB | 4.7KB |
+| ink | 1 | 1.60ms | 29.9% | 1.58ms–1.63ms | 624 ops/s | 1.92s | 357.2MB | 0.00KB | 5.4MB | 4.6KB |
+| rich | 1 | 1.70ms | 27.9% | 1.68ms–1.73ms | 587 ops/s | 2.05s | 33.8MB | 72.0KB | 5.5MB | 4.7KB |
+| prompt-toolkit | 1 | 1.97ms | 26.8% | 1.94ms–2.00ms | 509 ops/s | 2.36s | 37.5MB | 100.0KB | 5.5MB | 4.7KB |
+| urwid | 1 | 2.57ms | 26.8% | 2.53ms–2.61ms | 389 ops/s | 3.08s | 42.6MB | 36.0KB | 5.5MB | 4.7KB |
 
 ## terminal-virtual-list (items=100000,viewport=40)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 34µs | 15.7% | 34µs–35µs | 29.1K ops/s | 34.41ms | 4.6MB | 0.00KB | 5.2MB | 5.3KB |
-| TUIX.Renderer | 1 | 133µs | 26.3% | 131µs–136µs | 7.5K ops/s | 144.08ms | 4.3MB | 0.00KB | 5.3MB | 5.4KB |
-| rezitui | 1 | 147µs | 240.4% | 125µs–169µs | 6.8K ops/s | 147.78ms | 210.8MB | 4.0KB | 4.1MB | 4.2KB |
-| tuix-python | 1 | 148µs | 23.4% | 146µs–150µs | 6.7K ops/s | 157.88ms | 19.3MB | 64.0KB | 5.2MB | 5.3KB |
-| opentui-react | 1 | 180µs | 48.5% | 175µs–185µs | 5.6K ops/s | 185.09ms | 58.0MB | 0.00KB | 3.0MB | 3.1KB |
-| blessed | 1 | 219µs | 93.9% | 206µs–232µs | 4.6K ops/s | 219.36ms | 520.8MB | 68.0KB | 1.0MB | 1.0KB |
-| bubbletea | 1 | 351µs | 131.4% | 322µs–379µs | 2.9K ops/s | 350.98ms | 24.8MB | 0.00KB | 40.6MB | 41.6KB |
-| ratatui | 1 | 359µs | 46.7% | 348µs–369µs | 2.8K ops/s | 358.81ms | 27.0KB | 0.00KB | 40.6MB | 41.6KB |
-| opentui-core | 1 | 695µs | 41.3% | 677µs–712µs | 1.4K ops/s | 770.26ms | 36.7MB | 0.00KB | 165.1MB | 169.0KB |
-| rich | 1 | 1.08ms | 34.0% | 1.05ms–1.10ms | 929 ops/s | 1.08s | 33.9MB | 36.0KB | 4.6MB | 4.7KB |
-| prompt-toolkit | 1 | 1.57ms | 27.2% | 1.54ms–1.60ms | 637 ops/s | 1.57s | 37.6MB | 8.0KB | 4.6MB | 4.7KB |
-| urwid | 1 | 2.56ms | 29.8% | 2.51ms–2.61ms | 390 ops/s | 2.56s | 42.8MB | 0.00KB | 4.6MB | 4.7KB |
-| terminal-kit | 1 | 2.86ms | 19.5% | 2.82ms–2.89ms | 350 ops/s | 2.86s | 125.7MB | 416.0KB | 4.6MB | 4.7KB |
-| ink | 1 | 3.23ms | 21.5% | 3.19ms–3.27ms | 310 ops/s | 3.23s | 350.2MB | 4.0KB | 262.7KB | 269B |
+| TUIX.Core | 1 | 54µs | 26.5% | 53µs–55µs | 18.5K ops/s | 54.14ms | 4.7MB | 0.00KB | 5.2MB | 5.3KB |
+| rezitui | 1 | 66µs | 244.2% | 56µs–76µs | 15.2K ops/s | 65.97ms | 220.7MB | 0.00KB | 4.1MB | 4.2KB |
+| opentui-react | 1 | 106µs | 35.5% | 104µs–108µs | 9.4K ops/s | 108.86ms | 39.2MB | 0.00KB | 3.0MB | 3.1KB |
+| TUIX.Renderer | 1 | 135µs | 26.7% | 133µs–137µs | 7.4K ops/s | 145.78ms | 4.3MB | 0.00KB | 5.3MB | 5.4KB |
+| bubbletea | 1 | 176µs | 85.9% | 166µs–185µs | 5.7K ops/s | 175.78ms | 20.7MB | 0.00KB | 40.6MB | 41.6KB |
+| ratatui | 1 | 185µs | 11.4% | 184µs–186µs | 5.4K ops/s | 184.88ms | 27.0KB | 0.00KB | 40.6MB | 41.6KB |
+| tuix-python | 1 | 208µs | 32.2% | 204µs–212µs | 4.8K ops/s | 220.92ms | 19.5MB | 28.0KB | 5.2MB | 5.3KB |
+| blessed | 1 | 219µs | 115.4% | 203µs–235µs | 4.6K ops/s | 219.33ms | 523.4MB | 0.00KB | 1.0MB | 1.0KB |
+| opentui-core | 1 | 307µs | 41.8% | 299µs–315µs | 3.3K ops/s | 351.90ms | 36.9MB | 0.00KB | 165.1MB | 169.0KB |
+| rich | 1 | 939µs | 30.8% | 922µs–957µs | 1.1K ops/s | 940.19ms | 34.0MB | 216.0KB | 4.6MB | 4.7KB |
+| terminal-kit | 1 | 1.29ms | 29.6% | 1.27ms–1.31ms | 775 ops/s | 1.29s | 128.9MB | 324.0KB | 4.6MB | 4.7KB |
+| prompt-toolkit | 1 | 1.43ms | 27.6% | 1.41ms–1.46ms | 698 ops/s | 1.43s | 37.5MB | 0.00KB | 4.6MB | 4.7KB |
+| ink | 1 | 1.61ms | 29.2% | 1.58ms–1.64ms | 621 ops/s | 1.61s | 358.1MB | 0.00KB | 262.7KB | 269B |
+| urwid | 1 | 1.86ms | 24.5% | 1.84ms–1.89ms | 537 ops/s | 1.86s | 42.6MB | 36.0KB | 4.6MB | 4.7KB |
 
 ## terminal-table (cols=8,rows=40)
 
 | Framework | Runs | Mean | Run CV | Mean CI95 | ops/s | Wall | Peak RSS | RSS Growth | Bytes(local) | Bytes(pty) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| TUIX.Core | 1 | 31µs | 15.1% | 31µs–31µs | 32.2K ops/s | 15.56ms | 4.6MB | 0.00KB | 5.1MB | 10.5KB |
-| TUIX.Renderer | 1 | 117µs | 26.0% | 115µs–120µs | 8.5K ops/s | 66.23ms | 4.4MB | 0.00KB | 5.2MB | 10.7KB |
-| tuix-python | 1 | 241µs | 87.9% | 223µs–260µs | 4.1K ops/s | 136.73ms | 19.2MB | 0.00KB | 12.6MB | 25.8KB |
-| bubbletea | 1 | 420µs | 82.1% | 390µs–450µs | 2.4K ops/s | 210.35ms | 24.8MB | 0.00KB | 20.3MB | 41.6KB |
-| ratatui | 1 | 475µs | 42.0% | 457µs–492µs | 2.1K ops/s | 237.50ms | 27.0KB | 0.00KB | 20.3MB | 41.6KB |
-| opentui-core | 1 | 557µs | 33.7% | 541µs–574µs | 1.8K ops/s | 323.21ms | 36.7MB | 0.00KB | 82.5MB | 169.0KB |
-| blessed | 1 | 1.03ms | 39.3% | 993µs–1.06ms | 973 ops/s | 514.48ms | 520.6MB | 8.0KB | 3.0MB | 6.2KB |
-| opentui-react | 1 | 1.18ms | 33.6% | 1.15ms–1.22ms | 846 ops/s | 623.42ms | 58.0MB | 0.00KB | 91.4MB | 187.3KB |
-| rich | 1 | 2.05ms | 32.7% | 1.99ms–2.10ms | 489 ops/s | 1.02s | 33.4MB | 0.00KB | 2.3MB | 4.7KB |
-| rezitui | 1 | 2.16ms | 62.0% | 2.05ms–2.28ms | 462 ops/s | 1.08s | 212.6MB | 1.8MB | 7.6MB | 15.6KB |
-| prompt-toolkit | 1 | 2.70ms | 29.4% | 2.63ms–2.77ms | 370 ops/s | 1.35s | 37.4MB | 0.00KB | 2.3MB | 4.7KB |
-| terminal-kit | 1 | 2.89ms | 20.0% | 2.84ms–2.94ms | 346 ops/s | 1.45s | 126.0MB | 4.0KB | 2.3MB | 4.7KB |
-| ink | 1 | 3.40ms | 15.3% | 3.35ms–3.44ms | 294 ops/s | 1.70s | 349.5MB | 0.00KB | 2.3MB | 4.7KB |
-| urwid | 1 | 4.01ms | 24.5% | 3.93ms–4.10ms | 249 ops/s | 2.01s | 42.8MB | 0.00KB | 2.3MB | 4.7KB |
+| TUIX.Core | 1 | 58µs | 11.4% | 58µs–59µs | 17.1K ops/s | 29.27ms | 4.7MB | 0.00KB | 5.1MB | 10.5KB |
+| tuix-python | 1 | 139µs | 17.0% | 137µs–141µs | 7.2K ops/s | 83.60ms | 19.5MB | 12.0KB | 12.6MB | 25.8KB |
+| TUIX.Renderer | 1 | 154µs | 30.9% | 149µs–158µs | 6.5K ops/s | 86.40ms | 4.4MB | 0.00KB | 5.2MB | 10.7KB |
+| bubbletea | 1 | 220µs | 28.5% | 214µs–225µs | 4.5K ops/s | 110.05ms | 20.7MB | 0.00KB | 20.3MB | 41.6KB |
+| opentui-core | 1 | 239µs | 38.2% | 231µs–247µs | 4.2K ops/s | 145.67ms | 36.9MB | 0.00KB | 82.5MB | 169.0KB |
+| ratatui | 1 | 245µs | 38.0% | 236µs–253µs | 4.1K ops/s | 122.30ms | 27.0KB | 0.00KB | 20.3MB | 41.6KB |
+| opentui-react | 1 | 450µs | 38.7% | 435µs–465µs | 2.2K ops/s | 241.18ms | 39.2MB | 0.00KB | 91.4MB | 187.3KB |
+| blessed | 1 | 902µs | 40.5% | 870µs–934µs | 1.1K ops/s | 451.03ms | 522.8MB | 56.0KB | 3.0MB | 6.2KB |
+| rezitui | 1 | 947µs | 71.0% | 888µs–1.01ms | 1.1K ops/s | 473.74ms | 223.6MB | 1.8MB | 7.6MB | 15.6KB |
+| terminal-kit | 1 | 1.23ms | 27.0% | 1.20ms–1.26ms | 811 ops/s | 616.66ms | 129.0MB | 8.0KB | 2.3MB | 4.7KB |
+| rich | 1 | 1.63ms | 27.9% | 1.59ms–1.67ms | 615 ops/s | 813.07ms | 34.0MB | 0.00KB | 2.3MB | 4.7KB |
+| ink | 1 | 1.67ms | 31.3% | 1.62ms–1.71ms | 600 ops/s | 834.22ms | 357.5MB | 0.00KB | 2.3MB | 4.7KB |
+| prompt-toolkit | 1 | 2.40ms | 28.6% | 2.34ms–2.46ms | 417 ops/s | 1.20s | 37.5MB | 0.00KB | 2.3MB | 4.7KB |
+| urwid | 1 | 2.83ms | 25.5% | 2.76ms–2.89ms | 354 ops/s | 1.41s | 42.7MB | 24.0KB | 2.3MB | 4.7KB |
 
 ## Relative Performance (vs fastest per scenario)
 
@@ -485,31 +485,31 @@
 
 | Scenario | blessed | terminal-kit | ink | rezitui | bubbletea | ratatui | opentui-core | opentui-react | TUIX.Renderer | TUIX.Core | tuix-python | rich | urwid | prompt-toolkit |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| startup | 180.7x [171.4x, 189.9x] | 2.7x [2.7x, 2.8x] | 21.2x [20.0x, 22.4x] | 1.1x [0.7x, 1.5x] | 1.9x [1.6x, 2.2x] | 1.5x [1.4x, 1.5x] | 3.6x [3.3x, 3.9x] | 3.3x [2.9x, 3.8x] | 1.1x [1.0x, 1.2x] | **1.0x** | **1.0x** | 8.1x [7.9x, 8.3x] | 8.1x [7.9x, 8.3x] | 5.8x [5.6x, 6.0x] |
-| tree-construction (items=10) | 2.9x [2.2x, 3.6x] | 8.2x [8.1x, 8.4x] | 20.0x [19.0x, 21.1x] | 3.3x [2.7x, 3.8x] | 6.2x [5.8x, 6.6x] | 1.9x [1.8x, 1.9x] | 9.2x [8.7x, 9.6x] | 1.6x [1.6x, 1.7x] | 1.3x [1.3x, 1.4x] | **1.0x** | 2.2x [2.1x, 2.2x] | 27.5x [26.7x, 28.3x] | 45.5x [44.1x, 46.9x] | 26.1x [25.3x, 26.8x] |
-| tree-construction (items=100) | 9.8x [8.7x, 10.9x] | 25.7x [25.1x, 26.4x] | 150.4x [145.4x, 155.4x] | 2.5x [1.9x, 3.0x] | 4.8x [4.6x, 5.1x] | 3.5x [3.4x, 3.6x] | 2.8x [2.7x, 2.8x] | 2.1x [2.1x, 2.2x] | 1.4x [1.4x, 1.4x] | **1.0x** | 2.5x [2.5x, 2.6x] | 17.8x [17.3x, 18.3x] | 34.5x [33.6x, 35.5x] | 18.1x [17.7x, 18.5x] |
-| tree-construction (items=500) | 42.5x [40.3x, 44.6x] | 197.9x [189.5x, 206.4x] | 972.3x [957.2x, 987.4x] | 7.0x [5.3x, 8.7x] | 14.7x [14.3x, 15.1x] | 13.2x [12.9x, 13.5x] | 3.5x [2.9x, 4.1x] | 4.8x [4.6x, 4.9x] | **1.0x** | 1.1x [1.1x, 1.1x] | 2.8x [2.8x, 2.9x] | 23.5x [22.8x, 24.3x] | 32.2x [31.4x, 33.0x] | 18.9x [18.6x, 19.2x] |
-| tree-construction (items=1000) | 81.4x [78.3x, 84.5x] | 500.1x [494.2x, 506.1x] | 1616.6x [1589.3x, 1643.8x] | 9.1x [7.3x, 10.8x] | 24.9x [24.5x, 25.4x] | 23.9x [23.2x, 24.5x] | 2.1x [2.0x, 2.2x] | 5.6x [4.9x, 6.4x] | 1.2x [1.2x, 1.2x] | **1.0x** | 2.8x [2.8x, 2.9x] | 18.1x [17.6x, 18.6x] | 33.1x [32.2x, 33.9x] | 19.9x [19.4x, 20.4x] |
-| rerender | 2.6x [2.2x, 3.1x] | 40.3x [39.6x, 40.9x] | 91.7x [89.6x, 93.7x] | 4.5x [3.6x, 5.5x] | 10.7x [10.3x, 11.0x] | 5.9x [5.7x, 6.0x] | 9.8x [9.5x, 10.1x] | 3.7x [3.6x, 3.8x] | **1.0x** | 1.2x [1.1x, 1.2x] | **1.0x** | 136.3x [133.4x, 139.1x] | 167.6x [164.4x, 170.8x] | 115.9x [113.3x, 118.5x] |
-| content-update | 25.4x [24.1x, 26.8x] | 48.4x [46.9x, 49.8x] | 459.2x [450.0x, 468.4x] | 5.3x [3.3x, 7.3x] | 19.3x [18.7x, 20.0x] | 8.2x [7.9x, 8.5x] | 11.5x [11.0x, 12.0x] | 7.2x [6.9x, 7.5x] | 6.4x [6.2x, 6.5x] | **1.0x** | 6.2x [6.1x, 6.4x] | 107.9x [105.3x, 110.6x] | 144.9x [141.2x, 148.5x] | 84.8x [82.6x, 86.9x] |
-| layout-stress (cols=4,rows=10) | 4.7x [3.9x, 5.5x] | 27.1x [26.5x, 27.8x] | 271.1x [264.8x, 277.3x] | 33.3x [31.3x, 35.2x] | 4.0x [3.8x, 4.1x] | 2.2x [2.2x, 2.3x] | 2.1x [2.0x, 2.3x] | 1.2x [1.2x, 1.2x] | **1.0x** | 1.3x [1.3x, 1.4x] | 1.2x [1.2x, 1.3x] | 19.4x [19.0x, 19.9x] | 39.4x [38.0x, 40.9x] | 27.7x [26.5x, 28.8x] |
-| scroll-stress (items=2000) | 297.6x [279.9x, 315.4x] | 95.4x [92.3x, 98.6x] | 232.0x [195.0x, 268.9x] | 5.0x [4.3x, 5.7x] | 8.0x [7.2x, 8.8x] | 9.7x [9.3x, 10.1x] | 7.2x [6.0x, 8.4x] | 3.4x [3.1x, 3.8x] | 7.7x [7.1x, 8.4x] | **1.0x** | 9.3x [8.3x, 10.4x] | 54.6x [50.1x, 59.1x] | 66.2x [63.6x, 68.9x] | 51.9x [47.4x, 56.4x] |
-| virtual-list (items=100000,viewport=40) | 9.5x [7.7x, 11.3x] | 85.3x [83.0x, 87.6x] | 122.8x [120.6x, 125.0x] | 6.8x [5.9x, 7.8x] | 8.6x [8.2x, 8.9x] | 6.6x [6.5x, 6.7x] | 10.1x [9.7x, 10.4x] | 3.3x [3.3x, 3.4x] | 5.0x [4.8x, 5.1x] | **1.0x** | 5.0x [4.9x, 5.1x] | 48.8x [47.6x, 50.0x] | 85.6x [83.9x, 87.2x] | 47.8x [46.9x, 48.7x] |
-| tables (cols=8,rows=100) | 25.8x [24.5x, 27.1x] | 85.6x [82.9x, 88.4x] | 122.1x [118.9x, 125.3x] | 64.4x [58.3x, 70.6x] | 10.2x [9.6x, 10.7x] | 11.6x [11.3x, 11.8x] | 8.5x [8.0x, 9.0x] | 14.2x [13.5x, 14.9x] | 3.4x [3.4x, 3.4x] | **1.0x** | 4.4x [4.3x, 4.5x] | 57.8x [56.2x, 59.4x] | 124.7x [120.3x, 129.1x] | 69.5x [67.2x, 71.8x] |
-| memory-profile | 4.1x [4.0x, 4.2x] | 13.4x [13.3x, 13.5x] | 16.5x [16.4x, 16.7x] | 1.4x [1.1x, 1.7x] | 1.5x [1.4x, 1.5x] | **1.0x** | 1.7x [1.7x, 1.8x] | 1.9x [1.9x, 2.0x] | 1.4x [1.4x, 1.4x] | 1.8x [1.7x, 1.8x] | 1.8x [1.8x, 1.8x] | 19.4x [19.1x, 19.6x] | 19.8x [19.5x, 20.0x] | 13.9x [13.7x, 14.1x] |
-| terminal-rerender | 7.8x [7.6x, 7.9x] | 52.6x [52.0x, 53.3x] | 112.6x [111.0x, 114.3x] | 1.6x [1.3x, 1.9x] | 5.0x [4.8x, 5.1x] | 4.8x [4.6x, 4.9x] | 15.1x [14.7x, 15.5x] | 4.1x [4.0x, 4.1x] | **1.0x** | 1.2x [1.2x, 1.3x] | 1.1x [1.1x, 1.1x] | 111.5x [109.8x, 113.2x] | 179.8x [176.7x, 182.9x] | 140.1x [137.7x, 142.6x] |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | 13.6x [13.2x, 14.1x] | 42.6x [41.6x, 43.7x] | 106.1x [104.5x, 107.7x] | 1.7x [1.4x, 2.0x] | 4.6x [4.3x, 4.9x] | 4.6x [4.4x, 4.7x] | 8.7x [8.4x, 8.9x] | 4.2x [4.1x, 4.3x] | **1.0x** | 1.1x [1.0x, 1.1x] | 1.2x [1.1x, 1.3x] | 27.0x [25.8x, 28.2x] | 76.2x [74.2x, 78.2x] | 50.4x [49.0x, 51.8x] |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | 27.5x [26.4x, 28.7x] | 93.6x [92.2x, 94.9x] | 102.3x [100.6x, 104.1x] | 5.4x [3.7x, 7.0x] | 11.3x [10.7x, 11.9x] | 8.4x [8.2x, 8.7x] | 10.5x [10.2x, 10.9x] | 14.0x [13.6x, 14.3x] | 8.1x [8.0x, 8.3x] | **1.0x** | 10.5x [10.2x, 10.8x] | 134.4x [130.9x, 137.9x] | 131.3x [127.4x, 135.1x] | 95.9x [93.6x, 98.3x] |
-| terminal-screen-transition (cols=120,rows=40) | 4.7x [4.6x, 4.8x] | 14.9x [14.7x, 15.1x] | 16.7x [16.5x, 17.0x] | **1.0x** | 1.2x [1.2x, 1.2x] | 1.4x [1.3x, 1.5x] | 2.4x [2.4x, 2.5x] | 2.7x [2.7x, 2.8x] | 1.4x [1.3x, 1.4x] | 1.8x [1.8x, 1.9x] | 1.6x [1.6x, 1.7x] | 11.8x [11.6x, 12.1x] | 17.4x [17.1x, 17.7x] | 13.8x [13.6x, 14.1x] |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | 14.7x [14.3x, 15.0x] | 91.7x [90.7x, 92.6x] | 94.4x [93.2x, 95.7x] | 26.3x [24.2x, 28.4x] | 5.7x [5.6x, 5.9x] | 7.1x [7.0x, 7.2x] | 19.2x [18.8x, 19.5x] | 7.9x [7.8x, 8.1x] | 1.5x [1.5x, 1.6x] | **1.0x** | 1.9x [1.9x, 2.0x] | 66.0x [64.9x, 67.1x] | 103.2x [101.4x, 104.9x] | 81.8x [80.4x, 83.3x] |
-| terminal-input-latency (cols=120,rows=40) | 15.8x [15.4x, 16.2x] | 47.4x [46.7x, 48.0x] | 136.0x [134.2x, 137.7x] | 6.8x [5.5x, 8.0x] | 20.5x [19.3x, 21.8x] | 4.2x [4.1x, 4.3x] | 28.2x [27.0x, 29.4x] | 4.7x [4.6x, 4.8x] | 1.1x [1.0x, 1.1x] | 1.2x [1.2x, 1.3x] | **1.0x** | 55.4x [54.4x, 56.4x] | 110.3x [108.4x, 112.2x] | 84.5x [82.9x, 86.0x] |
-| terminal-memory-soak (cols=120,rows=40) | 3.2x [3.1x, 3.2x] | 9.4x [9.3x, 9.5x] | 11.0x [10.8x, 11.1x] | 1.4x [1.1x, 1.6x] | 1.4x [1.3x, 1.5x] | **1.0x** | 2.7x [2.7x, 2.8x] | 2.7x [2.6x, 2.7x] | 1.1x [1.1x, 1.1x] | 1.4x [1.4x, 1.4x] | 1.2x [1.2x, 1.2x] | 13.9x [13.7x, 14.1x] | 14.7x [14.4x, 14.9x] | 10.9x [10.7x, 11.1x] |
-| terminal-full-ui (cols=120,rows=40,services=24) | 20.6x [20.1x, 21.0x] | 74.4x [73.6x, 75.3x] | 79.1x [78.2x, 80.1x] | 63.3x [60.6x, 66.0x] | 18.5x [17.2x, 19.8x] | 12.0x [11.7x, 12.3x] | 21.0x [20.6x, 21.4x] | 19.7x [19.3x, 20.0x] | 2.2x [2.2x, 2.2x] | **1.0x** | 2.5x [2.5x, 2.5x] | 59.4x [58.3x, 60.6x] | 106.3x [104.5x, 108.1x] | 77.8x [76.5x, 79.1x] |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | 15.4x [15.0x, 15.7x] | 56.0x [55.4x, 56.6x] | 68.0x [67.0x, 69.0x] | 44.9x [42.9x, 46.9x] | 14.2x [13.4x, 15.0x] | 7.8x [7.4x, 8.3x] | 18.0x [17.3x, 18.6x] | 16.7x [16.4x, 17.1x] | 2.2x [2.1x, 2.2x] | **1.0x** | 2.3x [2.3x, 2.4x] | 49.9x [49.0x, 50.7x] | 82.0x [80.8x, 83.2x] | 53.4x [52.5x, 54.4x] |
-| terminal-strict-ui (cols=120,rows=40,services=24) | 20.9x [20.4x, 21.4x] | 70.4x [69.5x, 71.3x] | 78.6x [77.8x, 79.4x] | 55.5x [51.9x, 59.1x] | 18.8x [17.6x, 20.0x] | 10.8x [10.4x, 11.1x] | 18.9x [18.6x, 19.3x] | 36.4x [34.3x, 38.4x] | 2.4x [2.3x, 2.4x] | **1.0x** | 2.5x [2.5x, 2.5x] | 62.2x [61.1x, 63.3x] | 103.5x [101.7x, 105.2x] | 72.7x [71.5x, 74.0x] |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | 18.8x [18.4x, 19.3x] | 64.7x [63.9x, 65.6x] | 85.9x [84.8x, 87.1x] | 53.0x [50.3x, 55.7x] | 17.6x [16.6x, 18.6x] | 10.1x [9.8x, 10.4x] | 16.7x [16.5x, 17.0x] | 33.9x [32.5x, 35.4x] | 2.4x [2.4x, 2.5x] | **1.0x** | 2.9x [2.8x, 2.9x] | 61.2x [59.9x, 62.4x] | 101.1x [99.5x, 102.8x] | 71.6x [70.4x, 72.7x] |
-| terminal-virtual-list (items=100000,viewport=40) | 6.4x [6.0x, 6.7x] | 83.1x [82.1x, 84.1x] | 93.9x [92.7x, 95.2x] | 4.3x [3.6x, 4.9x] | 10.2x [9.4x, 11.0x] | 10.4x [10.1x, 10.7x] | 20.2x [19.7x, 20.7x] | 5.2x [5.1x, 5.4x] | 3.9x [3.8x, 3.9x] | **1.0x** | 4.3x [4.2x, 4.4x] | 31.3x [30.7x, 32.0x] | 74.5x [73.1x, 75.9x] | 45.7x [44.9x, 46.5x] |
-| terminal-table (cols=8,rows=40) | 33.1x [31.9x, 34.2x] | 92.9x [91.3x, 94.5x] | 109.3x [107.8x, 110.8x] | 69.6x [65.8x, 73.4x] | 13.5x [12.5x, 14.5x] | 15.3x [14.7x, 15.8x] | 17.9x [17.4x, 18.5x] | 38.0x [36.9x, 39.1x] | 3.8x [3.7x, 3.9x] | **1.0x** | 7.8x [7.2x, 8.4x] | 65.8x [63.9x, 67.7x] | 129.1x [126.4x, 131.9x] | 86.9x [84.6x, 89.1x] |
+| startup | 131.4x [127.2x, 135.6x] | 2.7x [2.6x, 2.8x] | 12.9x [12.1x, 13.6x] | **1.0x** | 1.4x [1.3x, 1.6x] | **1.0x** | 3.9x [3.6x, 4.2x] | 2.0x [1.8x, 2.2x] | 1.3x [1.2x, 1.4x] | 1.3x [1.3x, 1.4x] | 1.2x [1.1x, 1.3x] | 7.3x [7.0x, 7.5x] | 8.6x [8.1x, 9.2x] | 5.6x [5.3x, 5.9x] |
+| tree-construction (items=10) | 1.7x [1.3x, 2.1x] | 5.3x [5.2x, 5.4x] | 9.5x [9.1x, 9.9x] | 1.8x [1.4x, 2.3x] | 3.0x [2.9x, 3.1x] | 1.8x [1.7x, 1.8x] | 5.7x [5.3x, 6.1x] | 1.0x [1.0x, 1.1x] | 1.2x [1.2x, 1.3x] | **1.0x** | 1.9x [1.9x, 2.0x] | 14.6x [14.3x, 14.9x] | 23.3x [22.7x, 23.9x] | 15.8x [15.5x, 16.1x] |
+| tree-construction (items=100) | 5.6x [5.0x, 6.2x] | 15.5x [15.1x, 15.9x] | 49.6x [48.4x, 50.9x] | 1.2x [1.0x, 1.4x] | 2.2x [2.2x, 2.3x] | 2.0x [2.0x, 2.1x] | 1.6x [1.3x, 1.9x] | 1.5x [1.5x, 1.6x] | 1.0x [1.0x, 1.1x] | **1.0x** | 2.0x [1.9x, 2.0x] | 8.9x [8.7x, 9.1x] | 12.7x [12.4x, 12.9x] | 9.9x [9.7x, 10.2x] |
+| tree-construction (items=500) | 36.3x [34.3x, 38.2x] | 111.9x [109.3x, 114.5x] | 385.0x [377.7x, 392.2x] | 5.6x [4.2x, 7.0x] | 12.5x [12.2x, 12.8x] | 8.8x [8.8x, 8.8x] | 2.5x [2.4x, 2.7x] | 5.6x [5.5x, 5.8x] | **1.0x** | 1.9x [1.9x, 2.0x] | 2.2x [2.1x, 2.2x] | 14.9x [14.6x, 15.3x] | 22.5x [21.9x, 23.1x] | 16.7x [16.3x, 17.1x] |
+| tree-construction (items=1000) | 54.6x [52.7x, 56.5x] | 174.5x [171.1x, 177.8x] | 596.2x [585.7x, 606.6x] | 6.6x [5.4x, 7.7x] | 14.6x [14.2x, 14.9x] | 13.7x [13.6x, 13.9x] | 1.3x [1.3x, 1.4x] | 3.9x [3.3x, 4.4x] | 1.2x [1.1x, 1.2x] | **1.0x** | 1.7x [1.7x, 1.8x] | 14.3x [13.9x, 14.6x] | 18.1x [17.7x, 18.5x] | 13.9x [13.6x, 14.3x] |
+| rerender | 2.5x [2.4x, 2.5x] | 20.4x [20.0x, 20.9x] | 62.1x [60.1x, 64.1x] | 4.1x [3.1x, 5.2x] | 8.7x [8.4x, 9.1x] | 5.5x [5.3x, 5.6x] | 12.8x [12.4x, 13.2x] | 3.9x [3.8x, 4.0x] | **1.0x** | 2.2x [2.1x, 2.2x] | 1.2x [1.2x, 1.2x] | 123.4x [121.1x, 125.6x] | 140.0x [137.7x, 142.3x] | 102.8x [101.1x, 104.5x] |
+| content-update | 11.3x [10.7x, 11.9x] | 10.6x [10.3x, 10.9x] | 121.3x [118.4x, 124.2x] | 2.5x [1.8x, 3.1x] | 9.3x [9.0x, 9.6x] | 3.3x [3.2x, 3.4x] | 8.5x [8.1x, 8.9x] | 5.3x [5.0x, 5.6x] | 4.7x [4.7x, 4.8x] | **1.0x** | 4.3x [4.2x, 4.5x] | 50.2x [49.1x, 51.3x] | 50.8x [49.8x, 51.9x] | 42.8x [41.8x, 43.8x] |
+| layout-stress (cols=4,rows=10) | 4.1x [3.5x, 4.8x] | 11.5x [11.2x, 11.8x] | 116.5x [113.0x, 120.0x] | 26.6x [24.9x, 28.3x] | 3.4x [3.2x, 3.5x] | 2.3x [2.2x, 2.3x] | 1.7x [1.6x, 1.7x] | **1.0x** | 1.6x [1.6x, 1.6x] | 2.1x [2.1x, 2.2x] | 1.3x [1.2x, 1.3x] | 17.9x [17.4x, 18.4x] | 28.6x [27.8x, 29.4x] | 19.6x [19.0x, 20.2x] |
+| scroll-stress (items=2000) | 154.1x [146.3x, 161.9x] | 41.4x [39.6x, 43.3x] | 52.9x [43.7x, 62.1x] | 2.1x [2.0x, 2.3x] | 4.1x [3.3x, 4.9x] | 4.8x [4.7x, 4.8x] | 3.8x [3.3x, 4.4x] | 1.9x [1.6x, 2.1x] | 6.9x [6.7x, 7.2x] | **1.0x** | 8.2x [7.5x, 8.8x] | 25.6x [23.9x, 27.4x] | 33.6x [32.0x, 35.3x] | 20.5x [19.5x, 21.5x] |
+| virtual-list (items=100000,viewport=40) | 5.7x [5.2x, 6.2x] | 24.6x [24.1x, 25.1x] | 37.4x [36.4x, 38.3x] | 4.4x [3.9x, 4.9x] | 5.7x [5.5x, 6.0x] | 5.2x [5.1x, 5.3x] | 5.8x [5.6x, 6.0x] | 2.2x [2.1x, 2.2x] | 3.3x [3.2x, 3.4x] | **1.0x** | 4.7x [4.6x, 4.7x] | 30.1x [29.5x, 30.6x] | 51.5x [50.6x, 52.4x] | 31.1x [30.6x, 31.7x] |
+| tables (cols=8,rows=100) | 21.5x [20.4x, 22.6x] | 35.9x [34.6x, 37.1x] | 42.1x [41.0x, 43.2x] | 50.8x [47.0x, 54.6x] | 9.2x [8.7x, 9.8x] | 5.6x [5.4x, 5.9x] | 13.3x [12.5x, 14.0x] | 17.4x [16.4x, 18.3x] | 5.9x [5.8x, 5.9x] | **1.0x** | 4.2x [4.0x, 4.4x] | 56.7x [54.7x, 58.6x] | 78.1x [76.1x, 80.1x] | 54.0x [52.8x, 55.1x] |
+| memory-profile | 4.6x [4.5x, 4.6x] | 6.6x [6.5x, 6.7x] | 9.5x [9.4x, 9.7x] | 1.4x [1.1x, 1.6x] | 1.7x [1.6x, 1.7x] | **1.0x** | 2.2x [2.1x, 2.2x] | 1.8x [1.8x, 1.8x] | 1.9x [1.9x, 2.0x] | 2.6x [2.5x, 2.6x] | 2.3x [2.3x, 2.3x] | 20.0x [19.7x, 20.2x] | 18.6x [18.3x, 18.8x] | 12.6x [12.4x, 12.7x] |
+| terminal-rerender | 8.3x [8.2x, 8.5x] | 17.9x [17.6x, 18.2x] | 57.0x [55.9x, 58.0x] | 1.4x [1.1x, 1.7x] | 4.5x [4.3x, 4.7x] | 4.2x [4.2x, 4.3x] | 15.0x [14.6x, 15.4x] | 4.6x [4.5x, 4.7x] | 1.1x [1.1x, 1.2x] | 1.3x [1.3x, 1.3x] | **1.0x** | 91.9x [90.6x, 93.3x] | 123.6x [121.7x, 125.5x] | 109.0x [107.1x, 110.9x] |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | 14.3x [13.7x, 14.9x] | 15.8x [15.3x, 16.2x] | 50.5x [49.2x, 51.8x] | 2.1x [1.7x, 2.4x] | 4.2x [3.9x, 4.6x] | 3.8x [3.6x, 3.9x] | 8.7x [8.5x, 8.9x] | 4.4x [4.3x, 4.6x] | **1.0x** | 1.1x [1.1x, 1.2x] | 1.3x [1.3x, 1.3x] | 25.3x [24.6x, 25.9x] | 57.0x [55.8x, 58.2x] | 42.7x [41.8x, 43.6x] |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | 12.7x [12.3x, 13.1x] | 17.7x [17.3x, 18.1x] | 29.5x [28.8x, 30.2x] | 3.9x [2.6x, 5.2x] | 4.7x [4.5x, 4.9x] | 3.0x [3.0x, 3.0x] | 5.0x [4.9x, 5.2x] | 6.4x [6.2x, 6.6x] | 5.4x [5.3x, 5.6x] | **1.0x** | 6.7x [6.5x, 6.8x] | 56.5x [55.3x, 57.7x] | 52.0x [50.8x, 53.3x] | 45.4x [44.4x, 46.4x] |
+| terminal-screen-transition (cols=120,rows=40) | 3.8x [3.7x, 3.9x] | 6.0x [5.9x, 6.1x] | 7.8x [7.7x, 7.9x] | **1.0x** | 1.1x [1.0x, 1.1x] | 1.1x [1.1x, 1.2x] | 1.6x [1.6x, 1.7x] | 2.3x [2.2x, 2.3x] | 1.6x [1.6x, 1.7x] | 2.0x [2.0x, 2.1x] | 1.8x [1.7x, 1.8x] | 9.2x [9.0x, 9.3x] | 12.9x [12.7x, 13.2x] | 10.2x [10.0x, 10.3x] |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | 12.3x [12.0x, 12.6x] | 28.8x [28.4x, 29.3x] | 40.0x [39.4x, 40.7x] | 12.0x [11.1x, 12.8x] | 4.5x [4.4x, 4.7x] | 5.3x [5.2x, 5.4x] | 5.9x [5.7x, 6.0x] | 6.9x [6.7x, 7.0x] | 1.7x [1.7x, 1.7x] | **1.0x** | 1.8x [1.7x, 1.8x] | 45.2x [44.5x, 46.0x] | 61.0x [60.2x, 61.8x] | 49.7x [48.9x, 50.5x] |
+| terminal-input-latency (cols=120,rows=40) | 13.2x [12.9x, 13.6x] | 15.9x [15.6x, 16.2x] | 58.2x [57.2x, 59.2x] | 2.1x [1.7x, 2.5x] | 9.8x [9.4x, 10.1x] | 3.8x [3.7x, 3.8x] | 9.3x [9.1x, 9.4x] | 4.7x [4.5x, 4.8x] | **1.0x** | 1.3x [1.2x, 1.3x] | 1.2x [1.2x, 1.2x] | 39.9x [39.3x, 40.5x] | 73.4x [72.3x, 74.5x] | 61.7x [60.7x, 62.8x] |
+| terminal-memory-soak (cols=120,rows=40) | 3.7x [3.7x, 3.8x] | 6.6x [6.5x, 6.7x] | 8.4x [8.3x, 8.5x] | 1.1x [0.8x, 1.3x] | **1.0x** | **1.0x** | 1.7x [1.7x, 1.8x] | 1.9x [1.9x, 1.9x] | 1.7x [1.7x, 1.7x] | 2.3x [2.2x, 2.3x] | 2.1x [2.0x, 2.1x] | 17.3x [17.0x, 17.5x] | 15.8x [15.6x, 16.1x] | 12.6x [12.4x, 12.8x] |
+| terminal-full-ui (cols=120,rows=40,services=24) | 15.3x [15.0x, 15.6x] | 23.7x [23.3x, 24.2x] | 38.9x [38.2x, 39.5x] | 18.8x [18.0x, 19.7x] | 12.0x [11.7x, 12.3x] | 4.1x [4.1x, 4.1x] | 6.7x [6.6x, 6.9x] | 7.3x [7.1x, 7.4x] | 2.2x [2.2x, 2.3x] | **1.0x** | 2.9x [2.8x, 2.9x] | 41.4x [40.8x, 42.0x] | 59.2x [58.4x, 60.0x] | 49.9x [49.0x, 50.7x] |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | 14.3x [13.9x, 14.6x] | 22.7x [22.4x, 23.1x] | 40.6x [40.0x, 41.3x] | 15.5x [14.7x, 16.3x] | 11.8x [11.5x, 12.1x] | 4.2x [4.1x, 4.3x] | 7.7x [7.5x, 8.0x] | 7.5x [7.4x, 7.7x] | 2.6x [2.6x, 2.7x] | **1.0x** | 2.8x [2.7x, 2.8x] | 36.8x [36.3x, 37.3x] | 53.6x [52.9x, 54.3x] | 45.5x [44.7x, 46.3x] |
+| terminal-strict-ui (cols=120,rows=40,services=24) | 16.2x [15.8x, 16.5x] | 25.5x [25.1x, 25.9x] | 41.7x [41.0x, 42.4x] | 18.5x [17.7x, 19.4x] | 12.1x [11.8x, 12.5x] | 4.5x [4.4x, 4.5x] | 7.7x [7.5x, 7.9x] | 13.0x [12.7x, 13.2x] | 2.2x [2.2x, 2.2x] | **1.0x** | 2.2x [2.2x, 2.2x] | 43.1x [42.5x, 43.8x] | 64.9x [63.9x, 65.9x] | 52.8x [51.9x, 53.6x] |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | 16.4x [16.0x, 16.7x] | 21.9x [21.6x, 22.3x] | 38.3x [37.6x, 38.9x] | 15.3x [14.6x, 16.1x] | 14.7x [14.4x, 15.1x] | 4.0x [3.9x, 4.0x] | 6.2x [6.1x, 6.3x] | 12.1x [11.6x, 12.7x] | 2.0x [2.0x, 2.1x] | **1.0x** | 2.7x [2.6x, 2.7x] | 40.7x [40.0x, 41.3x] | 61.3x [60.4x, 62.3x] | 46.9x [46.2x, 47.6x] |
+| terminal-virtual-list (items=100000,viewport=40) | 4.1x [3.8x, 4.3x] | 23.8x [23.4x, 24.3x] | 29.8x [29.2x, 30.3x] | 1.2x [1.0x, 1.4x] | 3.2x [3.1x, 3.4x] | 3.4x [3.4x, 3.4x] | 5.7x [5.5x, 5.8x] | 2.0x [1.9x, 2.0x] | 2.5x [2.5x, 2.5x] | **1.0x** | 3.9x [3.8x, 3.9x] | 17.4x [17.0x, 17.7x] | 34.5x [33.9x, 35.0x] | 26.5x [26.0x, 27.0x] |
+| terminal-table (cols=8,rows=40) | 15.4x [14.9x, 16.0x] | 21.1x [20.6x, 21.6x] | 28.5x [27.7x, 29.3x] | 16.2x [15.2x, 17.2x] | 3.8x [3.7x, 3.9x] | 4.2x [4.0x, 4.3x] | 4.1x [3.9x, 4.2x] | 7.7x [7.4x, 8.0x] | 2.6x [2.6x, 2.7x] | **1.0x** | 2.4x [2.3x, 2.4x] | 27.8x [27.1x, 28.5x] | 48.3x [47.2x, 49.4x] | 41.0x [40.0x, 42.1x] |
 
 ## Memory Comparison
 
@@ -518,351 +518,351 @@
 | startup | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | startup | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 4.0KB |
 | startup | TUIX.Core | 4.0MB | 4.0MB | 4.0MB | 4.0KB |
-| startup | bubbletea | 16.0MB | 10.5MB | 16.0MB | 5.5MB |
-| startup | tuix-python | 18.2MB | 18.2MB | 18.2MB | 4.0KB |
-| startup | rich | 31.5MB | 31.0MB | 31.5MB | 492.0KB |
+| startup | bubbletea | 11.7MB | 10.8MB | 11.7MB | 904.0KB |
+| startup | tuix-python | 18.4MB | 18.3MB | 18.4MB | 52.0KB |
+| startup | rich | 32.0MB | 31.4MB | 32.0MB | 620.0KB |
 | startup | opentui-core | 33.3MB | 32.9MB | 33.3MB | 412.0KB |
-| startup | opentui-react | 35.9MB | 35.5MB | 35.9MB | 412.0KB |
-| startup | prompt-toolkit | 36.2MB | 36.1MB | 36.2MB | 24.0KB |
-| startup | urwid | 42.0MB | 42.0MB | 42.0MB | 24.0KB |
-| startup | terminal-kit | 43.4MB | 43.4MB | 43.4MB | 28.0KB |
-| startup | ink | 62.3MB | 59.6MB | 62.3MB | 2.7MB |
-| startup | rezitui | 78.4MB | 65.0MB | 78.4MB | 13.4MB |
-| startup | blessed | 149.5MB | 75.1MB | 149.5MB | 74.4MB |
+| startup | opentui-react | 35.8MB | 35.4MB | 35.8MB | 416.0KB |
+| startup | prompt-toolkit | 36.1MB | 36.1MB | 36.1MB | 16.0KB |
+| startup | urwid | 41.8MB | 41.8MB | 41.8MB | 24.0KB |
+| startup | terminal-kit | 46.4MB | 46.6MB | 46.4MB | 0.00KB |
+| startup | ink | 65.0MB | 58.3MB | 65.0MB | 6.7MB |
+| startup | rezitui | 81.7MB | 67.8MB | 81.7MB | 13.9MB |
+| startup | blessed | 152.1MB | 77.7MB | 152.1MB | 74.5MB |
 | tree-construction (items=10) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | tree-construction (items=10) | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 0.00KB |
 | tree-construction (items=10) | TUIX.Core | 4.0MB | 4.0MB | 4.0MB | 0.00KB |
-| tree-construction (items=10) | bubbletea | 16.6MB | 16.3MB | 16.6MB | 296.0KB |
-| tree-construction (items=10) | tuix-python | 18.2MB | 18.2MB | 18.2MB | 16.0KB |
-| tree-construction (items=10) | rich | 31.5MB | 31.5MB | 31.5MB | 24.0KB |
-| tree-construction (items=10) | opentui-core | 33.3MB | 33.3MB | 33.3MB | 0.00KB |
-| tree-construction (items=10) | opentui-react | 36.0MB | 35.9MB | 36.0MB | 44.0KB |
-| tree-construction (items=10) | prompt-toolkit | 36.2MB | 36.2MB | 36.2MB | 32.0KB |
-| tree-construction (items=10) | urwid | 42.1MB | 42.0MB | 42.1MB | 76.0KB |
-| tree-construction (items=10) | terminal-kit | 43.7MB | 43.7MB | 43.7MB | 36.0KB |
-| tree-construction (items=10) | ink | 66.1MB | 63.3MB | 66.1MB | 2.7MB |
-| tree-construction (items=10) | rezitui | 98.1MB | 79.4MB | 98.1MB | 18.7MB |
-| tree-construction (items=10) | blessed | 157.9MB | 151.5MB | 157.9MB | 6.4MB |
+| tree-construction (items=10) | bubbletea | 16.2MB | 11.7MB | 16.2MB | 4.5MB |
+| tree-construction (items=10) | tuix-python | 18.5MB | 18.5MB | 18.5MB | 52.0KB |
+| tree-construction (items=10) | rich | 32.1MB | 32.0MB | 32.1MB | 28.0KB |
+| tree-construction (items=10) | opentui-core | 34.2MB | 33.3MB | 34.2MB | 944.0KB |
+| tree-construction (items=10) | opentui-react | 35.9MB | 35.8MB | 35.9MB | 92.0KB |
+| tree-construction (items=10) | prompt-toolkit | 36.1MB | 36.1MB | 36.1MB | 16.0KB |
+| tree-construction (items=10) | urwid | 41.9MB | 41.9MB | 41.9MB | 76.0KB |
+| tree-construction (items=10) | terminal-kit | 46.7MB | 46.6MB | 46.7MB | 32.0KB |
+| tree-construction (items=10) | ink | 69.1MB | 66.0MB | 69.1MB | 3.1MB |
+| tree-construction (items=10) | rezitui | 100.4MB | 83.4MB | 100.4MB | 17.1MB |
+| tree-construction (items=10) | blessed | 161.1MB | 154.2MB | 161.1MB | 6.9MB |
 | tree-construction (items=100) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | tree-construction (items=100) | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 0.00KB |
 | tree-construction (items=100) | TUIX.Core | 4.0MB | 4.0MB | 4.0MB | 0.00KB |
-| tree-construction (items=100) | bubbletea | 16.6MB | 16.6MB | 16.6MB | 16.0KB |
-| tree-construction (items=100) | tuix-python | 18.3MB | 18.3MB | 18.3MB | 16.0KB |
-| tree-construction (items=100) | rich | 31.6MB | 31.5MB | 31.6MB | 28.0KB |
-| tree-construction (items=100) | opentui-core | 34.0MB | 33.3MB | 34.0MB | 736.0KB |
+| tree-construction (items=100) | bubbletea | 16.2MB | 16.2MB | 16.2MB | 8.0KB |
+| tree-construction (items=100) | tuix-python | 18.6MB | 18.6MB | 18.6MB | 16.0KB |
+| tree-construction (items=100) | rich | 32.1MB | 32.1MB | 32.1MB | 16.0KB |
+| tree-construction (items=100) | opentui-core | 34.9MB | 34.5MB | 34.9MB | 440.0KB |
 | tree-construction (items=100) | opentui-react | 36.1MB | 36.0MB | 36.1MB | 104.0KB |
-| tree-construction (items=100) | prompt-toolkit | 36.3MB | 36.2MB | 36.3MB | 72.0KB |
-| tree-construction (items=100) | urwid | 42.1MB | 42.1MB | 42.1MB | 16.0KB |
-| tree-construction (items=100) | terminal-kit | 43.7MB | 43.6MB | 43.7MB | 80.0KB |
-| tree-construction (items=100) | ink | 101.3MB | 82.1MB | 101.3MB | 19.2MB |
-| tree-construction (items=100) | rezitui | 107.5MB | 96.2MB | 107.5MB | 11.3MB |
-| tree-construction (items=100) | blessed | 240.9MB | 161.4MB | 240.9MB | 79.6MB |
+| tree-construction (items=100) | prompt-toolkit | 36.1MB | 36.1MB | 36.1MB | 16.0KB |
+| tree-construction (items=100) | urwid | 41.9MB | 41.9MB | 41.9MB | 20.0KB |
+| tree-construction (items=100) | terminal-kit | 46.5MB | 46.7MB | 46.5MB | 0.00KB |
+| tree-construction (items=100) | ink | 106.4MB | 73.6MB | 106.4MB | 32.7MB |
+| tree-construction (items=100) | rezitui | 110.6MB | 98.8MB | 110.6MB | 11.8MB |
+| tree-construction (items=100) | blessed | 244.4MB | 165.1MB | 244.4MB | 79.3MB |
 | tree-construction (items=500) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | tree-construction (items=500) | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 48.0KB |
 | tree-construction (items=500) | TUIX.Core | 4.0MB | 4.0MB | 4.0MB | 0.00KB |
-| tree-construction (items=500) | bubbletea | 16.6MB | 16.6MB | 16.6MB | 0.00KB |
-| tree-construction (items=500) | tuix-python | 18.3MB | 18.3MB | 18.3MB | 16.0KB |
-| tree-construction (items=500) | rich | 31.6MB | 31.6MB | 31.6MB | 12.0KB |
-| tree-construction (items=500) | opentui-core | 34.3MB | 34.0MB | 34.3MB | 244.0KB |
-| tree-construction (items=500) | opentui-react | 36.3MB | 36.1MB | 36.3MB | 208.0KB |
-| tree-construction (items=500) | prompt-toolkit | 36.3MB | 36.3MB | 36.3MB | 32.0KB |
-| tree-construction (items=500) | urwid | 42.1MB | 42.1MB | 42.1MB | 32.0KB |
-| tree-construction (items=500) | terminal-kit | 43.6MB | 43.7MB | 43.6MB | 0.00KB |
-| tree-construction (items=500) | rezitui | 166.2MB | 110.7MB | 166.2MB | 55.6MB |
-| tree-construction (items=500) | ink | 194.4MB | 103.7MB | 194.4MB | 90.7MB |
-| tree-construction (items=500) | blessed | 450.9MB | 257.6MB | 450.9MB | 193.3MB |
+| tree-construction (items=500) | bubbletea | 16.2MB | 16.2MB | 16.2MB | 0.00KB |
+| tree-construction (items=500) | tuix-python | 18.6MB | 18.6MB | 18.6MB | 16.0KB |
+| tree-construction (items=500) | rich | 32.1MB | 32.1MB | 32.1MB | 12.0KB |
+| tree-construction (items=500) | opentui-core | 34.9MB | 34.9MB | 34.9MB | 0.00KB |
+| tree-construction (items=500) | prompt-toolkit | 36.1MB | 36.1MB | 36.1MB | 16.0KB |
+| tree-construction (items=500) | opentui-react | 37.1MB | 36.1MB | 37.1MB | 1.0MB |
+| tree-construction (items=500) | urwid | 42.0MB | 41.9MB | 42.0MB | 32.0KB |
+| tree-construction (items=500) | terminal-kit | 46.8MB | 46.5MB | 46.8MB | 308.0KB |
+| tree-construction (items=500) | rezitui | 167.8MB | 113.2MB | 167.8MB | 54.6MB |
+| tree-construction (items=500) | ink | 188.1MB | 106.9MB | 188.1MB | 81.2MB |
+| tree-construction (items=500) | blessed | 454.1MB | 260.9MB | 454.1MB | 193.2MB |
 | tree-construction (items=1000) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
-| tree-construction (items=1000) | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 0.00KB |
-| tree-construction (items=1000) | TUIX.Core | 4.0MB | 4.0MB | 4.0MB | 0.00KB |
-| tree-construction (items=1000) | bubbletea | 16.6MB | 16.6MB | 16.6MB | 0.00KB |
-| tree-construction (items=1000) | tuix-python | 18.4MB | 18.3MB | 18.4MB | 16.0KB |
-| tree-construction (items=1000) | rich | 31.6MB | 31.6MB | 31.6MB | 12.0KB |
-| tree-construction (items=1000) | opentui-core | 34.8MB | 34.6MB | 34.8MB | 236.0KB |
-| tree-construction (items=1000) | prompt-toolkit | 36.4MB | 36.3MB | 36.4MB | 116.0KB |
-| tree-construction (items=1000) | opentui-react | 38.0MB | 36.5MB | 38.0MB | 1.5MB |
-| tree-construction (items=1000) | urwid | 42.1MB | 42.1MB | 42.1MB | 16.0KB |
-| tree-construction (items=1000) | terminal-kit | 51.8MB | 43.7MB | 51.8MB | 8.1MB |
-| tree-construction (items=1000) | rezitui | 184.0MB | 166.4MB | 184.0MB | 17.6MB |
-| tree-construction (items=1000) | ink | 347.0MB | 206.6MB | 347.0MB | 140.4MB |
-| tree-construction (items=1000) | blessed | 516.7MB | 451.7MB | 516.7MB | 65.0MB |
+| tree-construction (items=1000) | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 48.0KB |
+| tree-construction (items=1000) | TUIX.Core | 4.0MB | 4.0MB | 4.0MB | 48.0KB |
+| tree-construction (items=1000) | bubbletea | 16.2MB | 16.2MB | 16.2MB | 0.00KB |
+| tree-construction (items=1000) | tuix-python | 18.7MB | 18.6MB | 18.7MB | 72.0KB |
+| tree-construction (items=1000) | rich | 32.1MB | 32.1MB | 32.1MB | 16.0KB |
+| tree-construction (items=1000) | opentui-core | 35.0MB | 34.9MB | 35.0MB | 96.0KB |
+| tree-construction (items=1000) | prompt-toolkit | 36.2MB | 36.1MB | 36.2MB | 16.0KB |
+| tree-construction (items=1000) | opentui-react | 38.0MB | 37.1MB | 38.0MB | 848.0KB |
+| tree-construction (items=1000) | urwid | 42.0MB | 42.0MB | 42.0MB | 16.0KB |
+| tree-construction (items=1000) | terminal-kit | 55.1MB | 46.8MB | 55.1MB | 8.2MB |
+| tree-construction (items=1000) | rezitui | 185.9MB | 167.8MB | 185.9MB | 18.1MB |
+| tree-construction (items=1000) | ink | 355.0MB | 218.7MB | 355.0MB | 136.3MB |
+| tree-construction (items=1000) | blessed | 521.4MB | 453.8MB | 521.4MB | 67.6MB |
 | rerender | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | rerender | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 0.00KB |
 | rerender | TUIX.Core | 4.1MB | 4.1MB | 4.1MB | 0.00KB |
-| rerender | bubbletea | 16.6MB | 16.6MB | 16.6MB | 0.00KB |
-| rerender | tuix-python | 18.4MB | 18.4MB | 18.4MB | 32.0KB |
-| rerender | rich | 31.6MB | 31.6MB | 31.6MB | 32.0KB |
-| rerender | opentui-core | 34.8MB | 34.8MB | 34.8MB | 0.00KB |
-| rerender | prompt-toolkit | 36.6MB | 36.4MB | 36.6MB | 160.0KB |
-| rerender | opentui-react | 38.0MB | 38.0MB | 38.0MB | 0.00KB |
-| rerender | urwid | 42.2MB | 42.1MB | 42.2MB | 68.0KB |
-| rerender | terminal-kit | 52.0MB | 51.8MB | 52.0MB | 112.0KB |
-| rerender | rezitui | 191.6MB | 184.0MB | 191.6MB | 7.6MB |
-| rerender | ink | 346.5MB | 346.9MB | 346.5MB | 0.00KB |
-| rerender | blessed | 516.4MB | 516.7MB | 516.4MB | 0.00KB |
+| rerender | bubbletea | 16.2MB | 16.2MB | 16.2MB | 0.00KB |
+| rerender | tuix-python | 18.7MB | 18.7MB | 18.7MB | 0.00KB |
+| rerender | rich | 32.1MB | 32.1MB | 32.1MB | 32.0KB |
+| rerender | opentui-core | 35.0MB | 35.0MB | 35.0MB | 0.00KB |
+| rerender | prompt-toolkit | 36.2MB | 36.2MB | 36.2MB | 32.0KB |
+| rerender | opentui-react | 38.0MB | 38.0MB | 38.0MB | 44.0KB |
+| rerender | urwid | 42.1MB | 42.0MB | 42.1MB | 72.0KB |
+| rerender | terminal-kit | 54.9MB | 55.1MB | 54.9MB | 0.00KB |
+| rerender | rezitui | 191.9MB | 186.0MB | 191.9MB | 6.0MB |
+| rerender | ink | 354.9MB | 354.7MB | 354.9MB | 208.0KB |
+| rerender | blessed | 520.5MB | 521.0MB | 520.5MB | 0.00KB |
 | content-update | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | content-update | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 0.00KB |
-| content-update | TUIX.Core | 4.0MB | 4.0MB | 4.0MB | 0.00KB |
-| content-update | bubbletea | 16.6MB | 16.6MB | 16.6MB | 8.0KB |
-| content-update | tuix-python | 18.5MB | 18.4MB | 18.5MB | 72.0KB |
-| content-update | rich | 32.1MB | 31.7MB | 32.1MB | 420.0KB |
-| content-update | opentui-core | 34.8MB | 34.8MB | 34.8MB | 0.00KB |
-| content-update | prompt-toolkit | 36.6MB | 36.6MB | 36.6MB | 72.0KB |
-| content-update | opentui-react | 38.9MB | 38.0MB | 38.9MB | 880.0KB |
-| content-update | urwid | 42.2MB | 42.2MB | 42.2MB | 0.00KB |
-| content-update | terminal-kit | 52.1MB | 52.0MB | 52.1MB | 56.0KB |
-| content-update | rezitui | 184.9MB | 190.0MB | 184.9MB | 0.00KB |
-| content-update | ink | 346.9MB | 346.7MB | 346.9MB | 160.0KB |
-| content-update | blessed | 516.9MB | 518.5MB | 516.9MB | 0.00KB |
+| content-update | TUIX.Core | 4.1MB | 4.1MB | 4.1MB | 0.00KB |
+| content-update | bubbletea | 16.2MB | 16.2MB | 16.2MB | 0.00KB |
+| content-update | tuix-python | 18.7MB | 18.7MB | 18.7MB | 0.00KB |
+| content-update | rich | 32.7MB | 32.3MB | 32.7MB | 460.0KB |
+| content-update | opentui-core | 35.0MB | 35.0MB | 35.0MB | 0.00KB |
+| content-update | prompt-toolkit | 36.2MB | 36.2MB | 36.2MB | 16.0KB |
+| content-update | opentui-react | 38.9MB | 38.0MB | 38.9MB | 900.0KB |
+| content-update | urwid | 42.1MB | 42.1MB | 42.1MB | 0.00KB |
+| content-update | terminal-kit | 55.1MB | 55.0MB | 55.1MB | 68.0KB |
+| content-update | rezitui | 188.0MB | 191.8MB | 188.0MB | 0.00KB |
+| content-update | ink | 355.0MB | 355.0MB | 355.0MB | 0.00KB |
+| content-update | blessed | 520.8MB | 523.1MB | 520.8MB | 0.00KB |
 | layout-stress (cols=4,rows=10) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | layout-stress (cols=4,rows=10) | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 0.00KB |
 | layout-stress (cols=4,rows=10) | TUIX.Core | 4.1MB | 4.1MB | 4.1MB | 0.00KB |
-| layout-stress (cols=4,rows=10) | bubbletea | 16.6MB | 16.6MB | 16.6MB | 0.00KB |
-| layout-stress (cols=4,rows=10) | tuix-python | 18.5MB | 18.5MB | 18.5MB | 0.00KB |
-| layout-stress (cols=4,rows=10) | rich | 32.1MB | 32.1MB | 32.1MB | 12.0KB |
-| layout-stress (cols=4,rows=10) | opentui-core | 34.8MB | 34.8MB | 34.8MB | 0.00KB |
-| layout-stress (cols=4,rows=10) | prompt-toolkit | 36.7MB | 36.6MB | 36.7MB | 56.0KB |
+| layout-stress (cols=4,rows=10) | bubbletea | 16.2MB | 16.2MB | 16.2MB | 0.00KB |
+| layout-stress (cols=4,rows=10) | tuix-python | 18.7MB | 18.7MB | 18.7MB | 0.00KB |
+| layout-stress (cols=4,rows=10) | rich | 32.8MB | 32.8MB | 32.8MB | 8.0KB |
+| layout-stress (cols=4,rows=10) | opentui-core | 35.0MB | 35.0MB | 35.0MB | 0.00KB |
+| layout-stress (cols=4,rows=10) | prompt-toolkit | 36.2MB | 36.2MB | 36.2MB | 8.0KB |
 | layout-stress (cols=4,rows=10) | opentui-react | 38.9MB | 38.9MB | 38.9MB | 0.00KB |
-| layout-stress (cols=4,rows=10) | urwid | 42.2MB | 42.2MB | 42.2MB | 0.00KB |
-| layout-stress (cols=4,rows=10) | terminal-kit | 52.1MB | 52.1MB | 52.1MB | 0.00KB |
-| layout-stress (cols=4,rows=10) | rezitui | 187.1MB | 185.1MB | 187.1MB | 2.0MB |
-| layout-stress (cols=4,rows=10) | ink | 347.3MB | 346.6MB | 347.3MB | 640.0KB |
-| layout-stress (cols=4,rows=10) | blessed | 517.0MB | 520.0MB | 517.0MB | 0.00KB |
+| layout-stress (cols=4,rows=10) | urwid | 42.1MB | 42.1MB | 42.1MB | 0.00KB |
+| layout-stress (cols=4,rows=10) | terminal-kit | 55.1MB | 55.1MB | 55.1MB | 4.0KB |
+| layout-stress (cols=4,rows=10) | rezitui | 188.7MB | 187.6MB | 188.7MB | 1.0MB |
+| layout-stress (cols=4,rows=10) | ink | 355.7MB | 355.3MB | 355.7MB | 488.0KB |
+| layout-stress (cols=4,rows=10) | blessed | 521.4MB | 526.0MB | 521.4MB | 0.00KB |
 | scroll-stress (items=2000) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | scroll-stress (items=2000) | TUIX.Renderer | 3.9MB | 3.9MB | 3.9MB | 0.00KB |
-| scroll-stress (items=2000) | TUIX.Core | 4.0MB | 4.0MB | 4.0MB | 0.00KB |
-| scroll-stress (items=2000) | bubbletea | 16.6MB | 16.6MB | 16.6MB | 0.00KB |
-| scroll-stress (items=2000) | tuix-python | 18.5MB | 18.5MB | 18.5MB | 0.00KB |
-| scroll-stress (items=2000) | rich | 32.2MB | 32.1MB | 32.2MB | 80.0KB |
-| scroll-stress (items=2000) | opentui-core | 34.9MB | 34.8MB | 34.9MB | 100.0KB |
-| scroll-stress (items=2000) | prompt-toolkit | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
+| scroll-stress (items=2000) | TUIX.Core | 4.1MB | 4.1MB | 4.1MB | 0.00KB |
+| scroll-stress (items=2000) | bubbletea | 16.2MB | 16.2MB | 16.2MB | 0.00KB |
+| scroll-stress (items=2000) | tuix-python | 18.7MB | 18.7MB | 18.7MB | 4.0KB |
+| scroll-stress (items=2000) | rich | 32.9MB | 32.8MB | 32.9MB | 80.0KB |
+| scroll-stress (items=2000) | opentui-core | 35.1MB | 35.0MB | 35.1MB | 100.0KB |
+| scroll-stress (items=2000) | prompt-toolkit | 36.2MB | 36.2MB | 36.2MB | 4.0KB |
 | scroll-stress (items=2000) | opentui-react | 38.9MB | 38.9MB | 38.9MB | 0.00KB |
-| scroll-stress (items=2000) | urwid | 42.2MB | 42.2MB | 42.2MB | 0.00KB |
-| scroll-stress (items=2000) | terminal-kit | 52.1MB | 52.1MB | 52.1MB | 0.00KB |
-| scroll-stress (items=2000) | rezitui | 187.2MB | 187.1MB | 187.2MB | 56.0KB |
-| scroll-stress (items=2000) | ink | 347.3MB | 347.3MB | 347.3MB | 4.0KB |
-| scroll-stress (items=2000) | blessed | 516.9MB | 517.1MB | 516.9MB | 0.00KB |
+| scroll-stress (items=2000) | urwid | 42.1MB | 42.1MB | 42.1MB | 0.00KB |
+| scroll-stress (items=2000) | terminal-kit | 55.2MB | 55.2MB | 55.2MB | 0.00KB |
+| scroll-stress (items=2000) | rezitui | 188.9MB | 188.7MB | 188.9MB | 236.0KB |
+| scroll-stress (items=2000) | ink | 355.7MB | 355.7MB | 355.7MB | 4.0KB |
+| scroll-stress (items=2000) | blessed | 521.2MB | 520.9MB | 521.2MB | 212.0KB |
 | virtual-list (items=100000,viewport=40) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | virtual-list (items=100000,viewport=40) | TUIX.Renderer | 4.0MB | 4.0MB | 4.0MB | 0.00KB |
 | virtual-list (items=100000,viewport=40) | TUIX.Core | 4.1MB | 4.1MB | 4.1MB | 0.00KB |
-| virtual-list (items=100000,viewport=40) | tuix-python | 18.5MB | 18.5MB | 18.5MB | 4.0KB |
-| virtual-list (items=100000,viewport=40) | bubbletea | 20.8MB | 20.6MB | 20.8MB | 256.0KB |
-| virtual-list (items=100000,viewport=40) | rich | 32.5MB | 32.2MB | 32.5MB | 308.0KB |
-| virtual-list (items=100000,viewport=40) | opentui-core | 34.9MB | 34.9MB | 34.9MB | 0.00KB |
-| virtual-list (items=100000,viewport=40) | prompt-toolkit | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
+| virtual-list (items=100000,viewport=40) | tuix-python | 18.7MB | 18.7MB | 18.7MB | 32.0KB |
+| virtual-list (items=100000,viewport=40) | bubbletea | 20.2MB | 16.2MB | 20.2MB | 4.0MB |
+| virtual-list (items=100000,viewport=40) | rich | 32.9MB | 32.9MB | 32.9MB | 12.0KB |
+| virtual-list (items=100000,viewport=40) | opentui-core | 35.1MB | 35.1MB | 35.1MB | 0.00KB |
+| virtual-list (items=100000,viewport=40) | prompt-toolkit | 36.3MB | 36.2MB | 36.3MB | 72.0KB |
 | virtual-list (items=100000,viewport=40) | opentui-react | 38.9MB | 38.9MB | 38.9MB | 0.00KB |
-| virtual-list (items=100000,viewport=40) | urwid | 42.3MB | 42.2MB | 42.3MB | 64.0KB |
-| virtual-list (items=100000,viewport=40) | terminal-kit | 93.4MB | 89.0MB | 93.4MB | 4.3MB |
-| virtual-list (items=100000,viewport=40) | rezitui | 189.4MB | 187.4MB | 189.4MB | 2.0MB |
-| virtual-list (items=100000,viewport=40) | ink | 347.4MB | 347.4MB | 347.4MB | 0.00KB |
-| virtual-list (items=100000,viewport=40) | blessed | 520.0MB | 519.9MB | 520.0MB | 148.0KB |
+| virtual-list (items=100000,viewport=40) | urwid | 42.1MB | 42.1MB | 42.1MB | 64.0KB |
+| virtual-list (items=100000,viewport=40) | terminal-kit | 96.1MB | 91.8MB | 96.1MB | 4.3MB |
+| virtual-list (items=100000,viewport=40) | rezitui | 190.4MB | 189.2MB | 190.4MB | 1.2MB |
+| virtual-list (items=100000,viewport=40) | ink | 356.7MB | 356.7MB | 356.7MB | 4.0KB |
+| virtual-list (items=100000,viewport=40) | blessed | 522.6MB | 522.2MB | 522.6MB | 360.0KB |
 | tables (cols=8,rows=100) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | tables (cols=8,rows=100) | TUIX.Renderer | 4.0MB | 4.0MB | 4.0MB | 0.00KB |
 | tables (cols=8,rows=100) | TUIX.Core | 4.1MB | 4.1MB | 4.1MB | 0.00KB |
-| tables (cols=8,rows=100) | tuix-python | 18.5MB | 18.5MB | 18.5MB | 0.00KB |
-| tables (cols=8,rows=100) | bubbletea | 20.8MB | 20.8MB | 20.8MB | 0.00KB |
-| tables (cols=8,rows=100) | rich | 32.5MB | 32.5MB | 32.5MB | 8.0KB |
-| tables (cols=8,rows=100) | opentui-core | 34.9MB | 34.9MB | 34.9MB | 0.00KB |
-| tables (cols=8,rows=100) | prompt-toolkit | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
+| tables (cols=8,rows=100) | tuix-python | 18.7MB | 18.7MB | 18.7MB | 8.0KB |
+| tables (cols=8,rows=100) | bubbletea | 20.2MB | 20.2MB | 20.2MB | 0.00KB |
+| tables (cols=8,rows=100) | rich | 32.9MB | 32.9MB | 32.9MB | 0.00KB |
+| tables (cols=8,rows=100) | opentui-core | 35.1MB | 35.1MB | 35.1MB | 0.00KB |
+| tables (cols=8,rows=100) | prompt-toolkit | 36.3MB | 36.3MB | 36.3MB | 8.0KB |
 | tables (cols=8,rows=100) | opentui-react | 38.9MB | 38.9MB | 38.9MB | 0.00KB |
-| tables (cols=8,rows=100) | urwid | 42.3MB | 42.3MB | 42.3MB | 0.00KB |
-| tables (cols=8,rows=100) | terminal-kit | 93.3MB | 93.3MB | 93.3MB | 0.00KB |
-| tables (cols=8,rows=100) | rezitui | 187.5MB | 188.6MB | 187.5MB | 0.00KB |
-| tables (cols=8,rows=100) | ink | 348.0MB | 348.0MB | 348.0MB | 0.00KB |
-| tables (cols=8,rows=100) | blessed | 519.5MB | 519.4MB | 519.5MB | 68.0KB |
+| tables (cols=8,rows=100) | urwid | 42.1MB | 42.1MB | 42.1MB | 0.00KB |
+| tables (cols=8,rows=100) | terminal-kit | 96.1MB | 96.1MB | 96.1MB | 32.0KB |
+| tables (cols=8,rows=100) | rezitui | 189.8MB | 189.6MB | 189.8MB | 256.0KB |
+| tables (cols=8,rows=100) | ink | 356.7MB | 356.7MB | 356.7MB | 0.00KB |
+| tables (cols=8,rows=100) | blessed | 523.4MB | 523.4MB | 523.4MB | 0.00KB |
 | memory-profile | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | memory-profile | TUIX.Renderer | 4.0MB | 4.0MB | 4.0MB | 0.00KB |
 | memory-profile | TUIX.Core | 4.1MB | 4.1MB | 4.1MB | 0.00KB |
-| memory-profile | tuix-python | 18.6MB | 18.5MB | 18.6MB | 60.0KB |
-| memory-profile | bubbletea | 20.8MB | 20.8MB | 20.8MB | 0.00KB |
-| memory-profile | rich | 32.4MB | 32.5MB | 32.4MB | 0.00KB |
-| memory-profile | opentui-core | 34.9MB | 34.9MB | 34.9MB | 36.0KB |
-| memory-profile | prompt-toolkit | 36.8MB | 36.7MB | 36.8MB | 84.0KB |
-| memory-profile | opentui-react | 39.1MB | 38.9MB | 39.1MB | 228.0KB |
-| memory-profile | urwid | 42.3MB | 42.3MB | 42.3MB | 64.0KB |
-| memory-profile | terminal-kit | 93.3MB | 93.3MB | 93.3MB | 44.0KB |
-| memory-profile | rezitui | 187.8MB | 187.8MB | 187.8MB | 76.0KB |
-| memory-profile | ink | 348.0MB | 348.0MB | 348.0MB | 12.0KB |
-| memory-profile | blessed | 519.3MB | 519.6MB | 519.3MB | 0.00KB |
+| memory-profile | tuix-python | 18.9MB | 18.8MB | 18.9MB | 84.0KB |
+| memory-profile | bubbletea | 20.2MB | 20.2MB | 20.2MB | 0.00KB |
+| memory-profile | rich | 32.9MB | 32.9MB | 32.9MB | 40.0KB |
+| memory-profile | opentui-core | 35.1MB | 35.1MB | 35.1MB | 52.0KB |
+| memory-profile | prompt-toolkit | 36.6MB | 36.3MB | 36.6MB | 320.0KB |
+| memory-profile | opentui-react | 39.2MB | 38.9MB | 39.2MB | 272.0KB |
+| memory-profile | urwid | 42.2MB | 42.1MB | 42.2MB | 84.0KB |
+| memory-profile | terminal-kit | 95.9MB | 95.9MB | 95.9MB | 76.0KB |
+| memory-profile | rezitui | 190.9MB | 190.0MB | 190.9MB | 940.0KB |
+| memory-profile | ink | 356.7MB | 356.7MB | 356.7MB | 12.0KB |
+| memory-profile | blessed | 522.6MB | 523.4MB | 522.6MB | 0.00KB |
 | terminal-rerender | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
-| terminal-rerender | TUIX.Renderer | 4.2MB | 4.2MB | 4.2MB | 0.00KB |
-| terminal-rerender | TUIX.Core | 4.4MB | 4.4MB | 4.4MB | 0.00KB |
-| terminal-rerender | tuix-python | 18.7MB | 18.6MB | 18.7MB | 68.0KB |
-| terminal-rerender | bubbletea | 24.8MB | 20.8MB | 24.8MB | 4.0MB |
-| terminal-rerender | rich | 32.2MB | 32.1MB | 32.2MB | 84.0KB |
-| terminal-rerender | opentui-core | 35.7MB | 35.7MB | 35.7MB | 24.0KB |
-| terminal-rerender | prompt-toolkit | 37.0MB | 37.0MB | 37.0MB | 0.00KB |
-| terminal-rerender | opentui-react | 39.1MB | 39.1MB | 39.1MB | 0.00KB |
-| terminal-rerender | urwid | 42.4MB | 42.3MB | 42.4MB | 64.0KB |
-| terminal-rerender | terminal-kit | 93.4MB | 93.4MB | 93.4MB | 8.0KB |
-| terminal-rerender | rezitui | 187.3MB | 187.8MB | 187.3MB | 0.00KB |
-| terminal-rerender | ink | 347.6MB | 348.0MB | 347.6MB | 0.00KB |
-| terminal-rerender | blessed | 519.3MB | 519.3MB | 519.3MB | 4.0KB |
+| terminal-rerender | TUIX.Renderer | 4.1MB | 4.1MB | 4.1MB | 0.00KB |
+| terminal-rerender | TUIX.Core | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
+| terminal-rerender | tuix-python | 19.1MB | 19.0MB | 19.1MB | 64.0KB |
+| terminal-rerender | bubbletea | 20.2MB | 20.2MB | 20.2MB | 0.00KB |
+| terminal-rerender | rich | 33.0MB | 32.9MB | 33.0MB | 16.0KB |
+| terminal-rerender | opentui-core | 35.9MB | 35.9MB | 35.9MB | 24.0KB |
+| terminal-rerender | prompt-toolkit | 37.2MB | 36.9MB | 37.2MB | 284.0KB |
+| terminal-rerender | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-rerender | urwid | 42.3MB | 42.2MB | 42.3MB | 64.0KB |
+| terminal-rerender | terminal-kit | 96.1MB | 96.0MB | 96.1MB | 128.0KB |
+| terminal-rerender | rezitui | 189.1MB | 190.9MB | 189.1MB | 0.00KB |
+| terminal-rerender | ink | 356.7MB | 356.7MB | 356.7MB | 4.0KB |
+| terminal-rerender | blessed | 522.6MB | 522.6MB | 522.6MB | 0.00KB |
 | terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | TUIX.Renderer | 4.1MB | 4.1MB | 4.1MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | TUIX.Core | 4.4MB | 4.4MB | 4.4MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | tuix-python | 18.7MB | 18.7MB | 18.7MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | rich | 32.4MB | 32.2MB | 32.4MB | 172.0KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | prompt-toolkit | 37.1MB | 37.0MB | 37.1MB | 104.0KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | opentui-react | 39.1MB | 39.1MB | 39.1MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | urwid | 42.4MB | 42.4MB | 42.4MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | terminal-kit | 93.2MB | 93.4MB | 93.2MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | rezitui | 188.9MB | 187.3MB | 188.9MB | 1.6MB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | ink | 348.1MB | 347.7MB | 348.1MB | 384.0KB |
-| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | blessed | 519.6MB | 519.6MB | 519.6MB | 8.0KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | TUIX.Core | 4.5MB | 4.5MB | 4.5MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | tuix-python | 19.1MB | 19.1MB | 19.1MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | bubbletea | 20.7MB | 20.5MB | 20.7MB | 264.0KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | rich | 33.1MB | 33.0MB | 33.1MB | 112.0KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | prompt-toolkit | 37.2MB | 37.2MB | 37.2MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | urwid | 42.3MB | 42.3MB | 42.3MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | terminal-kit | 96.1MB | 96.1MB | 96.1MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | rezitui | 191.0MB | 189.1MB | 191.0MB | 1.8MB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | ink | 356.7MB | 356.7MB | 356.7MB | 4.0KB |
+| terminal-frame-fill (cols=120,dirtyLines=1,rows=40) | blessed | 522.7MB | 522.6MB | 522.7MB | 80.0KB |
 | terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | TUIX.Renderer | 4.2MB | 4.2MB | 4.2MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | TUIX.Core | 4.4MB | 4.4MB | 4.4MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | tuix-python | 18.7MB | 18.7MB | 18.7MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | rich | 33.0MB | 32.7MB | 33.0MB | 308.0KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | prompt-toolkit | 37.0MB | 37.1MB | 37.0MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | opentui-react | 39.1MB | 39.1MB | 39.1MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | urwid | 42.4MB | 42.4MB | 42.4MB | 4.0KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | terminal-kit | 93.3MB | 93.3MB | 93.3MB | 4.0KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | rezitui | 200.4MB | 188.9MB | 200.4MB | 11.5MB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | ink | 348.1MB | 348.1MB | 348.1MB | 0.00KB |
-| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | blessed | 520.0MB | 519.7MB | 520.0MB | 312.0KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | TUIX.Core | 4.5MB | 4.5MB | 4.5MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | tuix-python | 19.0MB | 19.0MB | 19.0MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | rich | 33.0MB | 33.1MB | 33.0MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | prompt-toolkit | 37.2MB | 37.2MB | 37.2MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | urwid | 42.3MB | 42.3MB | 42.3MB | 36.0KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | terminal-kit | 96.4MB | 96.4MB | 96.4MB | 4.0KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | rezitui | 220.6MB | 191.0MB | 220.6MB | 29.6MB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | ink | 356.7MB | 356.7MB | 356.7MB | 0.00KB |
+| terminal-frame-fill (cols=120,dirtyLines=40,rows=40) | blessed | 522.9MB | 522.7MB | 522.9MB | 188.0KB |
 | terminal-screen-transition (cols=120,rows=40) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-screen-transition (cols=120,rows=40) | TUIX.Renderer | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
 | terminal-screen-transition (cols=120,rows=40) | TUIX.Core | 4.6MB | 4.6MB | 4.6MB | 0.00KB |
-| terminal-screen-transition (cols=120,rows=40) | tuix-python | 18.8MB | 18.7MB | 18.8MB | 64.0KB |
-| terminal-screen-transition (cols=120,rows=40) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-screen-transition (cols=120,rows=40) | rich | 33.0MB | 33.0MB | 33.0MB | 0.00KB |
-| terminal-screen-transition (cols=120,rows=40) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-screen-transition (cols=120,rows=40) | prompt-toolkit | 37.1MB | 37.0MB | 37.1MB | 68.0KB |
-| terminal-screen-transition (cols=120,rows=40) | opentui-react | 39.1MB | 39.1MB | 39.1MB | 0.00KB |
-| terminal-screen-transition (cols=120,rows=40) | urwid | 42.4MB | 42.4MB | 42.4MB | 8.0KB |
-| terminal-screen-transition (cols=120,rows=40) | terminal-kit | 93.4MB | 93.4MB | 93.4MB | 0.00KB |
-| terminal-screen-transition (cols=120,rows=40) | rezitui | 206.7MB | 200.7MB | 206.7MB | 6.1MB |
-| terminal-screen-transition (cols=120,rows=40) | ink | 348.0MB | 347.9MB | 348.0MB | 28.0KB |
-| terminal-screen-transition (cols=120,rows=40) | blessed | 519.8MB | 519.8MB | 519.8MB | 4.0KB |
+| terminal-screen-transition (cols=120,rows=40) | tuix-python | 19.5MB | 19.5MB | 19.5MB | 28.0KB |
+| terminal-screen-transition (cols=120,rows=40) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-screen-transition (cols=120,rows=40) | rich | 33.1MB | 33.1MB | 33.1MB | 0.00KB |
+| terminal-screen-transition (cols=120,rows=40) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-screen-transition (cols=120,rows=40) | prompt-toolkit | 37.2MB | 37.2MB | 37.2MB | 64.0KB |
+| terminal-screen-transition (cols=120,rows=40) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-screen-transition (cols=120,rows=40) | urwid | 42.4MB | 42.3MB | 42.4MB | 16.0KB |
+| terminal-screen-transition (cols=120,rows=40) | terminal-kit | 96.4MB | 96.3MB | 96.4MB | 104.0KB |
+| terminal-screen-transition (cols=120,rows=40) | rezitui | 219.0MB | 220.6MB | 219.0MB | 0.00KB |
+| terminal-screen-transition (cols=120,rows=40) | ink | 356.7MB | 356.7MB | 356.7MB | 0.00KB |
+| terminal-screen-transition (cols=120,rows=40) | blessed | 522.9MB | 522.9MB | 522.9MB | 0.00KB |
 | terminal-fps-stream (channels=12,cols=120,rows=40) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-fps-stream (channels=12,cols=120,rows=40) | TUIX.Renderer | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | TUIX.Core | 4.5MB | 4.5MB | 4.5MB | 0.00KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | tuix-python | 18.8MB | 18.8MB | 18.8MB | 16.0KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | rich | 33.0MB | 33.0MB | 33.0MB | 0.00KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | prompt-toolkit | 37.1MB | 37.1MB | 37.1MB | 0.00KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | opentui-react | 39.1MB | 39.1MB | 39.1MB | 0.00KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | urwid | 42.5MB | 42.4MB | 42.5MB | 64.0KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | terminal-kit | 93.4MB | 93.6MB | 93.4MB | 0.00KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | rezitui | 207.6MB | 206.5MB | 207.6MB | 1.2MB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | ink | 348.2MB | 348.2MB | 348.2MB | 8.0KB |
-| terminal-fps-stream (channels=12,cols=120,rows=40) | blessed | 519.6MB | 519.6MB | 519.6MB | 12.0KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | TUIX.Core | 4.6MB | 4.6MB | 4.6MB | 0.00KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | tuix-python | 19.2MB | 19.2MB | 19.2MB | 36.0KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | rich | 33.1MB | 33.1MB | 33.1MB | 4.0KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | prompt-toolkit | 37.2MB | 37.2MB | 37.2MB | 0.00KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | urwid | 42.4MB | 42.4MB | 42.4MB | 68.0KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | terminal-kit | 96.6MB | 96.6MB | 96.6MB | 0.00KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | rezitui | 222.1MB | 219.9MB | 222.1MB | 2.2MB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | ink | 356.8MB | 356.8MB | 356.8MB | 0.00KB |
+| terminal-fps-stream (channels=12,cols=120,rows=40) | blessed | 522.2MB | 522.1MB | 522.2MB | 28.0KB |
 | terminal-input-latency (cols=120,rows=40) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-input-latency (cols=120,rows=40) | TUIX.Renderer | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
 | terminal-input-latency (cols=120,rows=40) | TUIX.Core | 4.5MB | 4.5MB | 4.5MB | 0.00KB |
-| terminal-input-latency (cols=120,rows=40) | tuix-python | 18.9MB | 18.8MB | 18.9MB | 32.0KB |
-| terminal-input-latency (cols=120,rows=40) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-input-latency (cols=120,rows=40) | rich | 33.4MB | 33.0MB | 33.4MB | 412.0KB |
-| terminal-input-latency (cols=120,rows=40) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-input-latency (cols=120,rows=40) | prompt-toolkit | 37.4MB | 37.2MB | 37.4MB | 224.0KB |
-| terminal-input-latency (cols=120,rows=40) | opentui-react | 39.1MB | 39.1MB | 39.1MB | 0.00KB |
-| terminal-input-latency (cols=120,rows=40) | urwid | 42.5MB | 42.5MB | 42.5MB | 36.0KB |
-| terminal-input-latency (cols=120,rows=40) | terminal-kit | 93.4MB | 93.4MB | 93.4MB | 24.0KB |
-| terminal-input-latency (cols=120,rows=40) | rezitui | 208.4MB | 207.6MB | 208.4MB | 824.0KB |
-| terminal-input-latency (cols=120,rows=40) | ink | 348.3MB | 348.3MB | 348.3MB | 0.00KB |
-| terminal-input-latency (cols=120,rows=40) | blessed | 520.0MB | 519.6MB | 520.0MB | 336.0KB |
+| terminal-input-latency (cols=120,rows=40) | tuix-python | 19.3MB | 19.2MB | 19.3MB | 64.0KB |
+| terminal-input-latency (cols=120,rows=40) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 8.0KB |
+| terminal-input-latency (cols=120,rows=40) | rich | 33.5MB | 33.1MB | 33.5MB | 412.0KB |
+| terminal-input-latency (cols=120,rows=40) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-input-latency (cols=120,rows=40) | prompt-toolkit | 37.3MB | 37.2MB | 37.3MB | 68.0KB |
+| terminal-input-latency (cols=120,rows=40) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-input-latency (cols=120,rows=40) | urwid | 42.5MB | 42.5MB | 42.5MB | 4.0KB |
+| terminal-input-latency (cols=120,rows=40) | terminal-kit | 96.5MB | 96.4MB | 96.5MB | 48.0KB |
+| terminal-input-latency (cols=120,rows=40) | rezitui | 220.6MB | 222.1MB | 220.6MB | 0.00KB |
+| terminal-input-latency (cols=120,rows=40) | ink | 356.7MB | 356.6MB | 356.7MB | 28.0KB |
+| terminal-input-latency (cols=120,rows=40) | blessed | 522.4MB | 522.2MB | 522.4MB | 216.0KB |
 | terminal-memory-soak (cols=120,rows=40) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-memory-soak (cols=120,rows=40) | TUIX.Renderer | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
-| terminal-memory-soak (cols=120,rows=40) | TUIX.Core | 4.6MB | 4.5MB | 4.6MB | 124.0KB |
-| terminal-memory-soak (cols=120,rows=40) | tuix-python | 19.0MB | 18.9MB | 19.0MB | 80.0KB |
-| terminal-memory-soak (cols=120,rows=40) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 8.0KB |
-| terminal-memory-soak (cols=120,rows=40) | rich | 33.4MB | 33.1MB | 33.4MB | 360.0KB |
-| terminal-memory-soak (cols=120,rows=40) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-memory-soak (cols=120,rows=40) | prompt-toolkit | 37.2MB | 37.4MB | 37.2MB | 0.00KB |
-| terminal-memory-soak (cols=120,rows=40) | opentui-react | 39.1MB | 39.1MB | 39.1MB | 0.00KB |
-| terminal-memory-soak (cols=120,rows=40) | urwid | 42.5MB | 42.5MB | 42.5MB | 20.0KB |
-| terminal-memory-soak (cols=120,rows=40) | terminal-kit | 93.5MB | 93.5MB | 93.5MB | 0.00KB |
-| terminal-memory-soak (cols=120,rows=40) | rezitui | 208.4MB | 208.4MB | 208.4MB | 8.0KB |
-| terminal-memory-soak (cols=120,rows=40) | ink | 348.4MB | 348.3MB | 348.4MB | 40.0KB |
-| terminal-memory-soak (cols=120,rows=40) | blessed | 520.0MB | 520.0MB | 520.0MB | 0.00KB |
+| terminal-memory-soak (cols=120,rows=40) | TUIX.Core | 4.6MB | 4.6MB | 4.6MB | 0.00KB |
+| terminal-memory-soak (cols=120,rows=40) | tuix-python | 19.3MB | 19.2MB | 19.3MB | 64.0KB |
+| terminal-memory-soak (cols=120,rows=40) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-memory-soak (cols=120,rows=40) | rich | 33.7MB | 33.4MB | 33.7MB | 272.0KB |
+| terminal-memory-soak (cols=120,rows=40) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-memory-soak (cols=120,rows=40) | prompt-toolkit | 37.3MB | 37.3MB | 37.3MB | 8.0KB |
+| terminal-memory-soak (cols=120,rows=40) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-memory-soak (cols=120,rows=40) | urwid | 42.5MB | 42.5MB | 42.5MB | 32.0KB |
+| terminal-memory-soak (cols=120,rows=40) | terminal-kit | 96.6MB | 96.6MB | 96.6MB | 0.00KB |
+| terminal-memory-soak (cols=120,rows=40) | rezitui | 220.7MB | 220.6MB | 220.7MB | 80.0KB |
+| terminal-memory-soak (cols=120,rows=40) | ink | 356.7MB | 356.7MB | 356.7MB | 0.00KB |
+| terminal-memory-soak (cols=120,rows=40) | blessed | 522.4MB | 522.4MB | 522.4MB | 24.0KB |
 | terminal-full-ui (cols=120,rows=40,services=24) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-full-ui (cols=120,rows=40,services=24) | TUIX.Renderer | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | TUIX.Core | 4.6MB | 4.6MB | 4.6MB | 0.00KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | tuix-python | 19.0MB | 19.0MB | 19.0MB | 0.00KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | rich | 33.7MB | 33.4MB | 33.7MB | 212.0KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | prompt-toolkit | 37.2MB | 37.2MB | 37.2MB | 16.0KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | opentui-react | 39.1MB | 39.1MB | 39.1MB | 0.00KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | urwid | 42.6MB | 42.5MB | 42.6MB | 48.0KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | terminal-kit | 93.9MB | 93.9MB | 93.9MB | 8.0KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | rezitui | 208.3MB | 210.2MB | 208.3MB | 0.00KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | ink | 348.7MB | 348.5MB | 348.7MB | 184.0KB |
-| terminal-full-ui (cols=120,rows=40,services=24) | blessed | 520.1MB | 520.1MB | 520.1MB | 24.0KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | TUIX.Core | 4.5MB | 4.5MB | 4.5MB | 0.00KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | tuix-python | 19.3MB | 19.3MB | 19.3MB | 0.00KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | rich | 33.6MB | 33.7MB | 33.6MB | 0.00KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | prompt-toolkit | 37.4MB | 37.3MB | 37.4MB | 64.0KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | urwid | 42.6MB | 42.5MB | 42.6MB | 104.0KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | terminal-kit | 97.0MB | 97.0MB | 97.0MB | 4.0KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | rezitui | 221.3MB | 221.4MB | 221.3MB | 0.00KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | ink | 357.1MB | 357.0MB | 357.1MB | 184.0KB |
+| terminal-full-ui (cols=120,rows=40,services=24) | blessed | 522.5MB | 522.5MB | 522.5MB | 28.0KB |
 | terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | TUIX.Renderer | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | TUIX.Core | 4.5MB | 4.5MB | 4.5MB | 0.00KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | tuix-python | 19.0MB | 19.0MB | 19.0MB | 32.0KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | rich | 33.7MB | 33.7MB | 33.7MB | 76.0KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | prompt-toolkit | 37.6MB | 37.2MB | 37.6MB | 456.0KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | opentui-react | 39.1MB | 39.1MB | 39.1MB | 0.00KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | urwid | 42.6MB | 42.6MB | 42.6MB | 40.0KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | terminal-kit | 94.0MB | 93.9MB | 94.0MB | 48.0KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | rezitui | 210.8MB | 207.6MB | 210.8MB | 3.2MB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | ink | 349.0MB | 349.0MB | 349.0MB | 0.00KB |
-| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | blessed | 519.5MB | 519.2MB | 519.5MB | 300.0KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | TUIX.Core | 4.6MB | 4.6MB | 4.6MB | 0.00KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | tuix-python | 19.4MB | 19.3MB | 19.4MB | 64.0KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | rich | 33.7MB | 33.6MB | 33.7MB | 60.0KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | prompt-toolkit | 37.4MB | 37.4MB | 37.4MB | 64.0KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | urwid | 42.7MB | 42.6MB | 42.7MB | 52.0KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | terminal-kit | 97.0MB | 97.0MB | 97.0MB | 0.00KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | rezitui | 226.5MB | 221.3MB | 226.5MB | 5.2MB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | ink | 357.2MB | 357.2MB | 357.2MB | 8.0KB |
+| terminal-full-ui-navigation (cols=120,dwell=8,rows=40,services=24) | blessed | 522.5MB | 522.5MB | 522.5MB | 0.00KB |
 | terminal-strict-ui (cols=120,rows=40,services=24) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-strict-ui (cols=120,rows=40,services=24) | TUIX.Renderer | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | TUIX.Core | 4.6MB | 4.6MB | 4.6MB | 0.00KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | tuix-python | 19.2MB | 19.1MB | 19.2MB | 96.0KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | rich | 33.8MB | 33.7MB | 33.8MB | 36.0KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | prompt-toolkit | 37.3MB | 37.6MB | 37.3MB | 0.00KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | urwid | 42.7MB | 42.6MB | 42.7MB | 84.0KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | opentui-react | 56.6MB | 39.1MB | 56.6MB | 17.5MB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | terminal-kit | 94.0MB | 94.0MB | 94.0MB | 0.00KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | rezitui | 210.8MB | 210.8MB | 210.8MB | 4.0KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | ink | 349.0MB | 349.0MB | 349.0MB | 0.00KB |
-| terminal-strict-ui (cols=120,rows=40,services=24) | blessed | 519.7MB | 519.6MB | 519.7MB | 68.0KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | TUIX.Core | 4.7MB | 4.7MB | 4.7MB | 0.00KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | tuix-python | 19.4MB | 19.4MB | 19.4MB | 4.0KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | rich | 33.7MB | 33.7MB | 33.7MB | 40.0KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | prompt-toolkit | 37.4MB | 37.4MB | 37.4MB | 20.0KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | urwid | 42.5MB | 42.7MB | 42.5MB | 0.00KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | terminal-kit | 97.1MB | 97.1MB | 97.1MB | 0.00KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | rezitui | 219.6MB | 226.5MB | 219.6MB | 0.00KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | ink | 357.2MB | 357.2MB | 357.2MB | 0.00KB |
+| terminal-strict-ui (cols=120,rows=40,services=24) | blessed | 522.5MB | 522.5MB | 522.5MB | 0.00KB |
 | terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | TUIX.Renderer | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | TUIX.Core | 4.6MB | 4.6MB | 4.6MB | 0.00KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | tuix-python | 19.1MB | 19.1MB | 19.1MB | 0.00KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | rich | 33.8MB | 33.8MB | 33.8MB | 36.0KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | prompt-toolkit | 37.6MB | 37.4MB | 37.6MB | 228.0KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | urwid | 42.8MB | 42.7MB | 42.8MB | 64.0KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | opentui-react | 58.0MB | 56.6MB | 58.0MB | 1.4MB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | terminal-kit | 94.1MB | 94.1MB | 94.1MB | 0.00KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | rezitui | 210.8MB | 210.8MB | 210.8MB | 20.0KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | ink | 349.0MB | 349.0MB | 349.0MB | 0.00KB |
-| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | blessed | 519.8MB | 519.7MB | 519.8MB | 48.0KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | TUIX.Core | 4.5MB | 4.5MB | 4.5MB | 0.00KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | tuix-python | 19.4MB | 19.4MB | 19.4MB | 32.0KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | rich | 33.8MB | 33.7MB | 33.8MB | 72.0KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | prompt-toolkit | 37.5MB | 37.4MB | 37.5MB | 100.0KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | urwid | 42.6MB | 42.5MB | 42.6MB | 36.0KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | terminal-kit | 97.1MB | 97.1MB | 97.1MB | 56.0KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | rezitui | 220.8MB | 219.6MB | 220.8MB | 1.2MB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | ink | 357.2MB | 357.2MB | 357.2MB | 0.00KB |
+| terminal-strict-ui-navigation (cols=120,dwell=8,rows=40,services=24) | blessed | 522.5MB | 522.5MB | 522.5MB | 0.00KB |
 | terminal-virtual-list (items=100000,viewport=40) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-virtual-list (items=100000,viewport=40) | TUIX.Renderer | 4.3MB | 4.3MB | 4.3MB | 0.00KB |
-| terminal-virtual-list (items=100000,viewport=40) | TUIX.Core | 4.6MB | 4.6MB | 4.6MB | 0.00KB |
-| terminal-virtual-list (items=100000,viewport=40) | tuix-python | 19.3MB | 19.2MB | 19.3MB | 64.0KB |
-| terminal-virtual-list (items=100000,viewport=40) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-virtual-list (items=100000,viewport=40) | rich | 33.9MB | 33.8MB | 33.9MB | 36.0KB |
-| terminal-virtual-list (items=100000,viewport=40) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-virtual-list (items=100000,viewport=40) | prompt-toolkit | 37.6MB | 37.6MB | 37.6MB | 8.0KB |
-| terminal-virtual-list (items=100000,viewport=40) | urwid | 42.8MB | 42.8MB | 42.8MB | 0.00KB |
-| terminal-virtual-list (items=100000,viewport=40) | opentui-react | 58.0MB | 58.0MB | 58.0MB | 0.00KB |
-| terminal-virtual-list (items=100000,viewport=40) | terminal-kit | 125.7MB | 125.3MB | 125.7MB | 416.0KB |
-| terminal-virtual-list (items=100000,viewport=40) | rezitui | 210.8MB | 210.8MB | 210.8MB | 4.0KB |
-| terminal-virtual-list (items=100000,viewport=40) | ink | 350.2MB | 350.2MB | 350.2MB | 4.0KB |
-| terminal-virtual-list (items=100000,viewport=40) | blessed | 520.8MB | 520.8MB | 520.8MB | 68.0KB |
+| terminal-virtual-list (items=100000,viewport=40) | TUIX.Core | 4.7MB | 4.7MB | 4.7MB | 0.00KB |
+| terminal-virtual-list (items=100000,viewport=40) | tuix-python | 19.5MB | 19.5MB | 19.5MB | 28.0KB |
+| terminal-virtual-list (items=100000,viewport=40) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-virtual-list (items=100000,viewport=40) | rich | 34.0MB | 33.8MB | 34.0MB | 216.0KB |
+| terminal-virtual-list (items=100000,viewport=40) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-virtual-list (items=100000,viewport=40) | prompt-toolkit | 37.5MB | 37.5MB | 37.5MB | 0.00KB |
+| terminal-virtual-list (items=100000,viewport=40) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-virtual-list (items=100000,viewport=40) | urwid | 42.6MB | 42.6MB | 42.6MB | 36.0KB |
+| terminal-virtual-list (items=100000,viewport=40) | terminal-kit | 128.9MB | 128.6MB | 128.9MB | 324.0KB |
+| terminal-virtual-list (items=100000,viewport=40) | rezitui | 220.7MB | 220.8MB | 220.7MB | 0.00KB |
+| terminal-virtual-list (items=100000,viewport=40) | ink | 358.1MB | 358.1MB | 358.1MB | 0.00KB |
+| terminal-virtual-list (items=100000,viewport=40) | blessed | 523.4MB | 524.8MB | 523.4MB | 0.00KB |
 | terminal-table (cols=8,rows=40) | ratatui | 27.0KB | 27.0KB | 27.0KB | 0.00KB |
 | terminal-table (cols=8,rows=40) | TUIX.Renderer | 4.4MB | 4.4MB | 4.4MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | TUIX.Core | 4.6MB | 4.6MB | 4.6MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | tuix-python | 19.2MB | 19.2MB | 19.2MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | bubbletea | 24.8MB | 24.8MB | 24.8MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | rich | 33.4MB | 33.4MB | 33.4MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | opentui-core | 36.7MB | 36.7MB | 36.7MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | prompt-toolkit | 37.4MB | 37.6MB | 37.4MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | urwid | 42.8MB | 42.8MB | 42.8MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | opentui-react | 58.0MB | 58.0MB | 58.0MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | terminal-kit | 126.0MB | 126.0MB | 126.0MB | 4.0KB |
-| terminal-table (cols=8,rows=40) | rezitui | 212.6MB | 210.9MB | 212.6MB | 1.8MB |
-| terminal-table (cols=8,rows=40) | ink | 349.5MB | 349.5MB | 349.5MB | 0.00KB |
-| terminal-table (cols=8,rows=40) | blessed | 520.6MB | 520.6MB | 520.6MB | 8.0KB |
+| terminal-table (cols=8,rows=40) | TUIX.Core | 4.7MB | 4.7MB | 4.7MB | 0.00KB |
+| terminal-table (cols=8,rows=40) | tuix-python | 19.5MB | 19.5MB | 19.5MB | 12.0KB |
+| terminal-table (cols=8,rows=40) | bubbletea | 20.7MB | 20.7MB | 20.7MB | 0.00KB |
+| terminal-table (cols=8,rows=40) | rich | 34.0MB | 34.0MB | 34.0MB | 0.00KB |
+| terminal-table (cols=8,rows=40) | opentui-core | 36.9MB | 36.9MB | 36.9MB | 0.00KB |
+| terminal-table (cols=8,rows=40) | prompt-toolkit | 37.5MB | 37.5MB | 37.5MB | 0.00KB |
+| terminal-table (cols=8,rows=40) | opentui-react | 39.2MB | 39.2MB | 39.2MB | 0.00KB |
+| terminal-table (cols=8,rows=40) | urwid | 42.7MB | 42.6MB | 42.7MB | 24.0KB |
+| terminal-table (cols=8,rows=40) | terminal-kit | 129.0MB | 129.0MB | 129.0MB | 8.0KB |
+| terminal-table (cols=8,rows=40) | rezitui | 223.6MB | 221.8MB | 223.6MB | 1.8MB |
+| terminal-table (cols=8,rows=40) | ink | 357.5MB | 357.5MB | 357.5MB | 0.00KB |
+| terminal-table (cols=8,rows=40) | blessed | 522.8MB | 522.8MB | 522.8MB | 56.0KB |
 

@@ -26,6 +26,9 @@ void stop_input_listening(void);
  * has_event == 0 means no event in that queue. */
 TuixInputSnapshot get_input_snapshot(void);
 
+/* Peek the latest input snapshot without consuming queued events. */
+TuixInputSnapshot peek_input_snapshot(void);
+
 #ifdef __cplusplus
 }
 #endif

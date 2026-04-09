@@ -26,17 +26,18 @@ def main():
     uid_a = objects.create_object(builders.PROGRESSBAR, b"Main", 0.7, 0.08, 0.3, 0.15)
     uid_b = objects.create_object(builders.PROGRESSBAR, b"Main", 0.7, 0.08, 0.55, 0.15)
 
-    ptr_a = buffers.get_buffer_by_uid(uid_a)
-    ptr_b = buffers.get_buffer_by_uid(uid_b)
-    obj_a = ptr_a.contents.obj.contents
-    obj_b = ptr_b.contents.obj.contents
+    obj_a = objects.get_object_by_uid(uid_a)
+    obj_b = objects.get_object_by_uid(uid_b)
+    if obj_a is None or obj_b is None:
+        print("failed to get progressbar objects")
+        return 1
 
     objects.tuix_progressbar_set_style(obj_a, ord('#'), ord('-'), 120, 220, 80, 50, 50, 50)
     objects.tuix_progressbar_set_style(obj_b, ord('='), ord('.'), 60, 160, 255, 50, 50, 50)
 
     step = 0
     while step <= 100:
-        snap = input.get_snapshot()
+        snap = input.peek_snapshot()
         kb = snap.keyboard
         if kb and kb.has_event and kb.code == 0x1B:
             break

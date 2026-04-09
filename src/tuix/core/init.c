@@ -5,6 +5,10 @@
 #include "tuix_registry.h"
 #include <stdlib.h>
 
+#ifndef TUIX_DEFAULT_DEBUG_MODE
+#define TUIX_DEFAULT_DEBUG_MODE TUIX_DEBUG_NONE
+#endif
+
 #ifdef _WIN32
 TUIX_REGISTRY_API CRITICAL_SECTION tuix_registry_lock;
 #else
@@ -42,6 +46,7 @@ int tuix_init_registry() {
     tuix_registry.builders.capacity = 0;
 
     tuix_registry.frame_counter = 0;
+    tuix_registry.debug_config = (TuixDebugConfig)TUIX_DEFAULT_DEBUG_MODE;
 
     /* initialize lock */
 #ifdef _WIN32
@@ -58,10 +63,37 @@ int tuix_init_registry() {
 }
 
 int tuix_destroy_registry() {
+    // Free subcycles registry
+    for (int i = 0; i < tuix_registry.subcycles.count; i++) {
+        TuixSceneSubcycles* scene_subs = tuix_registry.subcycles.subcycles[i];
+
+        for (int j = 0; j < scene_subs->count; j++) {
+            TuixSubcycle* sub = scene_subs->subcycles[j];
+            if (!sub) {
+                continue;
+            }
+            if (sub->obj && sub->obj->state && sub->obj->builder && sub->obj->builder->destroy_state) {
+                sub->obj->builder->destroy_state(sub->obj->state);
+                sub->obj->state = NULL;
+            }
+            free(sub);
+        }
+
+        free(scene_subs->subcycles);
+        free(scene_subs->scene_name);
+        free(scene_subs);
+    }
+
+    free(tuix_registry.subcycles.subcycles);
+    tuix_registry.subcycles.count = 0;
+
     // Free scenes registry
     for (int i = 0; i < tuix_registry.scenes.count; i++) {
         for (int j = 0; j < tuix_registry.scenes.scenes[i]->count; j++) {
             TuixBuffer* buf = tuix_registry.scenes.scenes[i]->buffers[j];
+            if (!buf) {
+                continue;
+            }
             free(buf->pixels);
             free(buf->obj);
             free(buf);
@@ -73,22 +105,6 @@ int tuix_destroy_registry() {
     free(tuix_registry.scenes.scenes);
     free(tuix_registry.scenes.names);
     tuix_registry.scenes.count = 0;
-
-    // Free subcycles registry
-    for (int i = 0; i < tuix_registry.subcycles.count; i++) {
-        TuixSceneSubcycles* scene_subs = tuix_registry.subcycles.subcycles[i];
-
-        for (int j = 0; j < scene_subs->count; j++) {
-            free(scene_subs->subcycles[j]);
-        }
-
-        free(scene_subs->subcycles);
-        free(scene_subs->scene_name);
-        free(scene_subs);
-    }
-
-    free(tuix_registry.subcycles.subcycles);
-    tuix_registry.subcycles.count = 0;
 
     free(tuix_registry.builders.builders);
     tuix_registry.builders.count = 0;

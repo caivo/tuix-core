@@ -34,18 +34,19 @@ def main():
     input.listen()
 
     uid = objects.create_object(builders.CHOICE, b"Main", 0.35, 0.55, 0.2, 0.32)
-    ptr = buffers.get_buffer_by_uid(uid)
-    obj = ptr.contents.obj.contents
+    obj = objects.get_object_by_uid(uid)
+    if obj is None:
+        print("failed to get object")
+        return 1
 
     options = [name for name, *_ in COLOURS]
     objects.tuix_choice_set_options(obj, options)
 
     while not objects.tuix_choice_is_confirmed(obj):
-        snap = input.get_snapshot()
+        snap = input.peek_snapshot()
         kb = snap.keyboard
         if kb and kb.has_event and kb.code == 0x1B:
             break
-        objects.tuix_choice_feed_input(obj, snap)
         engine.main_loop()
         sleep_ms(16)
 

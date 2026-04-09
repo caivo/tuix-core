@@ -46,13 +46,12 @@ def main():
     uid_choice = objects.create_object(builders.CHOICE, SCENE, 0.4, 0.45, 0.2, 0.05)
     uid_input = objects.create_object(builders.INPUT, SCENE, 0.4, 0.1, 0.4, 0.55)
 
-    pb_ptr = buffers.get_buffer_by_uid(uid_pb)
-    ch_ptr = buffers.get_buffer_by_uid(uid_choice)
-    in_ptr = buffers.get_buffer_by_uid(uid_input)
-
-    pb = pb_ptr.contents.obj.contents
-    ch = ch_ptr.contents.obj.contents
-    inp = in_ptr.contents.obj.contents
+    pb = objects.get_object_by_uid(uid_pb)
+    ch = objects.get_object_by_uid(uid_choice)
+    inp = objects.get_object_by_uid(uid_input)
+    if pb is None or ch is None or inp is None:
+        print("failed to get one or more objects")
+        return 1
 
     objects.tuix_progressbar_set_style(pb, ord('>'), ord('-'), 80, 200, 80, 40, 40, 40)
     objects.tuix_choice_set_options(ch, [b"Option A", b"Option B", b"Option C", b"Option D"])
@@ -65,7 +64,7 @@ def main():
     entered = None
 
     for frame in range(TIMEOUT_FRAMES + 1):
-        snap = input.get_snapshot()
+        snap = input.peek_snapshot()
         kb = snap.keyboard
         ms = snap.mouse
 
@@ -82,15 +81,11 @@ def main():
 
         objects.tuix_progressbar_set_value(pb, frame / TIMEOUT_FRAMES)
 
-        if chosen is None and active_uid == uid_choice and not objects.tuix_choice_is_confirmed(ch):
-            objects.tuix_choice_feed_input(ch, snap)
         if chosen is None and objects.tuix_choice_is_confirmed(ch):
             chosen = int(objects.tuix_choice_get_result(ch))
             active_uid = uid_input
             scenes.set_focus(SCENE, active_uid)
 
-        if entered is None and active_uid == uid_input and not objects.tuix_input_is_submitted(inp):
-            objects.tuix_input_feed_input(inp, snap)
         if entered is None and objects.tuix_input_is_submitted(inp):
             raw = objects.tuix_input_get_result(inp)
             entered = raw.decode(errors="replace") if raw else ""

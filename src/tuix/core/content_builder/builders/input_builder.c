@@ -173,6 +173,37 @@ static TuixHandlerResponse input_handler(TuixObject *obj, bool has_event, bool i
 
     TuixInputState *s = (TuixInputState*)obj->state;
 
+    if (has_event && snap && !snap->consumed_mouse && snap->mouse && snap->mouse->has_event && !s->submitted) {
+        TuixBuffer b;
+        if (tuix_get_buffer_snapshot_by_uid(obj->uid, &b) == 0) {
+            int w = b.width;
+            int h = b.height;
+            int row = h > 2 ? 1 : 0;
+            int field_x0 = 1;
+            int field_w = w - 2;
+            if (field_w < 1) { field_w = w; field_x0 = 0; }
+
+            int mx = snap->mouse->col - 1;
+            int my = snap->mouse->row - 1;
+            int abs_row = b.margin_top + row;
+            int abs_x0 = b.margin_left + field_x0;
+            int abs_x1 = abs_x0 + field_w;
+
+            if (my == abs_row && mx >= abs_x0 && mx < abs_x1 &&
+                (snap->mouse->event == TUIX_MOUSE_PRESS || snap->mouse->event == TUIX_MOUSE_RELEASE)) {
+                int rel = mx - abs_x0;
+                int new_cursor = s->scroll_offset + rel;
+                if (new_cursor < 0) new_cursor = 0;
+                if (new_cursor > s->text_len) new_cursor = s->text_len;
+                if (new_cursor != s->cursor) {
+                    s->cursor = new_cursor;
+                    s->needs_redraw = 1;
+                }
+                snap->consumed_mouse = true;
+            }
+        }
+    }
+
     if (is_focused && has_event && snap && !snap->consumed_keyboard && snap->keyboard && snap->keyboard->has_event && !s->submitted) {
         int code = snap->keyboard->code;
 
@@ -236,7 +267,7 @@ static void input_on_resize(TuixObject *obj, TuixBuffer *buffer, int width, int 
 
 const TuixBuilder tuix_input_builder = {
     .name       = "InputBuilder",
-    .version    = "1.0",
+    .version    = "1.1.0",
     .author     = "custosh",
     .namespace  = "tuix",
     .create_state  = input_create_state,

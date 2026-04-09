@@ -1,1 +1,9 @@
 .git
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+build/
+dist/
+src/tuix_core.egg-info/

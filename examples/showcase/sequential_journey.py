@@ -73,7 +73,7 @@ def main():
     objects.tuix_progressbar_set_style(obj, b'#'[0], b'-'[0], 80, 200, 120, 60, 60, 60)
 
     for f in range(51):
-        snap = input.get_snapshot()
+        snap = input.peek_snapshot()
         kb = snap.keyboard
         if kb and kb.has_event and kb.code == 0x1B:
             break
@@ -96,11 +96,10 @@ def main():
     objects.tuix_choice_set_options(obj, options)
 
     while not objects.tuix_choice_is_confirmed(obj):
-        snap = input.get_snapshot()
+        snap = input.peek_snapshot()
         kb = snap.keyboard
         if kb and kb.has_event and kb.code == 0x1B:
             break
-        objects.tuix_choice_feed_input(obj, snap)
         engine.main_loop()
         sleep_ms(16)
 
@@ -125,11 +124,10 @@ def main():
     objects.tuix_input_set_placeholder(obj, b"Type your name...")
 
     while not objects.tuix_input_is_submitted(obj):
-        snap = input.get_snapshot()
+        snap = input.peek_snapshot()
         kb = snap.keyboard
         if kb and kb.has_event and kb.code == 0x1B:
             break
-        objects.tuix_input_feed_input(obj, snap)
         engine.main_loop()
         sleep_ms(16)
 
@@ -182,7 +180,7 @@ def main():
 
     # Show canvas until any key pressed
     while True:
-        snap = input.get_snapshot()
+        snap = input.peek_snapshot()
         kb = snap.keyboard
         if kb and kb.has_event:
             break

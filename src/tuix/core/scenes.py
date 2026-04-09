@@ -81,4 +81,3 @@ def compact_cold_scenes(cold_frames: int, min_pixel_bytes: int, keep_active_scen
         fn = _lib.get_func('tuix_compact_cold_scenes', restype=ctypes.c_int, 
                            argtypes=[ctypes.c_ulonglong, ctypes.c_size_t, ctypes.c_int])
         return fn(cold_frames, min_pixel_bytes, 1 if keep_active_scene else 0) if fn else 0
-

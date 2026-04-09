@@ -32,7 +32,9 @@ TuixObject tuix_objects_new_object(char* builder_name, char* scene_name, float w
         return (TuixObject){0};
     }
     TuixObject obj;
+    tuix_lock();
     obj.uid = tuix_registry.next_uid++;
+    tuix_unlock();
     obj.builder = builder;
     obj.state = NULL;
     obj.width_mod = width_mod;

@@ -76,6 +76,8 @@ class TuixScene(ctypes.Structure):
         ('current_focus', ctypes.c_int),
         ('last_active_frame', ctypes.c_ulonglong),
         ('last_compacted_frame', ctypes.c_ulonglong),
+        ('topology_version', ctypes.c_ulonglong),
+        ('last_composited_topology_version', ctypes.c_ulonglong),
     ]
 
 
@@ -122,9 +124,11 @@ class TuixRegistry(ctypes.Structure):
         ('subcycles', TuixSubcycles),
         ('builders', TuixBuilders),
         ('current_scene_name', ctypes.c_char_p),
+        ('frame_counter', ctypes.c_ulonglong),
         ('next_uid', ctypes.c_int),
         ('terminal_width', ctypes.c_int),
         ('terminal_height', ctypes.c_int),
         ('terminal_height_old', ctypes.c_int),
         ('terminal_width_old', ctypes.c_int),
+        ('debug_config', ctypes.c_int),
     ]

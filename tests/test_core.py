@@ -31,6 +31,12 @@ class TestEngine:
     def test_main_loop_does_not_crash(self):
         engine.main_loop()
 
+    def test_core_loop_stats_are_available(self):
+        stats = engine.get_core_loop_stats()
+        assert isinstance(stats, dict)
+        assert "total_ms" in stats
+        assert "input_ms" in stats
+
 
 # ── Scene management ─────────────────────────────────────────────────────────
 
@@ -71,7 +77,7 @@ class TestRegistry:
 
 class TestBuffers:
     def test_unknown_uid_returns_none(self):
-        assert buffers.get_buffer_by_uid(999999) is None
+        assert buffers.get_buffer_snapshot_by_uid(999999) is None
 
     def test_create_returns_valid_uid(self):
         uid, obj = _make_obj(builders.PROGRESSBAR)

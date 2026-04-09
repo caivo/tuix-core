@@ -22,7 +22,6 @@ def get_object_by_uid(uid):
 
 def demo_parent_child_hierarchy():
     """Demonstrate creating parent-child buffer relationships."""
-    print("\n=== Buffer Hierarchy Demo ===")
     
     if engine.init() != 0:
         print("tuix_init() failed")
@@ -40,7 +39,6 @@ def demo_parent_child_hierarchy():
         0.8, 0.6,  # 80% width, 60% height
         0.1, 0.1   # 10% margin top, 10% margin left
     )
-    print(f"Created parent canvas: uid={parent_uid}")
     
     # Create child canvas (smaller, foreground)
     child_uid = objects.create_object(
@@ -49,14 +47,11 @@ def demo_parent_child_hierarchy():
         0.4, 0.3,  # 40% width, 30% height
         0.3, 0.3   # 30% margin top, 30% margin left
     )
-    print(f"Created child canvas: uid={child_uid}")
     
     # Establish parent-child relationship
     result = buffers.set_buffer_parent(b"HierarchyScene", child_uid, parent_uid)
-    if result == 0:
-        print(f"✓ Set {child_uid} as child of {parent_uid}")
-    else:
-        print(f"✗ Failed to set parent relationship (error: {result})")
+    if result != 0:
+        print(f"Failed to set parent-child relationship: {result}")
     
     # Draw on both buffers
     engine.main_loop()  # Initialize geometry
@@ -83,11 +78,10 @@ def demo_parent_child_hierarchy():
         objects.tuix_canvas_draw_text(child_obj, 1, 1, b"CHILD", 255, 255, 255, 0, 0, 0)
     
     # Run for a few frames, showing the hierarchy
-    print("\nRendering hierarchy demo (5 frames)...")
     for frame in range(5):
         engine.main_loop()
         time.sleep(0.2)
-        snap = input.get_snapshot()
+        snap = input.peek_snapshot()
         if snap and snap.keyboard and snap.keyboard.has_event:
             if snap.keyboard.code == 0x1B:  # ESC key
                 break
@@ -98,13 +92,11 @@ def demo_parent_child_hierarchy():
     scenes.free_scene(b"HierarchyScene")
     engine.shutdown()
     
-    print("\n✓ Hierarchy demo complete")
     return 0
 
 
 def demo_z_index_layering():
     """Demonstrate z-index for controlling buffer layering."""
-    print("\n=== Buffer Z-Index Layering Demo ===")
     
     if engine.init() != 0:
         print("tuix_init() failed")
@@ -135,7 +127,6 @@ def demo_z_index_layering():
         
         # Set z-index (higher = on top)
         z_result = buffers.set_buffer_z_index(b"ZIndexScene", uid, i)
-        print(f"Created canvas {name} (uid={uid}, z={i})")
     
     # Draw and render
     engine.main_loop()
@@ -155,13 +146,11 @@ def demo_z_index_layering():
             objects.tuix_canvas_draw_text(obj, 1, 1, lbl, 255, 255, 255, 0, 0, 0)
     
     # Render with z-ordering
-    print("\nRendering z-index demo (5 frames, red on top -> blue on top)...")
     for frame in range(5):
         engine.main_loop()
         time.sleep(0.5)
     
     # Dynamically change z-ordering
-    print("\nChanging z-order: BLUE now on top")
     buffers.set_buffer_z_index(b"ZIndexScene", uids[2], 10)  # BLUE gets highest z
     
     for frame in range(3):
@@ -174,14 +163,11 @@ def demo_z_index_layering():
     scenes.free_scene(b"ZIndexScene")
     engine.shutdown()
     
-    print("\n✓ Z-index layering demo complete")
     return 0
 
 
 def main():
     """Run both hierarchy demonstrations."""
-    print("Buffer Hierarchy and Z-Index Demo (Tuix v0.3)")
-    print("=" * 50)
     
     # Run parent-child hierarchy demo
     if demo_parent_child_hierarchy() != 0:
@@ -192,9 +178,7 @@ def main():
     # Run z-index layering demo
     if demo_z_index_layering() != 0:
         return 1
-    
-    print("\n" + "=" * 50)
-    print("All demos completed successfully!")
+
     return 0
 
 

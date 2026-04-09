@@ -116,7 +116,6 @@ def demo_scene_stats():
     print("✓ Scene stats demo complete")
     return 0
 
-
 def demo_snapshot_api():
     """Demonstrate safe snapshot APIs for lock-free data access."""
     print("\n=== Snapshot APIs Demo ===")

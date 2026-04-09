@@ -5,21 +5,39 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 /* Persistent final buffer - only reallocated when the terminal dimensions change. */
 static TuixFinalBuffer s_final = { NULL, 0, 0, 0 };
+static TuixHitmap s_hitmap = { NULL, 0, 0, 0, 0 };
 static TuixPixel *s_blank_row  = NULL;
 static int        s_blank_w    = 0;
 static int       *s_draw_order = NULL;
 static unsigned char *s_draw_visited = NULL;
 static int        s_draw_cap   = 0;
+static TuixScene *s_cached_order_scene = NULL;
+static unsigned long long s_cached_order_topology_version = 0;
+static int s_cached_order_scene_count = -1;
+static int s_cached_order_count = 0;
+static int s_last_traversal_cache_hit = 0;
 
 static int ensure_draw_capacity(int n) {
     if (n <= s_draw_cap) return 1;
-    int *new_order = realloc(s_draw_order, sizeof(int) * (size_t)n);
+    int *new_order = malloc(sizeof(int) * (size_t)n);
     if (!new_order) return 0;
-    unsigned char *new_visited = realloc(s_draw_visited, sizeof(unsigned char) * (size_t)n);
-    if (!new_visited) return 0;
+    unsigned char *new_visited = malloc(sizeof(unsigned char) * (size_t)n);
+    if (!new_visited) {
+        free(new_order);
+        return 0;
+    }
+    if (s_draw_order && s_draw_cap > 0) {
+        memcpy(new_order, s_draw_order, sizeof(int) * (size_t)s_draw_cap);
+    }
+    if (s_draw_visited && s_draw_cap > 0) {
+        memcpy(new_visited, s_draw_visited, sizeof(unsigned char) * (size_t)s_draw_cap);
+    }
+    free(s_draw_order);
+    free(s_draw_visited);
     s_draw_order = new_order;
     s_draw_visited = new_visited;
     s_draw_cap = n;
@@ -66,7 +84,17 @@ static void append_subtree(TuixScene *scene, int idx, int *out_count) {
 
 static int build_traversal_order(TuixScene *scene) {
     if (!scene || scene->count <= 0) return 0;
+
+    if (s_cached_order_scene == scene &&
+        s_cached_order_topology_version == scene->topology_version &&
+        s_cached_order_scene_count == scene->count &&
+        s_cached_order_count > 0) {
+        s_last_traversal_cache_hit = 1;
+        return s_cached_order_count;
+    }
+
     if (!ensure_draw_capacity(scene->count)) return -1;
+    s_last_traversal_cache_hit = 0;
 
     memset(s_draw_visited, 0, sizeof(unsigned char) * (size_t)scene->count);
     int out_count = 0;
@@ -113,6 +141,11 @@ static int build_traversal_order(TuixScene *scene) {
         }
     }
 
+    s_cached_order_scene = scene;
+    s_cached_order_topology_version = scene->topology_version;
+    s_cached_order_scene_count = scene->count;
+    s_cached_order_count = out_count;
+
     return out_count;
 }
 
@@ -136,10 +169,51 @@ static void rebuild_blank_row(int width) {
         s_blank_row[x] = blank;
 }
 
+static void rebuild_hitmap(int width, int height) {
+    size_t total = (size_t)width * (size_t)height;
+    if (s_hitmap.width != width || s_hitmap.height != height) {
+        free(s_hitmap.pixels);
+        s_hitmap.pixels = NULL;
+        s_hitmap.width = width;
+        s_hitmap.height = height;
+        s_hitmap.capacity = 0;
+        s_hitmap.count = 0;
+    }
+
+    if (total == 0) {
+        return;
+    }
+
+    if (!s_hitmap.pixels) {
+        s_hitmap.pixels = malloc(sizeof(TuixHitmapPixel) * total);
+        if (!s_hitmap.pixels) {
+            printf("Memory allocation failed!\n");
+            exit(1);
+        }
+        s_hitmap.capacity = (int)total;
+    } else if (s_hitmap.capacity < (int)total) {
+        TuixHitmapPixel *new_pixels = realloc(s_hitmap.pixels, sizeof(TuixHitmapPixel) * total);
+        if (!new_pixels) {
+            printf("Memory allocation failed!\n");
+            exit(1);
+        }
+        s_hitmap.pixels = new_pixels;
+        s_hitmap.capacity = (int)total;
+    }
+
+    TuixHitmapPixel blank = { .obj_uid = 0, .idx = -1 };
+    for (size_t i = 0; i < total; i++) {
+        s_hitmap.pixels[i] = blank;
+    }
+    s_hitmap.count = (int)total;
+}
+
 TuixFinalBuffer *tuix_composite_scene(TuixScene *scene) {
     int W = tuix_registry.terminal_width;
     /* The bottom row is reserved for log output, so we subtract one. */
     int H = tuix_registry.terminal_height > 1 ? (tuix_registry.terminal_height - 1) : 1;
+
+    rebuild_hitmap(W, H);
 
     if (s_final.width != W || s_final.height != H) {
         free(s_final.pixels);
@@ -182,8 +256,15 @@ TuixFinalBuffer *tuix_composite_scene(TuixScene *scene) {
             int fy = by + mt;
             TuixPixel *dst = &s_final.pixels[(size_t)fy * W + (x0 + ml)];
             TuixPixel *src = &buffer->pixels[(size_t)by * bw + x0];
-
             memcpy(dst, src, sizeof(TuixPixel) * (size_t)run);
+
+            if (buffer->obj && buffer->obj->uid > 0) {
+                for (int rx = 0; rx < run; rx++) {
+                    int hit_idx = (int)((size_t)fy * (size_t)W + (size_t)(x0 + ml + rx));
+                    s_hitmap.pixels[hit_idx].obj_uid = buffer->obj->uid;
+                    s_hitmap.pixels[hit_idx].idx = hit_idx;
+                }
+            }
 
             /* Ensure custom_fg is set on every composited pixel. */
             for (int rx = 0; rx < run; rx++) {
@@ -194,4 +275,12 @@ TuixFinalBuffer *tuix_composite_scene(TuixScene *scene) {
     }
 
     return &s_final;
+}
+
+TuixHitmap *tuix_get_last_hitmap(void) {
+    return &s_hitmap;
+}
+
+int tuix_get_last_traversal_cache_hit(void) {
+    return s_last_traversal_cache_hit;
 }

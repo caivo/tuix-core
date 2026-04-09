@@ -71,18 +71,21 @@ static void clear_scene_buffers_content(TuixScene* scene) {
     scene->count = 0;
     scene->capacity = 0;
     scene->current_focus = -1;
+    scene->topology_version++;
+    scene->last_composited_topology_version = 0;
 }
 
 
 int tuix_init_scene(const char* name) {
+    tuix_lock();
     for (int i = 0; i < tuix_registry.scenes.count; i++) {
         if (strcmp(tuix_registry.scenes.names[i], name) == 0) {
+            tuix_unlock();
             printf("Scene with this name already exists\n");
             return 1;
         }
     }
 
-    tuix_lock();
     /* Ensure capacity using exponential growth to avoid frequent reallocs. */
     if (tuix_registry.scenes.count + 1 > tuix_registry.scenes.capacity) {
         int new_cap = tuix_registry.scenes.capacity ? tuix_registry.scenes.capacity * 2 : 4;
@@ -99,6 +102,8 @@ int tuix_init_scene(const char* name) {
     sc->current_focus = -1;
     sc->last_active_frame = tuix_registry.frame_counter;
     sc->last_compacted_frame = 0;
+    sc->topology_version = 1;
+    sc->last_composited_topology_version = 0;
 
     TuixSceneSubcycles* scene_subcycles = calloc(1, sizeof(TuixSceneSubcycles));
     if (!scene_subcycles) {
@@ -211,7 +216,9 @@ void tuix_clear_scene(const char* name) {
 
 
 char** tuix_get_scenes() {
+    tuix_lock();
     if (tuix_registry.scenes.count == 0) {
+        tuix_unlock();
         return NULL;
     }
 
@@ -225,31 +232,39 @@ char** tuix_get_scenes() {
         list[i] = strdup(tuix_registry.scenes.names[i]);
     }
 
+    tuix_unlock();
     return list;
 }
 
 
 
 TuixScene* tuix_get_scene(const char* name) {
+    tuix_lock();
     for (int i = 0; i < tuix_registry.scenes.count; i++) {
         if (strcmp(tuix_registry.scenes.names[i], name) == 0) {
-            return tuix_registry.scenes.scenes[i];
+            TuixScene* scene = tuix_registry.scenes.scenes[i];
+            tuix_unlock();
+            return scene;
         }
     }
+    tuix_unlock();
     return NULL;
 }
 
 int tuix_select_scene(const char* name) {
+    tuix_lock();
     for (int i = 0; i < tuix_registry.scenes.count; i++) {
         if (strcmp(tuix_registry.scenes.names[i], name) == 0) {
             tuix_registry.scenes.scenes[i]->active = 1;
             tuix_registry.scenes.scenes[i]->last_active_frame = tuix_registry.frame_counter;
             tuix_registry.current_scene_name = tuix_registry.scenes.names[i];
+            tuix_unlock();
             return 0;
         } else {
             tuix_registry.scenes.scenes[i]->active = 0;
         }
     }
+    tuix_unlock();
     return -1;
 }
 

@@ -33,3 +33,10 @@ def main_loop():
     fn = _lib.get_func('tuix_main_loop', restype=None, argtypes=None)
     return fn()
 
+
+def get_core_loop_stats():
+    getter = getattr(_lib._mod, 'get_core_loop_stats', None)
+    if getter is not None:
+        return getter()
+    return {}
+

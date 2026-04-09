@@ -29,9 +29,9 @@ def tuix_session():
 def _make_obj(builder, w=0.5, h=0.2, mt=0.1, ml=0.1):
     uid = objects.create_object(builder, SCENE, w, h, mt, ml)
     assert uid > 0
-    ptr = buffers.get_buffer_by_uid(uid)
-    assert ptr is not None and ptr.contents.obj
-    return uid, ptr.contents.obj.contents
+    obj = objects.get_object_by_uid(uid)
+    assert obj is not None
+    return uid, obj
 
 
 class TestMultimodalApis:
@@ -39,6 +39,10 @@ class TestMultimodalApis:
         snap = input.get_snapshot()
         assert hasattr(snap, "keyboard")
         assert hasattr(snap, "mouse")
+        assert hasattr(snap, "consumed_keyboard")
+        assert hasattr(snap, "consumed_mouse")
+        assert snap.consumed_keyboard in (False, True)
+        assert snap.consumed_mouse in (False, True)
 
     def test_scene_focus_routing_primitives(self):
         uid_choice, _ = _make_obj(builders.CHOICE, 0.4, 0.3, 0.2, 0.05)
@@ -70,8 +74,10 @@ class TestMultimodalApis:
         assert uid > 0
 
         _lib._mod.tuix_init_buffer(SCENE, obj_addr)
-        ptr = buffers.get_buffer_by_uid(uid)
-        assert ptr is not None
+        snap = buffers.get_buffer_snapshot_by_uid(uid)
+        assert isinstance(snap, dict)
+        assert snap.get("uid") == -1
+        assert snap.get("required_redraw") in (0, 1)
 
         buffers.free_buffer(SCENE, uid)
         _lib._mod.tuix_free_object_ptr(obj_addr)

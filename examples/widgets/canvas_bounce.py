@@ -41,10 +41,13 @@ def main():
     engine.main_loop()
     sleep_ms(40)
 
-    ptr = buffers.get_buffer_by_uid(uid)
-    w = ptr.contents.width
-    h = ptr.contents.height
-    obj = ptr.contents.obj.contents
+    snap = buffers.get_buffer_snapshot_by_uid(uid)
+    obj = objects.get_object_by_uid(uid)
+    if not snap or obj is None:
+        print("failed to get canvas snapshot/object")
+        return 1
+    w = int(snap['width'])
+    h = int(snap['height'])
 
     iw, ih = w - 2, h - 2
 
@@ -54,7 +57,7 @@ def main():
     t0 = time.time()
 
     while True:
-        snap = input.get_snapshot()
+        snap = input.peek_snapshot()
         kb = snap.keyboard
         if kb and kb.has_event:
             break

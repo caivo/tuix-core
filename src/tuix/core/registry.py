@@ -69,4 +69,3 @@ class RegistryProxy:
 
 
 registry = RegistryProxy(_registry)
-

@@ -131,6 +131,137 @@ def tuix_canvas_draw_cached_sprite(obj_ptr, sprite_id, dst_x, dst_y):
     return _lib._mod.tuix_canvas_draw_cached_sprite(_obj_addr(obj_ptr), sprite_id, dst_x, dst_y)
 
 
+# ── Text builder ──────────────────────────────────────────────────
+
+def tuix_text_set_text(obj_ptr, text):
+    return _lib._mod.tuix_text_set_text(_obj_addr(obj_ptr), text)
+
+def tuix_text_set_fg(obj_ptr, r, g, b):
+    return _lib._mod.tuix_text_set_fg(_obj_addr(obj_ptr), r, g, b)
+
+def tuix_text_set_bg(obj_ptr, r, g, b):
+    return _lib._mod.tuix_text_set_bg(_obj_addr(obj_ptr), r, g, b)
+
+
+# ── Box builder ───────────────────────────────────────────────────
+
+def tuix_box_set_border(obj_ptr, enabled):
+    return _lib._mod.tuix_box_set_border(_obj_addr(obj_ptr), enabled)
+
+def tuix_box_set_title(obj_ptr, title):
+    return _lib._mod.tuix_box_set_title(_obj_addr(obj_ptr), title)
+
+def tuix_box_set_color(obj_ptr, r, g, b):
+    return _lib._mod.tuix_box_set_color(_obj_addr(obj_ptr), r, g, b)
+
+
+# ── Divider builder ───────────────────────────────────────────────
+
+def tuix_divider_set_orientation(obj_ptr, vertical):
+    return _lib._mod.tuix_divider_set_orientation(_obj_addr(obj_ptr), vertical)
+
+def tuix_divider_set_symbol(obj_ptr, sym):
+    return _lib._mod.tuix_divider_set_symbol(_obj_addr(obj_ptr), _to_char(sym))
+
+def tuix_divider_set_color(obj_ptr, r, g, b):
+    return _lib._mod.tuix_divider_set_color(_obj_addr(obj_ptr), r, g, b)
+
+
+# ── Badge builder ─────────────────────────────────────────────────
+
+def tuix_badge_set_text(obj_ptr, text):
+    return _lib._mod.tuix_badge_set_text(_obj_addr(obj_ptr), text)
+
+def tuix_badge_set_colors(obj_ptr, fr, fg, fb, br, bg, bb):
+    return _lib._mod.tuix_badge_set_colors(_obj_addr(obj_ptr), fr, fg, fb, br, bg, bb)
+
+
+# ── Button builder ────────────────────────────────────────────────
+
+def tuix_button_set_label(obj_ptr, label):
+    return _lib._mod.tuix_button_set_label(_obj_addr(obj_ptr), label)
+
+def tuix_button_feed_input(obj_ptr, snap):
+    return _lib._mod.tuix_button_feed_input(_obj_addr(obj_ptr), snap)
+
+def tuix_button_is_pressed(obj_ptr):
+    return _lib._mod.tuix_button_is_pressed(_obj_addr(obj_ptr))
+
+def tuix_button_get_state(obj_ptr):
+    return _lib._mod.tuix_button_get_state(_obj_addr(obj_ptr))
+
+
+# ── Icon builder ──────────────────────────────────────────────────
+
+def tuix_icon_set_symbol(obj_ptr, sym):
+    if isinstance(sym, int):
+        sym = bytes([sym & 0xFF])
+    return _lib._mod.tuix_icon_set_symbol(_obj_addr(obj_ptr), sym)
+
+def tuix_icon_set_colors(obj_ptr, fr, fg, fb, br, bg, bb):
+    return _lib._mod.tuix_icon_set_colors(_obj_addr(obj_ptr), fr, fg, fb, br, bg, bb)
+
+
+# ── Tag builder ───────────────────────────────────────────────────
+
+def tuix_tag_set_text(obj_ptr, text):
+    return _lib._mod.tuix_tag_set_text(_obj_addr(obj_ptr), text)
+
+def tuix_tag_set_brackets(obj_ptr, left, right):
+    return _lib._mod.tuix_tag_set_brackets(_obj_addr(obj_ptr), _to_char(left), _to_char(right))
+
+def tuix_tag_set_colors(obj_ptr, fr, fg, fb, br, bg, bb):
+    return _lib._mod.tuix_tag_set_colors(_obj_addr(obj_ptr), fr, fg, fb, br, bg, bb)
+
+
+# ── Status builder ────────────────────────────────────────────────
+
+def tuix_status_set_status(obj_ptr, status):
+    return _lib._mod.tuix_status_set_status(_obj_addr(obj_ptr), status)
+
+
+# ── Menu builder ──────────────────────────────────────────────────
+
+def tuix_menu_set_title(obj_ptr, title):
+    return _lib._mod.tuix_menu_set_title(_obj_addr(obj_ptr), title)
+
+def tuix_menu_set_options(obj_ptr, labels):
+    return _lib._mod.tuix_menu_set_options(_obj_addr(obj_ptr), list(labels))
+
+def tuix_menu_feed_input(obj_ptr, snap):
+    return _lib._mod.tuix_menu_feed_input(_obj_addr(obj_ptr), snap)
+
+def tuix_menu_get_selected(obj_ptr):
+    return _lib._mod.tuix_menu_get_selected(_obj_addr(obj_ptr))
+
+def tuix_menu_is_activated(obj_ptr):
+    return _lib._mod.tuix_menu_is_activated(_obj_addr(obj_ptr))
+
+
+# ── ScrollContainer builder ───────────────────────────────────────
+
+def tuix_scroll_container_set_title(obj_ptr, title):
+    return _lib._mod.tuix_scroll_container_set_title(_obj_addr(obj_ptr), title)
+
+def tuix_scroll_container_set_content_size(obj_ptr, width, height):
+    return _lib._mod.tuix_scroll_container_set_content_size(_obj_addr(obj_ptr), width, height)
+
+def tuix_scroll_container_set_offset(obj_ptr, offset_x, offset_y):
+    return _lib._mod.tuix_scroll_container_set_offset(_obj_addr(obj_ptr), offset_x, offset_y)
+
+def tuix_scroll_container_get_offset_x(obj_ptr):
+    return _lib._mod.tuix_scroll_container_get_offset_x(_obj_addr(obj_ptr))
+
+def tuix_scroll_container_get_offset_y(obj_ptr):
+    return _lib._mod.tuix_scroll_container_get_offset_y(_obj_addr(obj_ptr))
+
+def tuix_scroll_container_feed_input(obj_ptr, snap):
+    return _lib._mod.tuix_scroll_container_feed_input(_obj_addr(obj_ptr), snap)
+
+def tuix_scroll_container_get_scroll_pos(obj_ptr):
+    return _lib._mod.tuix_scroll_container_get_scroll_pos(_obj_addr(obj_ptr))
+
+
 def get_object_snapshot_by_uid(uid: int) -> dict:
     """Get a snapshot (read-only copy) of an object by UID."""
     try:

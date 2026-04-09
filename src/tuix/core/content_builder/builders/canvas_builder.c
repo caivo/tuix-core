@@ -86,6 +86,7 @@ int tuix_canvas_set_pixel(TuixObject *obj, int x, int y, char sym, uint8_t fgr, 
     TuixCanvasChange *change = &s->changes[s->changes_count];
     change->x = x;
     change->y = y;
+    memset(&change->pixel, 0, sizeof(change->pixel));
     change->pixel.sym[0] = sym;
     change->pixel.sym[1] = '\0';
     change->pixel.styles.fg = (TuixRGBTuple){fgr, fgg, fgb};
@@ -136,6 +137,7 @@ static int canvas_queue_pixel(TuixCanvasState *s, int x, int y, char sym,
     TuixCanvasChange *c = &s->changes[s->changes_count];
     c->x = x;
     c->y = y;
+    memset(&c->pixel, 0, sizeof(c->pixel));
     c->pixel.sym[0] = sym;
     c->pixel.sym[1] = '\0';
     c->pixel.styles.fg  = (TuixRGBTuple){fgr, fgg, fgb};
@@ -436,6 +438,7 @@ static TuixPixel* tuix_canvas_build_content(TuixObject *obj, TuixBuffer* buffer)
             px->styles.fg = (TuixRGBTuple){255,255,255};
             px->styles.bg = (TuixRGBTuple){0,0,0};
             px->styles.custom_bg = 1;
+            px->styles.custom_fg = 1;
             px->styles.bold = 0;
             px->styles.underlined = 0;
             px->styles.italic = 0;
@@ -464,7 +467,7 @@ static void tuix_canvas_on_resize(TuixObject *obj, TuixBuffer *buffer, int width
 
 const TuixBuilder tuix_canvas_builder = {
     .name = "CanvasBuilder",
-    .version = "1.0",
+    .version = "1.1.0",
     .author = "custosh",
     .namespace = "tuix",
     .create_state = tuix_canvas_create_state,

@@ -101,6 +101,8 @@ void tuix_init_buffer(char* scene_name, TuixObject obj) {
 
     scene->buffers[scene->count] = bf;
     scene->count++;
+    scene->topology_version++;
+    scene->last_composited_topology_version = 0;
     tuix_unlock();
 }
 
@@ -215,6 +217,8 @@ void tuix_free_buffer(char* scene_name, int uid) {
             }
 
             scene->count--;
+            scene->topology_version++;
+            scene->last_composited_topology_version = 0;
 
             if (scene->count == 0) {
                 scene->current_focus = -1;
@@ -304,8 +308,17 @@ int tuix_set_buffer_parent(char* scene_name, int uid, int parent_uid) {
     }
 
     if (parent_uid < 0) {
+        if (buffer->parent_uid == -1) {
+            tuix_unlock();
+            return 0;
+        }
         buffer->parent_uid = -1;
         buffer->required_redraw = 1;
+        TuixScene* scene = tuix_get_scene(scene_name);
+        if (scene) {
+            scene->topology_version++;
+            scene->last_composited_topology_version = 0;
+        }
         tuix_unlock();
         return 0;
     }
@@ -329,8 +342,18 @@ int tuix_set_buffer_parent(char* scene_name, int uid, int parent_uid) {
         return -1;
     }
 
+    if (buffer->parent_uid == parent_uid) {
+        tuix_unlock();
+        return 0;
+    }
+
     buffer->parent_uid = parent_uid;
     buffer->required_redraw = 1;
+    TuixScene* scene = tuix_get_scene(scene_name);
+    if (scene) {
+        scene->topology_version++;
+        scene->last_composited_topology_version = 0;
+    }
     tuix_unlock();
     return 0;
 }
@@ -356,8 +379,17 @@ int tuix_set_buffer_z_index(char* scene_name, int uid, int z_index) {
         printf("Buffer not found: %d\n", uid);
         return -1;
     }
+    if (buffer->z_index == z_index) {
+        tuix_unlock();
+        return 0;
+    }
     buffer->z_index = z_index;
     buffer->required_redraw = 1;
+    TuixScene* scene = tuix_get_scene(scene_name);
+    if (scene) {
+        scene->topology_version++;
+        scene->last_composited_topology_version = 0;
+    }
     tuix_unlock();
     return 0;
 }

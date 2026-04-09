@@ -128,7 +128,32 @@ static TuixHandlerResponse choice_handler(TuixObject *obj, bool has_event, bool 
         return (TuixHandlerResponse){.requires_redraw = 0};
 
     TuixChoiceState *s = (TuixChoiceState*)obj->state;
-    if (is_focused && has_event && snap && !snap->consumed_keyboard && snap->keyboard && snap->keyboard->has_event && s->option_count > 0) {
+
+    if (has_event && snap && !snap->consumed_mouse && snap->mouse && snap->mouse->has_event && s->option_count > 0 && !s->confirmed) {
+        TuixBuffer b;
+        if (tuix_get_buffer_snapshot_by_uid(obj->uid, &b) == 0) {
+            int mx = snap->mouse->col - 1;
+            int my = snap->mouse->row - 1;
+            int inside = (mx >= b.margin_left && mx < b.margin_left + b.width &&
+                          my >= b.margin_top && my < b.margin_top + b.height);
+            if (inside) {
+                int row = my - b.margin_top;
+                if (row >= 0 && row < s->option_count) {
+                    if (s->selected != row) {
+                        s->selected = row;
+                        s->needs_redraw = 1;
+                    }
+                    if (snap->mouse->event == TUIX_MOUSE_RELEASE && snap->mouse->btn == TUIX_BTN_LEFT) {
+                        s->confirmed = 1;
+                        s->needs_redraw = 1;
+                        snap->consumed_mouse = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (is_focused && has_event && snap && !snap->consumed_keyboard && snap->keyboard && snap->keyboard->has_event && s->option_count > 0 && !s->confirmed) {
         int code = snap->keyboard->code;
         if (code == TUIX_VK_UP || code == 'k') {
             if (s->selected > 0) { s->selected--; s->needs_redraw = 1; }
@@ -156,7 +181,7 @@ static void choice_on_resize(TuixObject *obj, TuixBuffer *buffer, int width, int
 
 const TuixBuilder tuix_choice_builder = {
     .name       = "ChoiceBuilder",
-    .version    = "1.0",
+    .version    = "1.1.0",
     .author     = "custosh",
     .namespace  = "tuix",
     .create_state  = choice_create_state,

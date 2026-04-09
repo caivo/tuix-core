@@ -32,6 +32,14 @@ int tuix_input_mouse_enabled    = 1;
 
 #define QUEUE_CAP 128
 
+#define TUIX_VK_LEFT   0x25
+#define TUIX_VK_UP     0x26
+#define TUIX_VK_RIGHT  0x27
+#define TUIX_VK_DOWN   0x28
+#define TUIX_VK_HOME   0x24
+#define TUIX_VK_END    0x23
+#define TUIX_VK_DELETE 0x2E
+
 static TuixKeyboardKey kb_queue[QUEUE_CAP];
 static int kb_head = 0, kb_tail = 0;
 
@@ -58,7 +66,26 @@ static TuixKeyboardKey snap_keyboard = {0};
 static TuixInputSnapshot snap = { .mouse = &snap_mouse, .keyboard = &snap_keyboard };
 
 static double now_seconds(void) {
-    return (double)clock() / (double)CLOCKS_PER_SEC;
+#ifdef _WIN32
+    static LARGE_INTEGER freq = {0};
+    LARGE_INTEGER counter;
+    if (freq.QuadPart == 0) {
+        QueryPerformanceFrequency(&freq);
+    }
+    QueryPerformanceCounter(&counter);
+    if (freq.QuadPart <= 0) {
+        return (double)GetTickCount64() / 1000.0;
+    }
+    return (double)counter.QuadPart / (double)freq.QuadPart;
+#else
+    struct timespec ts;
+#if defined(CLOCK_MONOTONIC)
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
+        return (double)ts.tv_sec + (double)ts.tv_nsec / 1000000000.0;
+    }
+#endif
+    return (double)time(NULL);
+#endif
 }
 
 static void push_keyboard(int code) {
@@ -140,15 +167,17 @@ static DWORD WINAPI input_thread_fn(LPVOID arg) {
     }
 
     /* Configure stdin: native events, NO virtual terminal input */
-    DWORD orig_in_mode;
-    GetConsoleMode(hIn, &orig_in_mode);
+    DWORD orig_in_mode = 0;
+    BOOL have_orig_in_mode = GetConsoleMode(hIn, &orig_in_mode);
     DWORD in_mode = ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT;
     if (tuix_input_mouse_enabled) {
         in_mode |= ENABLE_MOUSE_INPUT;
     }
     /* No ENABLE_VIRTUAL_TERMINAL_INPUT - we want raw KEY_EVENT +
        MOUSE_EVENT records, not VT escape sequences */
-    SetConsoleMode(hIn, in_mode);
+    if (have_orig_in_mode) {
+        SetConsoleMode(hIn, in_mode);
+    }
 
     prev_btn_state = 0;
     INPUT_RECORD rec[64];
@@ -243,7 +272,9 @@ static DWORD WINAPI input_thread_fn(LPVOID arg) {
         }
     }
 
-    SetConsoleMode(hIn, orig_in_mode);
+    if (have_orig_in_mode) {
+        SetConsoleMode(hIn, orig_in_mode);
+    }
     return 0;
 }
 
@@ -251,6 +282,7 @@ static DWORD WINAPI input_thread_fn(LPVOID arg) {
 
 static struct termios orig_termios;
 static int raw_enabled = 0;
+static int posix_last_pressed_btn = TUIX_BTN_LEFT;
 
 static void disable_raw_mode(void) {
     if (!raw_enabled) return;
@@ -350,16 +382,73 @@ static int try_parse_mouse(const char *buf, int len) {
     } else if (typ == 'M') {
         event = TUIX_MOUSE_PRESS;
         btn = btn_bits;
+        if (btn >= TUIX_BTN_LEFT && btn <= TUIX_BTN_RIGHT) {
+            posix_last_pressed_btn = btn;
+        }
         mask = 1 << btn;
     } else if (typ == 'm') {
         event = TUIX_MOUSE_RELEASE;
-        btn = btn_bits;
+        btn = (btn_bits <= TUIX_BTN_RIGHT) ? btn_bits : posix_last_pressed_btn;
     }
+
+    if (event == TUIX_MOUSE_NONE)
+        return 3 + n;
 
     LOCK();
     push_mouse_ev(event, btn, mask, col, row);
     UNLOCK();
     return 3 + n;
+}
+
+/* Parse common VT cursor/editing key escapes and map them to VK-style codes.
+ * Returns bytes consumed, or 0 when no complete known sequence is present. */
+static int try_parse_key_escape(const char *buf, int len, int *out_code) {
+    if (!out_code) return 0;
+    if (len < 2 || buf[0] != '\x1b') return 0;
+
+    if (buf[1] == '[') {
+        if (len >= 3) {
+            switch (buf[2]) {
+            case 'A': *out_code = TUIX_VK_UP; return 3;
+            case 'B': *out_code = TUIX_VK_DOWN; return 3;
+            case 'C': *out_code = TUIX_VK_RIGHT; return 3;
+            case 'D': *out_code = TUIX_VK_LEFT; return 3;
+            case 'H': *out_code = TUIX_VK_HOME; return 3;
+            case 'F': *out_code = TUIX_VK_END; return 3;
+            default: break;
+            }
+        }
+        if (len >= 4 && buf[3] == '~') {
+            switch (buf[2]) {
+            case '1':
+            case '7':
+                *out_code = TUIX_VK_HOME;
+                return 4;
+            case '3':
+                *out_code = TUIX_VK_DELETE;
+                return 4;
+            case '4':
+            case '8':
+                *out_code = TUIX_VK_END;
+                return 4;
+            default:
+                break;
+            }
+        }
+    } else if (buf[1] == 'O' && len >= 3) {
+        switch (buf[2]) {
+        case 'A': *out_code = TUIX_VK_UP; return 3;
+        case 'B': *out_code = TUIX_VK_DOWN; return 3;
+        case 'C': *out_code = TUIX_VK_RIGHT; return 3;
+        case 'D': *out_code = TUIX_VK_LEFT; return 3;
+        case 'H': *out_code = TUIX_VK_HOME; return 3;
+        case 'F': *out_code = TUIX_VK_END; return 3;
+        default:
+            break;
+        }
+    }
+
+    return 0;
 }
 
 static void *input_thread_fn(void *arg) {
@@ -386,6 +475,22 @@ static void *input_thread_fn(void *arg) {
             if (tuix_input_mouse_enabled) {
                 int consumed = try_parse_mouse(buf, buf_len);
                 if (consumed > 0) {
+                    int remaining = buf_len - consumed;
+                    if (remaining > 0)
+                        memmove(buf, buf + consumed, remaining);
+                    buf_len = remaining;
+                    buf[buf_len] = '\0';
+                    continue;
+                }
+            }
+
+            if (tuix_input_keyboard_enabled) {
+                int key_code = 0;
+                int consumed = try_parse_key_escape(buf, buf_len, &key_code);
+                if (consumed > 0) {
+                    LOCK();
+                    push_keyboard(key_code);
+                    UNLOCK();
                     int remaining = buf_len - consumed;
                     if (remaining > 0)
                         memmove(buf, buf + consumed, remaining);
@@ -459,8 +564,15 @@ void listen_input(void) {
 
 #ifdef _WIN32
     input_thread = CreateThread(NULL, 0, input_thread_fn, NULL, 0, NULL);
+    if (!input_thread) {
+        input_running = 0;
+        return;
+    }
 #else
-    pthread_create(&input_thread, NULL, input_thread_fn, NULL);
+    if (pthread_create(&input_thread, NULL, input_thread_fn, NULL) != 0) {
+        input_running = 0;
+        return;
+    }
 #endif
 }
 
@@ -481,14 +593,16 @@ void stop_input_listening(void) {
 TuixInputSnapshot get_input_snapshot(void) {
     LOCK();
     if (kb_tail != kb_head) {
-        snap_keyboard = kb_queue[kb_tail];
-        kb_tail = (kb_tail + 1) % QUEUE_CAP;
+        int last_kb = (kb_head - 1 + QUEUE_CAP) % QUEUE_CAP;
+        snap_keyboard = kb_queue[last_kb];
+        kb_tail = kb_head;
     } else {
         snap_keyboard.has_event = 0;
     }
     if (mi_tail != mi_head) {
-        snap_mouse = mi_queue[mi_tail];
-        mi_tail = (mi_tail + 1) % QUEUE_CAP;
+        int last_mouse = (mi_head - 1 + QUEUE_CAP) % QUEUE_CAP;
+        snap_mouse = mi_queue[last_mouse];
+        mi_tail = mi_head;
     } else {
         snap_mouse.has_event = 0;
     }
@@ -496,4 +610,12 @@ TuixInputSnapshot get_input_snapshot(void) {
     snap.consumed_mouse = false;
     UNLOCK();
     return snap;
+}
+
+TuixInputSnapshot peek_input_snapshot(void) {
+    TuixInputSnapshot out;
+    LOCK();
+    out = snap;
+    UNLOCK();
+    return out;
 }

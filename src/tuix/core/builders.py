@@ -5,6 +5,16 @@ CANVAS = b"CanvasBuilder"
 CHOICE = b"ChoiceBuilder"
 INPUT = b"InputBuilder"
 PROGRESSBAR = b"ProgressBarBuilder"
+TEXT = b"TextBuilder"
+BOX = b"BoxBuilder"
+DIVIDER = b"DividerBuilder"
+BADGE = b"BadgeBuilder"
+BUTTON = b"ButtonBuilder"
+ICON = b"IconBuilder"
+TAG = b"TagBuilder"
+STATUS = b"StatusBuilder"
+MENU = b"MenuBuilder"
+SCROLL_CONTAINER = b"ScrollContainerBuilder"
 
 
 def register_standard():

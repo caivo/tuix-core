@@ -107,6 +107,8 @@ cdef extern from "types.h":
         int term_y
         TuixMouseKey* mouse
         TuixKeyboardKey* keyboard
+        unsigned char consumed_keyboard
+        unsigned char consumed_mouse
 
     ctypedef struct TuixScene:
         TuixBuffer** buffers
@@ -116,6 +118,8 @@ cdef extern from "types.h":
         int current_focus
         unsigned long long last_active_frame
         unsigned long long last_compacted_frame
+        unsigned long long topology_version
+        unsigned long long last_composited_topology_version
 
     ctypedef struct TuixSceneStats:
         int buffer_count
@@ -174,11 +178,13 @@ cdef extern from "types.h":
         TuixSubcycles subcycles
         TuixBuilders builders
         char* current_scene_name
+        unsigned long long frame_counter
         int next_uid
         int terminal_width
         int terminal_height
         int terminal_height_old
         int terminal_width_old
+        int debug_config
 
 # ═══════════════════════════════════════════════════════════════════
 #  Core lifecycle
@@ -193,6 +199,27 @@ cdef extern from "main.h":
     void c_tuix_main_loop "tuix_main_loop"() nogil
     # tuix_get_terminal_size lives in main.c but is linked into the extension
     void c_tuix_get_terminal_size "tuix_get_terminal_size"(int* width, int* height) nogil
+
+    ctypedef struct TuixCoreLoopStats:
+        unsigned long long frame_counter
+        double batch_commit_ms
+        double cache_refresh_ms
+        double input_ms
+        double routing_ms
+        double buffer_ms
+        double composite_ms
+        double python_commit_ms
+        double total_ms
+        int composite_skipped
+        int composite_forced
+        int traversal_cache_hit
+        int traversal_cache_miss
+        int size_changed
+        int has_input
+        int has_scene
+        int has_subcycles
+
+    void c_tuix_get_core_loop_stats "tuix_get_core_loop_stats"(TuixCoreLoopStats* out_stats) nogil
 
 # ═══════════════════════════════════════════════════════════════════
 #  Scenes & buffers
@@ -294,6 +321,63 @@ cdef extern from "content_builder/builders/input_builder.h":
     void c_tuix_input_reset "tuix_input_reset"(TuixObject* obj) nogil
 
 # ═══════════════════════════════════════════════════════════════════
+#  New builders
+# ═══════════════════════════════════════════════════════════════════
+cdef extern from "content_builder/builders/text_builder.h":
+    int c_tuix_text_set_text "tuix_text_set_text"(TuixObject* obj, const char* text) nogil
+    int c_tuix_text_set_fg "tuix_text_set_fg"(TuixObject* obj, uint8_t r, uint8_t g, uint8_t b) nogil
+    int c_tuix_text_set_bg "tuix_text_set_bg"(TuixObject* obj, uint8_t r, uint8_t g, uint8_t b) nogil
+    int c_tuix_text_clear_bg "tuix_text_clear_bg"(TuixObject* obj) nogil
+
+cdef extern from "content_builder/builders/box_builder.h":
+    int c_tuix_box_set_title "tuix_box_set_title"(TuixObject* obj, const char* title) nogil
+    int c_tuix_box_set_colors "tuix_box_set_colors"(TuixObject* obj, uint8_t border_r, uint8_t border_g, uint8_t border_b, uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) nogil
+
+cdef extern from "content_builder/builders/divider_builder.h":
+    int c_tuix_divider_set_orientation "tuix_divider_set_orientation"(TuixObject* obj, int orientation) nogil
+    int c_tuix_divider_set_symbol "tuix_divider_set_symbol"(TuixObject* obj, char sym) nogil
+    int c_tuix_divider_set_color "tuix_divider_set_color"(TuixObject* obj, uint8_t r, uint8_t g, uint8_t b) nogil
+
+cdef extern from "content_builder/builders/badge_builder.h":
+    int c_tuix_badge_set_text "tuix_badge_set_text"(TuixObject* obj, const char* text) nogil
+    int c_tuix_badge_set_colors "tuix_badge_set_colors"(TuixObject* obj, uint8_t fg_r, uint8_t fg_g, uint8_t fg_b, uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) nogil
+
+cdef extern from "content_builder/builders/button_builder.h":
+    int c_tuix_button_set_label "tuix_button_set_label"(TuixObject* obj, const char* label) nogil
+    int c_tuix_button_take_pressed "tuix_button_take_pressed"(TuixObject* obj) nogil
+    void c_tuix_button_reset "tuix_button_reset"(TuixObject* obj) nogil
+
+cdef extern from "content_builder/builders/icon_builder.h":
+    int c_tuix_icon_set_symbol "tuix_icon_set_symbol"(TuixObject* obj, const char* symbol) nogil
+    int c_tuix_icon_set_fg "tuix_icon_set_fg"(TuixObject* obj, uint8_t r, uint8_t g, uint8_t b) nogil
+    int c_tuix_icon_set_bg "tuix_icon_set_bg"(TuixObject* obj, uint8_t r, uint8_t g, uint8_t b) nogil
+    int c_tuix_icon_clear_bg "tuix_icon_clear_bg"(TuixObject* obj) nogil
+
+cdef extern from "content_builder/builders/tag_builder.h":
+    int c_tuix_tag_set_text "tuix_tag_set_text"(TuixObject* obj, const char* text) nogil
+    int c_tuix_tag_set_brackets "tuix_tag_set_brackets"(TuixObject* obj, char left, char right) nogil
+    int c_tuix_tag_set_colors "tuix_tag_set_colors"(TuixObject* obj, uint8_t fg_r, uint8_t fg_g, uint8_t fg_b, uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) nogil
+
+cdef extern from "content_builder/builders/status_builder.h":
+    int c_tuix_status_set_text "tuix_status_set_text"(TuixObject* obj, const char* text) nogil
+    int c_tuix_status_set_level "tuix_status_set_level"(TuixObject* obj, int level) nogil
+    int c_tuix_status_set_palette "tuix_status_set_palette"(TuixObject* obj, uint8_t ok_r, uint8_t ok_g, uint8_t ok_b, uint8_t warn_r, uint8_t warn_g, uint8_t warn_b, uint8_t err_r, uint8_t err_g, uint8_t err_b, uint8_t idle_r, uint8_t idle_g, uint8_t idle_b) nogil
+
+cdef extern from "content_builder/builders/menu_builder.h":
+    int c_tuix_menu_set_title "tuix_menu_set_title"(TuixObject* obj, const char* title) nogil
+    int c_tuix_menu_set_items "tuix_menu_set_items"(TuixObject* obj, const char** labels, int count) nogil
+    int c_tuix_menu_get_selected "tuix_menu_get_selected"(TuixObject* obj) nogil
+    int c_tuix_menu_take_activated "tuix_menu_take_activated"(TuixObject* obj) nogil
+    void c_tuix_menu_reset "tuix_menu_reset"(TuixObject* obj) nogil
+
+cdef extern from "content_builder/builders/scroll_container_builder.h":
+    int c_tuix_scroll_container_set_title "tuix_scroll_container_set_title"(TuixObject* obj, const char* title) nogil
+    int c_tuix_scroll_container_set_content_size "tuix_scroll_container_set_content_size"(TuixObject* obj, int content_w, int content_h) nogil
+    int c_tuix_scroll_container_set_offset "tuix_scroll_container_set_offset"(TuixObject* obj, int offset_x, int offset_y) nogil
+    int c_tuix_scroll_container_get_offset_x "tuix_scroll_container_get_offset_x"(TuixObject* obj) nogil
+    int c_tuix_scroll_container_get_offset_y "tuix_scroll_container_get_offset_y"(TuixObject* obj) nogil
+
+# ═══════════════════════════════════════════════════════════════════
 #  Input system (listener thread)
 # ═══════════════════════════════════════════════════════════════════
 cdef extern from "input/input.h":
@@ -302,6 +386,7 @@ cdef extern from "input/input.h":
     void c_listen_input "listen_input"() nogil
     void c_stop_input_listening "stop_input_listening"() nogil
     TuixInputSnapshot c_get_input_snapshot "get_input_snapshot"() nogil
+    TuixInputSnapshot c_peek_input_snapshot "peek_input_snapshot"() nogil
 
 # ═══════════════════════════════════════════════════════════════════
 #  Rendering
@@ -925,6 +1010,314 @@ cpdef void tuix_input_reset(uintptr_t obj_addr):
 
 
 # ═══════════════════════════════════════════════════════════════════
+#  New builders
+# ═══════════════════════════════════════════════════════════════════
+
+cpdef int tuix_text_set_text(uintptr_t obj_addr, bytes text):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = text
+    cdef int r
+    with nogil:
+        r = c_tuix_text_set_text(p, t)
+    return r
+
+cpdef int tuix_text_set_fg(uintptr_t obj_addr, int r, int g, int b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int ans
+    with nogil:
+        ans = c_tuix_text_set_fg(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
+    return ans
+
+cpdef int tuix_text_set_bg(uintptr_t obj_addr, int r, int g, int b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int ans
+    with nogil:
+        ans = c_tuix_text_set_bg(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
+    return ans
+
+cpdef int tuix_box_set_title(uintptr_t obj_addr, bytes title):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = title
+    cdef int r
+    with nogil:
+        r = c_tuix_box_set_title(p, t)
+    return r
+
+cpdef int tuix_box_set_colors(uintptr_t obj_addr, int border_r, int border_g, int border_b,
+                              int bg_r, int bg_g, int bg_b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_box_set_colors(p,
+                                  <uint8_t>border_r, <uint8_t>border_g, <uint8_t>border_b,
+                                  <uint8_t>bg_r, <uint8_t>bg_g, <uint8_t>bg_b)
+    return r
+
+cpdef int tuix_box_set_color(uintptr_t obj_addr, int r, int g, int b):
+    return tuix_box_set_colors(obj_addr, r, g, b, 0, 0, 0)
+
+cpdef int tuix_box_set_border(uintptr_t obj_addr, int enabled):
+    return 0
+
+cpdef int tuix_divider_set_orientation(uintptr_t obj_addr, int orientation):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_divider_set_orientation(p, orientation)
+    return r
+
+cpdef int tuix_divider_set_symbol(uintptr_t obj_addr, int sym):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_divider_set_symbol(p, <char>sym)
+    return r
+
+cpdef int tuix_divider_set_color(uintptr_t obj_addr, int r, int g, int b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int ans
+    with nogil:
+        ans = c_tuix_divider_set_color(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
+    return ans
+
+cpdef int tuix_badge_set_text(uintptr_t obj_addr, bytes text):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = text
+    cdef int r
+    with nogil:
+        r = c_tuix_badge_set_text(p, t)
+    return r
+
+cpdef int tuix_badge_set_colors(uintptr_t obj_addr, int fg_r, int fg_g, int fg_b,
+                                int bg_r, int bg_g, int bg_b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_badge_set_colors(p,
+                                    <uint8_t>fg_r, <uint8_t>fg_g, <uint8_t>fg_b,
+                                    <uint8_t>bg_r, <uint8_t>bg_g, <uint8_t>bg_b)
+    return r
+
+cpdef int tuix_button_set_label(uintptr_t obj_addr, bytes label):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = label
+    cdef int r
+    with nogil:
+        r = c_tuix_button_set_label(p, t)
+    return r
+
+cpdef int tuix_button_take_pressed(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_button_take_pressed(p)
+    return r
+
+cpdef void tuix_button_reset(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    with nogil:
+        c_tuix_button_reset(p)
+
+cpdef int tuix_button_feed_input(uintptr_t obj_addr, object snap):
+    return 0
+
+cpdef int tuix_button_is_pressed(uintptr_t obj_addr):
+    return tuix_button_take_pressed(obj_addr)
+
+cpdef int tuix_button_get_state(uintptr_t obj_addr):
+    return tuix_button_take_pressed(obj_addr)
+
+cpdef int tuix_icon_set_symbol(uintptr_t obj_addr, bytes symbol):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = symbol
+    cdef int r
+    with nogil:
+        r = c_tuix_icon_set_symbol(p, t)
+    return r
+
+cpdef int tuix_icon_set_fg(uintptr_t obj_addr, int r, int g, int b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int ans
+    with nogil:
+        ans = c_tuix_icon_set_fg(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
+    return ans
+
+cpdef int tuix_icon_set_bg(uintptr_t obj_addr, int r, int g, int b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int ans
+    with nogil:
+        ans = c_tuix_icon_set_bg(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
+    return ans
+
+cpdef int tuix_icon_clear_bg(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_icon_clear_bg(p)
+    return r
+
+cpdef int tuix_icon_set_colors(uintptr_t obj_addr, int fg_r, int fg_g, int fg_b,
+                               int bg_r, int bg_g, int bg_b):
+    cdef int r1 = tuix_icon_set_fg(obj_addr, fg_r, fg_g, fg_b)
+    cdef int r2 = tuix_icon_set_bg(obj_addr, bg_r, bg_g, bg_b)
+    if r1 != 0:
+        return r1
+    return r2
+
+cpdef int tuix_tag_set_text(uintptr_t obj_addr, bytes text):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = text
+    cdef int r
+    with nogil:
+        r = c_tuix_tag_set_text(p, t)
+    return r
+
+cpdef int tuix_tag_set_brackets(uintptr_t obj_addr, int left, int right):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_tag_set_brackets(p, <char>left, <char>right)
+    return r
+
+cpdef int tuix_tag_set_colors(uintptr_t obj_addr, int fg_r, int fg_g, int fg_b,
+                              int bg_r, int bg_g, int bg_b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_tag_set_colors(p,
+                                  <uint8_t>fg_r, <uint8_t>fg_g, <uint8_t>fg_b,
+                                  <uint8_t>bg_r, <uint8_t>bg_g, <uint8_t>bg_b)
+    return r
+
+cpdef int tuix_status_set_text(uintptr_t obj_addr, bytes text):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = text
+    cdef int r
+    with nogil:
+        r = c_tuix_status_set_text(p, t)
+    return r
+
+cpdef int tuix_status_set_level(uintptr_t obj_addr, int level):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_status_set_level(p, level)
+    return r
+
+cpdef int tuix_status_set_palette(uintptr_t obj_addr,
+                                  int ok_r, int ok_g, int ok_b,
+                                  int warn_r, int warn_g, int warn_b,
+                                  int err_r, int err_g, int err_b,
+                                  int idle_r, int idle_g, int idle_b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_status_set_palette(p,
+                                      <uint8_t>ok_r, <uint8_t>ok_g, <uint8_t>ok_b,
+                                      <uint8_t>warn_r, <uint8_t>warn_g, <uint8_t>warn_b,
+                                      <uint8_t>err_r, <uint8_t>err_g, <uint8_t>err_b,
+                                      <uint8_t>idle_r, <uint8_t>idle_g, <uint8_t>idle_b)
+    return r
+
+cpdef int tuix_status_set_status(uintptr_t obj_addr, int status):
+    return tuix_status_set_level(obj_addr, status)
+
+cpdef int tuix_menu_set_title(uintptr_t obj_addr, bytes title):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = title
+    cdef int r
+    with nogil:
+        r = c_tuix_menu_set_title(p, t)
+    return r
+
+cpdef int tuix_menu_set_items(uintptr_t obj_addr, list labels):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int count = <int>len(labels)
+    cdef const char** c_labels = <const char**>malloc(count * sizeof(const char*))
+    if c_labels == NULL and count > 0:
+        raise MemoryError()
+    cdef int i
+    for i in range(count):
+        c_labels[i] = <const char*>(<bytes>labels[i])
+    cdef int r
+    with nogil:
+        r = c_tuix_menu_set_items(p, c_labels, count)
+    free(c_labels)
+    return r
+
+cpdef int tuix_menu_set_options(uintptr_t obj_addr, list labels):
+    return tuix_menu_set_items(obj_addr, labels)
+
+cpdef int tuix_menu_get_selected(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_menu_get_selected(p)
+    return r
+
+cpdef int tuix_menu_take_activated(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_menu_take_activated(p)
+    return r
+
+cpdef int tuix_menu_is_activated(uintptr_t obj_addr):
+    cdef int v = tuix_menu_take_activated(obj_addr)
+    return 1 if v >= 0 else 0
+
+cpdef int tuix_menu_feed_input(uintptr_t obj_addr, object snap):
+    return 0
+
+cpdef void tuix_menu_reset(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    with nogil:
+        c_tuix_menu_reset(p)
+
+cpdef int tuix_scroll_container_set_title(uintptr_t obj_addr, bytes title):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = title
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_set_title(p, t)
+    return r
+
+cpdef int tuix_scroll_container_set_content_size(uintptr_t obj_addr, int content_w, int content_h):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_set_content_size(p, content_w, content_h)
+    return r
+
+cpdef int tuix_scroll_container_set_offset(uintptr_t obj_addr, int offset_x, int offset_y):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_set_offset(p, offset_x, offset_y)
+    return r
+
+cpdef int tuix_scroll_container_get_offset_x(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_get_offset_x(p)
+    return r
+
+cpdef int tuix_scroll_container_get_offset_y(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_get_offset_y(p)
+    return r
+
+cpdef int tuix_scroll_container_feed_input(uintptr_t obj_addr, object snap):
+    return 0
+
+cpdef int tuix_scroll_container_get_scroll_pos(uintptr_t obj_addr):
+    return tuix_scroll_container_get_offset_y(obj_addr)
+
+
+# ═══════════════════════════════════════════════════════════════════
 #  Input system (listener thread)
 # ═══════════════════════════════════════════════════════════════════
 
@@ -951,11 +1344,47 @@ def get_input_snapshot():
     with nogil:
         snap = c_get_input_snapshot()
     return _wrap_input_snapshot(snap)
+def peek_input_snapshot():
+    """Return the latest native input snapshot without consuming queued events."""
+    if not _input_active:
+        return _empty_snapshot()
+    cdef TuixInputSnapshot snap
+    with nogil:
+        snap = c_peek_input_snapshot()
+    return _wrap_input_snapshot(snap)
+
+
+def get_core_loop_stats():
+    """Return the most recent native frame timing snapshot as a Python dict."""
+    cdef TuixCoreLoopStats stats
+    with nogil:
+        c_tuix_get_core_loop_stats(&stats)
+    return {
+        "frame_counter": stats.frame_counter,
+        "batch_commit_ms": stats.batch_commit_ms,
+        "cache_refresh_ms": stats.cache_refresh_ms,
+        "input_ms": stats.input_ms,
+        "routing_ms": stats.routing_ms,
+        "buffer_ms": stats.buffer_ms,
+        "composite_ms": stats.composite_ms,
+        "python_commit_ms": stats.python_commit_ms,
+        "total_ms": stats.total_ms,
+        "composite_skipped": bool(stats.composite_skipped),
+        "composite_forced": bool(stats.composite_forced),
+        "traversal_cache_hit": bool(stats.traversal_cache_hit),
+        "traversal_cache_miss": bool(stats.traversal_cache_miss),
+        "size_changed": bool(stats.size_changed),
+        "has_input": bool(stats.has_input),
+        "has_scene": bool(stats.has_scene),
+        "has_subcycles": bool(stats.has_subcycles),
+    }
 
 cdef object _empty_snapshot():
     cdef InputSnapshot out = InputSnapshot.__new__(InputSnapshot)
     out.term_x = 0
     out.term_y = 0
+    out.consumed_keyboard = False
+    out.consumed_mouse = False
     out._keyboard = None
     out._mouse = None
     return out
@@ -965,6 +1394,8 @@ cdef object _wrap_input_snapshot(TuixInputSnapshot snap):
     cdef InputSnapshot out = InputSnapshot.__new__(InputSnapshot)
     out.term_x = snap.term_x
     out.term_y = snap.term_y
+    out.consumed_keyboard = snap.consumed_keyboard
+    out.consumed_mouse = snap.consumed_mouse
     if snap.keyboard != NULL:
         kb = KeyboardKey.__new__(KeyboardKey)
         kb.btn = snap.keyboard.btn
@@ -1000,6 +1431,7 @@ cdef class MouseKey:
 
 cdef class InputSnapshot:
     cdef public int term_x, term_y
+    cdef public bint consumed_keyboard, consumed_mouse
     cdef public object _keyboard
     cdef public object _mouse
 

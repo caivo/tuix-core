@@ -129,6 +129,8 @@ typedef struct TuixScene {
     int current_focus;
     unsigned long long last_active_frame;
     unsigned long long last_compacted_frame;
+    unsigned long long topology_version;
+    unsigned long long last_composited_topology_version;
 } TuixScene;
 
 typedef struct TuixSceneStats {
@@ -192,6 +194,13 @@ typedef struct TuixBuilders {
     int capacity;
 } TuixBuilders;
 
+typedef enum TuixDebugConfig {
+    TUIX_DEBUG_NONE = 0,
+    TUIX_DEBUG_STATS = 1,
+    TUIX_DEBUG_VERBOSE = 2,
+    TUIX_DEBUG_PROFILE = 3,
+} TuixDebugConfig;
+
 typedef struct TuixRegistry {
     TuixScenes scenes;
     TuixSubcycles subcycles;
@@ -203,6 +212,20 @@ typedef struct TuixRegistry {
     int terminal_height;
     int terminal_height_old;
     int terminal_width_old;
+    TuixDebugConfig debug_config;
 } TuixRegistry;
+
+typedef struct TuixHitmapPixel {
+    int obj_uid;
+    int idx; /* index of the pixel in the hitmap */
+} TuixHitmapPixel;
+
+typedef struct TuixHitmap {
+    TuixHitmapPixel* pixels;
+    int width;
+    int height;
+    int count; /* number of valid entries in pixels */
+    int capacity; /* allocated capacity of the pixels array */
+} TuixHitmap;
 
 #endif

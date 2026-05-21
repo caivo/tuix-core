@@ -8,16 +8,7 @@ Demonstrates the new buffer hierarchy system in v0.3:
 """
 
 import time
-import ctypes
-from tuix.core import engine, builders, scenes, registry, objects, buffers, input, _structs, _tuix_cy
-
-
-def get_object_by_uid(uid):
-    """Get a ctypes pointer to a TuixObject by uid."""
-    obj_addr = _tuix_cy._tuix_get_object_addr_by_uid(uid)
-    if obj_addr == 0:
-        return None
-    return ctypes.cast(ctypes.c_void_p(obj_addr), ctypes.POINTER(_structs.TuixObject)).contents
+from tuix.core import engine, builders, scenes, objects, buffers, input
 
 
 def demo_parent_child_hierarchy():
@@ -29,7 +20,7 @@ def demo_parent_child_hierarchy():
     
     builders.register_standard()
     scenes.init_scene(b"HierarchyScene")
-    registry.registry.current_scene_name = b"HierarchyScene"
+    scenes.select_scene(b"HierarchyScene")
     input.listen()
     
     # Create parent canvas (larger, background)
@@ -57,8 +48,8 @@ def demo_parent_child_hierarchy():
     engine.main_loop()  # Initialize geometry
     time.sleep(0.1)
     
-    parent_obj = get_object_by_uid(parent_uid)
-    child_obj = get_object_by_uid(child_uid)
+    parent_obj = objects.get_object_by_uid(parent_uid)
+    child_obj = objects.get_object_by_uid(child_uid)
     
     snap_parent = buffers.get_buffer_snapshot(b"HierarchyScene", parent_uid)
     snap_child = buffers.get_buffer_snapshot(b"HierarchyScene", child_uid)
@@ -90,6 +81,7 @@ def demo_parent_child_hierarchy():
     buffers.free_buffer(b"HierarchyScene", parent_uid)
     buffers.free_buffer(b"HierarchyScene", child_uid)
     scenes.free_scene(b"HierarchyScene")
+    input.stop()
     engine.shutdown()
     
     return 0
@@ -104,7 +96,7 @@ def demo_z_index_layering():
     
     builders.register_standard()
     scenes.init_scene(b"ZIndexScene")
-    registry.registry.current_scene_name = b"ZIndexScene"
+    scenes.select_scene(b"ZIndexScene")
     input.listen()
     
     # Create three overlapping canvases
@@ -133,7 +125,7 @@ def demo_z_index_layering():
     time.sleep(0.1)
     
     for uid, (name, r, g, b) in zip(uids, colors):
-        obj = get_object_by_uid(uid)
+        obj = objects.get_object_by_uid(uid)
         snap = buffers.get_buffer_snapshot(b"ZIndexScene", uid)
         
         if obj and snap and snap['width'] > 0:
@@ -161,6 +153,7 @@ def demo_z_index_layering():
     for uid in uids:
         buffers.free_buffer(b"ZIndexScene", uid)
     scenes.free_scene(b"ZIndexScene")
+    input.stop()
     engine.shutdown()
     
     return 0

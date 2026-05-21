@@ -26,5 +26,8 @@ typedef struct TuixCoreLoopStats {
 void tuix_main_loop(void);
 void tuix_get_terminal_size(int* width, int* height);
 void tuix_get_core_loop_stats(TuixCoreLoopStats* out_stats);
+int tuix_mouse_capture_begin(int uid);
+int tuix_mouse_capture_end(int uid);
+int tuix_get_mouse_capture_uid(void);
 
 #endif

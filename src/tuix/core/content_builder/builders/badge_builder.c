@@ -29,6 +29,7 @@ static void badge_destroy_state(void* state) {
     if (!state) return;
     TuixBadgeState *s = (TuixBadgeState*)state;
     free(s->text);
+    free(s->inserted_buffer);
     free(s);
 }
 

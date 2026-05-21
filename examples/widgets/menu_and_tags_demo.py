@@ -7,7 +7,10 @@ ESC exits.
 
 import time
 
-from tuix.core import builders, engine, input, objects, registry, scenes
+from tuix.core import builders, engine, input, objects, scenes
+
+
+SCENE = b"Main"
 
 
 def sleep_ms(ms):
@@ -32,13 +35,13 @@ def main():
 
     try:
         builders.register_standard()
-        scenes.init_scene(b"Main")
-        registry.registry.current_scene_name = b"Main"
+        scenes.init_scene(SCENE)
+        scenes.select_scene(SCENE)
         input.listen()
 
         for i, text in enumerate(TAGS):
             tag = must_get_obj(
-                objects.create_object(builders.TAG, b"Main", 0.14, 0.08, 0.06, 0.06 + i * 0.16),
+                objects.create_object(builders.TAG, SCENE, 0.14, 0.08, 0.06, 0.06 + i * 0.16),
                 f"tag[{i}]",
             )
             objects.tuix_tag_set_text(tag, text)
@@ -46,16 +49,19 @@ def main():
             objects.tuix_tag_set_colors(tag, 250, 220, 120, 45, 45, 70)
 
         menu = must_get_obj(
-            objects.create_object(builders.MENU, b"Main", 0.44, 0.6, 0.2, 0.28),
+            objects.create_object(builders.MENU, SCENE, 0.44, 0.6, 0.2, 0.28),
             "menu",
         )
-        objects.tuix_menu_set_options(menu, MENU_OPTIONS)
+        objects.tuix_menu_set_title(menu, b"MenuBuilder")
+        objects.tuix_menu_set_items(menu, MENU_OPTIONS)
 
         selected_text = must_get_obj(
-            objects.create_object(builders.TEXT, b"Main", 0.35, 0.1, 0.95, 0.06),
+            objects.create_object(builders.TEXT, SCENE, 0.35, 0.1, 0.95, 0.06),
             "selected_text",
         )
         objects.tuix_text_set_text(selected_text, b"Selected: -")
+        scenes.set_focus(SCENE, selected_text.uid)
+        scenes.set_focus(SCENE, menu.uid)
 
         while True:
             snap = input.peek_snapshot()
@@ -65,7 +71,7 @@ def main():
 
             engine.main_loop()
 
-            if objects.tuix_menu_is_activated(menu):
+            if objects.tuix_menu_take_activated(menu):
                 idx = objects.tuix_menu_get_selected(menu)
                 if 0 <= idx < len(MENU_OPTIONS):
                     display_text = f"Selected: {MENU_OPTIONS[idx].decode('utf-8')}".encode()

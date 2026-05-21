@@ -35,6 +35,7 @@ static void button_destroy_state(void* state) {
     if (!state) return;
     TuixButtonState *s = (TuixButtonState*)state;
     free(s->label);
+    free(s->inserted_buffer);
     free(s);
 }
 
@@ -156,12 +157,6 @@ static TuixHandlerResponse button_handler(TuixObject *obj, bool has_event, bool 
 
     if (has_event && snap) {
         if (snap->mouse && snap->mouse->has_event &&
-            snap->mouse->event == TUIX_MOUSE_RELEASE && snap->mouse->btn == TUIX_BTN_LEFT && s->mouse_armed) {
-            s->mouse_armed = 0;
-            s->needs_redraw = 1;
-        }
-
-        if (snap->mouse && snap->mouse->has_event &&
             (snap->mouse->event == TUIX_MOUSE_PRESS || snap->mouse->event == TUIX_MOUSE_RELEASE) &&
             snap->mouse->btn == TUIX_BTN_LEFT) {
             TuixBuffer b;
@@ -178,6 +173,9 @@ static TuixHandlerResponse button_handler(TuixObject *obj, bool has_event, bool 
                 } else if (snap->mouse->event == TUIX_MOUSE_RELEASE) {
                     if (s->mouse_armed && inside) {
                         s->pressed = 1;
+                    }
+                    if (s->mouse_armed) {
+                        s->mouse_armed = 0;
                     }
                     s->needs_redraw = 1;
                     snap->consumed_mouse = true;

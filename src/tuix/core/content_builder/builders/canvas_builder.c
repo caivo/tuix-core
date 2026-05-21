@@ -62,8 +62,7 @@ static void tuix_canvas_destroy_state(void* state) {
     if (!state) return;
     TuixCanvasState *s = (TuixCanvasState*)state;
     if (s->changes) free(s->changes);
-    /* Do NOT free inserted_buffer here - tuix_free_buffer() already frees buffer->pixels,
-       which points to the same allocation. */
+    free(s->inserted_buffer);
     for (int i = 0; i < s->sprite_cache_count; i++)
         free(s->sprite_cache[i].pixels);
     free(s->sprite_cache);

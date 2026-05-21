@@ -3,7 +3,16 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.so
+*.dll
+*.dylib
+*.obj
+*.lib
+*.exp
+*.log
 .pytest_cache/
 build/
 dist/
-src/tuix_core.egg-info/
+*.egg-info/
+.coverage
+htmlcov/

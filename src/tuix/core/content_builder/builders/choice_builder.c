@@ -36,8 +36,7 @@ static void choice_destroy_state(void* state) {
     for (int i = 0; i < s->option_count; i++)
         free(s->options[i]);
     free(s->options);
-    /* Do NOT free inserted_buffer here - tuix_free_buffer() already frees buffer->pixels,
-       which points to the same allocation. */
+    free(s->inserted_buffer);
     free(s);
 }
 

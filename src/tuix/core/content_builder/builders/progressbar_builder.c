@@ -41,8 +41,7 @@ static void* progressbar_create_state(void* params) {
 static void progressbar_destroy_state(void* state) {
     if (!state) return;
     TuixProgressBarState *s = (TuixProgressBarState*)state;
-    /* Do NOT free inserted_buffer here - tuix_free_buffer() already frees buffer->pixels,
-       which points to the same allocation. */
+    free(s->inserted_buffer);
     free(s);
 }
 

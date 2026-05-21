@@ -26,7 +26,10 @@ static void* divider_create_state(void* params) {
 }
 
 static void divider_destroy_state(void* state) {
-    free(state);
+    if (!state) return;
+    TuixDividerState *s = (TuixDividerState*)state;
+    free(s->inserted_buffer);
+    free(s);
 }
 
 static int divider_ensure_buffer(TuixDividerState *s, TuixBuffer *buffer) {

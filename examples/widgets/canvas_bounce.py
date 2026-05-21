@@ -7,7 +7,10 @@ Press any key to quit.
 
 import math
 import time
-from tuix.core import engine, builders, scenes, registry, objects, buffers, input
+from tuix.core import engine, builders, scenes, objects, buffers, input
+
+
+SCENE = b"Main"
 
 
 def sleep_ms(ms):
@@ -33,11 +36,11 @@ def main():
         return 1
 
     builders.register_standard()
-    scenes.init_scene(b"Main")
-    registry.registry.current_scene_name = b"Main"
+    scenes.init_scene(SCENE)
+    scenes.select_scene(SCENE)
     input.listen()
 
-    uid = objects.create_object(builders.CANVAS, b"Main", 0.85, 0.75, 0.1, 0.075)
+    uid = objects.create_object(builders.CANVAS, SCENE, 0.85, 0.75, 0.1, 0.075)
     engine.main_loop()
     sleep_ms(40)
 
@@ -94,7 +97,7 @@ def main():
             dy = -dy
             by = max(0.0, min(float(ih - 1), by))
 
-    buffers.free_buffer(b"Main", uid)
+    buffers.free_buffer(SCENE, uid)
     input.stop()
     engine.shutdown()
     return 0

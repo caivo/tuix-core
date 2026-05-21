@@ -107,9 +107,9 @@ static inline void ansi_index_to_rgb(int idx, TuixRGBTuple *out) {
 }
 
 
-/* prev_bg: flat array [H*W] storing only bg colors from previous frame.
-   Halfblocks only compare bg, so 3 bytes/pixel vs 27 for full TuixPixel. */
-static TuixRGBTuple *prev_bg = NULL;
+/* prev_bg: flat array [H*W] storing only terminal-visible bg color keys from
+   the previous frame. Halfblocks only compare bg output, so this is enough. */
+static unsigned int *prev_bg = NULL;
 static int prev_w = 0, prev_h = 0;
 
 /* Pre-built buffer of repeated \xe2\x96\x80 (U+2580 ▀) for fast memcpy */
@@ -121,6 +121,7 @@ static int halfblock_run_ready = 0;
 static unsigned long long *prev_pair_hash = NULL;
 static unsigned long long *curr_pair_hash = NULL;
 static int prev_num_pairs = 0;
+static inline unsigned int color_render_key(TuixRGBTuple c);
 
 #ifdef _WIN32
 static HANDLE g_stdout_handle = INVALID_HANDLE_VALUE;
@@ -140,20 +141,16 @@ static inline void flush_chunk(char *out, size_t *pos) {
 }
 #endif
 
-/* FNV-1a row-pair hash: uses raw (unquantized) bg colors for speed.
-   Two pixels with same raw bg always produce same quantized bg, so if the raw
-   hash matches the pair is guaranteed unchanged.  The only cost: two different
-   raw colors that quantize identically will trigger a re-render of an unchanged
-   pair-harmless extra work, no visual difference. */
+/* FNV-1a row-pair hash using terminal-visible bg color choices. */
 static inline unsigned long long halfblock_row_pair_hash(TuixPixel *row1, TuixPixel *row2, int w) {
     unsigned long long h = 0xcbf29ce484222325ULL;
     if (!row1) return h;
     for (int i = 0; i < w; i++) {
-        TuixRGBTuple c1 = row1[i].styles.bg;
-        h = (h ^ (((unsigned long long)c1.r << 16) | ((unsigned long long)c1.g << 8) | (unsigned long long)c1.b)) * 0x100000001b3ULL;
+        unsigned int c1 = color_render_key(row1[i].styles.bg);
+        h = (h ^ c1) * 0x100000001b3ULL;
         if (row2) {
-            TuixRGBTuple c2 = row2[i].styles.bg;
-            h = (h ^ (((unsigned long long)c2.r << 16) | ((unsigned long long)c2.g << 8) | (unsigned long long)c2.b)) * 0x100000001b3ULL;
+            unsigned int c2 = color_render_key(row2[i].styles.bg);
+            h = (h ^ c2) * 0x100000001b3ULL;
         }
     }
     return h;
@@ -228,6 +225,18 @@ static inline int ansi_best_match(const TuixRGBTuple *target, int *out_idx) {
     unsigned short v = abm_lut[(r5 << 11) | (g6 << 5) | b5];
     if (out_idx) *out_idx = v & 0x1FF;
     return v >> 9;
+}
+
+static inline unsigned int color_render_key(TuixRGBTuple c) {
+    if (!abm_lut_init) abm_lut_build();
+    unsigned int r5 = ((unsigned int)c.r * 31u + 127u) / 255u;
+    unsigned int g6 = ((unsigned int)c.g * 63u + 127u) / 255u;
+    unsigned int b5 = ((unsigned int)c.b * 31u + 127u) / 255u;
+    unsigned int rgb565 = (r5 << 11) | (g6 << 5) | b5;
+    unsigned short v = abm_lut[rgb565];
+    unsigned int mode = v >> 9;
+    if (mode == 5) return (mode << 16) | rgb565;
+    return (mode << 16) | (v & 0x1FF);
 }
 
 /* Fast non-negative integer to ASCII (up to 5 digits, 0–99999) */
@@ -344,7 +353,7 @@ void tuix_render_streaming(
 
     if (!prev_bg || prev_w != W || prev_h != H) {
         free(prev_bg);
-        prev_bg = calloc((size_t)H * (size_t)W, sizeof(TuixRGBTuple));
+        prev_bg = calloc((size_t)H * (size_t)W, sizeof(unsigned int));
         if (!prev_bg) return;
 
         prev_w = W;
@@ -375,7 +384,7 @@ void tuix_render_streaming(
     for (int _i = 0; _i < 6; _i++) quant_strength_buckets[_i] = 0;
 #endif
 
-    /* Quantization is now deferred: hash uses raw colors, and we only
+    /* Quantization is now deferred: hash uses terminal-visible colors, and we only
        quantize pixels belonging to pairs whose hash actually changed.
        This eliminates the O(W*H) precompute for sparse-change frames. */
 
@@ -456,13 +465,11 @@ void tuix_render_streaming(
                (halfblocks only use bg colors, so sym/fg/style changes are irrelevant) */
             if (!buffer->full_redraw) {
                 while (x < W) {
-                    TuixRGBTuple *c1 = &buffer->pixels[(size_t)y1 * W + x].styles.bg;
-                    TuixRGBTuple *p1 = &prev_bg[y1 * W + x];
-                    if (c1->r != p1->r || c1->g != p1->g || c1->b != p1->b) break;
+                    unsigned int c1 = color_render_key(buffer->pixels[(size_t)y1 * W + x].styles.bg);
+                    if (c1 != prev_bg[y1 * W + x]) break;
                     if (y2 < H) {
-                        TuixRGBTuple *c2 = &buffer->pixels[(size_t)y2 * W + x].styles.bg;
-                        TuixRGBTuple *p2 = &prev_bg[y2 * W + x];
-                        if (c2->r != p2->r || c2->g != p2->g || c2->b != p2->b) break;
+                        unsigned int c2 = color_render_key(buffer->pixels[(size_t)y2 * W + x].styles.bg);
+                        if (c2 != prev_bg[y2 * W + x]) break;
                     }
                     x++;
                 }
@@ -476,18 +483,16 @@ void tuix_render_streaming(
                 ? (buffer->pixels[(size_t)y2 * W + x].q_cached
                     ? buffer->pixels[(size_t)y2 * W + x].q_bg : tuix_rgb16(buffer->pixels[(size_t)y2 * W + x].styles.bg))
                 : q_top;
+            unsigned int top_key = color_render_key(buffer->pixels[(size_t)y1 * W + x].styles.bg);
+            unsigned int bot_key = (y2 < H) ? color_render_key(buffer->pixels[(size_t)y2 * W + x].styles.bg) : top_key;
 
-            /* Extend run: same quantized bg colors in both rows */
+            /* Extend run: same terminal-visible bg colors in both rows */
             int run_start = x;
             int run_end = x + 1;
             for (; run_end < W; run_end++) {
-                TuixRGBTuple t = buffer->pixels[(size_t)y1 * W + run_end].q_cached
-                    ? buffer->pixels[(size_t)y1 * W + run_end].q_bg : tuix_rgb16(buffer->pixels[(size_t)y1 * W + run_end].styles.bg);
-                if (t.r != q_top.r || t.g != q_top.g || t.b != q_top.b) break;
+                if (color_render_key(buffer->pixels[(size_t)y1 * W + run_end].styles.bg) != top_key) break;
                 if (y2 < H) {
-                    TuixRGBTuple b = buffer->pixels[(size_t)y2 * W + run_end].q_cached
-                        ? buffer->pixels[(size_t)y2 * W + run_end].q_bg : tuix_rgb16(buffer->pixels[(size_t)y2 * W + run_end].styles.bg);
-                    if (b.r != q_bot.r || b.g != q_bot.g || b.b != q_bot.b) break;
+                    if (color_render_key(buffer->pixels[(size_t)y2 * W + run_end].styles.bg) != bot_key) break;
                 }
             }
 
@@ -543,12 +548,12 @@ void tuix_render_streaming(
             TuixPixel *row1 = &buffer->pixels[(size_t)y1 * W];
             TuixPixel *row2 = (y2 < H) ? &buffer->pixels[(size_t)y2 * W] : NULL;
             if (row1) {
-                TuixRGBTuple *dst = &prev_bg[y1 * W];
-                for (int x = 0; x < W; x++) dst[x] = row1[x].styles.bg;
+                unsigned int *dst = &prev_bg[y1 * W];
+                for (int x = 0; x < W; x++) dst[x] = color_render_key(row1[x].styles.bg);
             }
             if (row2) {
-                TuixRGBTuple *dst = &prev_bg[y2 * W];
-                for (int x = 0; x < W; x++) dst[x] = row2[x].styles.bg;
+                unsigned int *dst = &prev_bg[y2 * W];
+                for (int x = 0; x < W; x++) dst[x] = color_render_key(row2[x].styles.bg);
             }
             prev_pair_hash[p] = halfblock_row_pair_hash(row1, row2, W);
         }
@@ -558,12 +563,12 @@ void tuix_render_streaming(
                 int y1 = p * 2;
                 int y2 = y1 + 1;
                 if (buffer->pixels) {
-                    TuixRGBTuple *dst = &prev_bg[y1 * W];
-                    for (int x = 0; x < W; x++) dst[x] = buffer->pixels[(size_t)y1 * W + x].styles.bg;
+                    unsigned int *dst = &prev_bg[y1 * W];
+                    for (int x = 0; x < W; x++) dst[x] = color_render_key(buffer->pixels[(size_t)y1 * W + x].styles.bg);
                 }
                 if (y2 < H && buffer->pixels) {
-                    TuixRGBTuple *dst = &prev_bg[y2 * W];
-                    for (int x = 0; x < W; x++) dst[x] = buffer->pixels[(size_t)y2 * W + x].styles.bg;
+                    unsigned int *dst = &prev_bg[y2 * W];
+                    for (int x = 0; x < W; x++) dst[x] = color_render_key(buffer->pixels[(size_t)y2 * W + x].styles.bg);
                 }
                 prev_pair_hash[p] = curr_pair_hash[p];
             }

@@ -7,7 +7,10 @@ Press ESC to exit.
 
 import time
 
-from tuix.core import builders, engine, input, objects, registry, scenes
+from tuix.core import builders, engine, input, objects, scenes
+
+
+SCENE = b"Main"
 
 
 def sleep_ms(ms):
@@ -43,21 +46,21 @@ def main():
 
     try:
         builders.register_standard()
-        scenes.init_scene(b"Main")
-        registry.registry.current_scene_name = b"Main"
+        scenes.init_scene(SCENE)
+        scenes.select_scene(SCENE)
         input.listen()
 
         box = must_get_obj(
-            objects.create_object(builders.BOX, b"Main", 0.7, 0.5, 0.2, 0.15),
+            objects.create_object(builders.BOX, SCENE, 0.7, 0.5, 0.2, 0.15),
             "box",
         )
         text = must_get_obj(
-            objects.create_object(builders.TEXT, b"Main", 0.62, 0.35, 0.28, 0.19),
+            objects.create_object(builders.TEXT, SCENE, 0.62, 0.35, 0.28, 0.19),
             "text",
         )
 
         objects.tuix_box_set_title(box, b"Text + Box")
-        objects.tuix_box_set_color(box, 220, 190, 120)
+        objects.tuix_box_set_colors(box, 220, 190, 120, 10, 12, 18)
 
         color_idx = 0
         msg_idx = 0

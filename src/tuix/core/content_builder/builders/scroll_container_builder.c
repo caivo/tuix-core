@@ -5,6 +5,9 @@
 #include <string.h>
 
 #include "../../buffer_manager.h"
+#include "../../main.h"
+#include "../../object_manager.h"
+#include "../../tuix_registry.h"
 
 #define TUIX_VK_LEFT  0x25
 #define TUIX_VK_UP    0x26
@@ -30,6 +33,28 @@ typedef struct {
 static void scroll_mark_redraw(TuixScrollContainerState *s) {
     if (!s) return;
     s->needs_redraw = 1;
+}
+
+int tuix_scroll_container_is_viewport(TuixObject *obj) {
+    return obj && obj->builder && obj->builder->name &&
+           strcmp(obj->builder->name, "ScrollContainerBuilder") == 0;
+}
+
+int tuix_scroll_container_get_viewport_offset(TuixObject *obj, int *offset_x, int *offset_y) {
+    if (!tuix_scroll_container_is_viewport(obj) || !obj->state) return -1;
+    TuixScrollContainerState *s = (TuixScrollContainerState*)obj->state;
+    if (offset_x) *offset_x = s->offset_x;
+    if (offset_y) *offset_y = s->offset_y;
+    return 0;
+}
+
+int tuix_scroll_container_get_viewport_insets(TuixObject *obj, int *left, int *top, int *right, int *bottom) {
+    if (!tuix_scroll_container_is_viewport(obj)) return -1;
+    if (left) *left = 1;
+    if (top) *top = 1;
+    if (right) *right = 1;
+    if (bottom) *bottom = 1;
+    return 0;
 }
 
 static void scroll_put(TuixPixel *p, char ch, TuixRGBTuple fg, TuixRGBTuple bg) {
@@ -98,6 +123,7 @@ static void scroll_destroy_state(void* state) {
     if (!state) return;
     TuixScrollContainerState *s = (TuixScrollContainerState*)state;
     free(s->title);
+    free(s->inserted_buffer);
     free(s);
 }
 
@@ -171,41 +197,9 @@ static TuixPixel* scroll_build_content(TuixObject *obj, TuixBuffer *buffer) {
         p->styles.bg = bg_border;
     }
 
-    int body_y0 = 1;
-    int body_y1 = h - 1;
-    static const char *lorem =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
-        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. "
-        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. ";
-    int lorem_len = (int)strlen(lorem);
-
-    for (int y = body_y0; y < body_y1; y++) {
-        for (int x = 1; x < w - 1; x++) {
-            int virtual_x = s->offset_x + (x - 1);
-            int virtual_y = s->offset_y + (y - 1);
-            int row_seed = (virtual_y * 53) % lorem_len;
-            if (row_seed < 0) row_seed += lorem_len;
-            int idx = (row_seed + virtual_x) % lorem_len;
-            if (idx < 0) idx += lorem_len;
-            char ch = lorem[idx];
-            TuixRGBTuple bg = ((virtual_y / 2) % 2 == 0) ? bg_body : bg_alt;
-            scroll_put(&s->inserted_buffer[(size_t)y * (size_t)w + (size_t)x], ch, fg_text, bg);
-        }
-    }
-
-    char info[96];
-    snprintf(info, sizeof(info), "ofs(%d,%d) view(%d,%d) content(%d,%d)",
-             s->offset_x, s->offset_y, view_w, view_h, s->content_w, s->content_h);
-    int info_len = (int)strlen(info);
-    int info_x = 2;
-    for (int i = 0; i < info_len && (info_x + i) < w - 1; i++) {
-        TuixPixel *p = &s->inserted_buffer[(size_t)(h - 1) * (size_t)w + (size_t)(info_x + i)];
-        p->sym[0] = info[i];
-        p->sym[1] = '\0';
-        p->styles.fg = fg_hint;
-        p->styles.bg = bg_border;
-    }
+    /* Body left intentionally blank — content is provided by child objects
+       attached to the scroll container. Builders should not draw persistent
+       filler content here to allow full customization. */
 
     return s->inserted_buffer;
 }
@@ -252,10 +246,12 @@ static TuixHandlerResponse scroll_handler(TuixObject *obj, bool has_event, bool 
             s->drag_active = 1;
             s->drag_last_col = snap->mouse->col;
             s->drag_last_row = snap->mouse->row;
+            tuix_mouse_capture_begin(obj->uid);
             snap->consumed_mouse = true;
         } else if (snap->mouse->event == TUIX_MOUSE_RELEASE && snap->mouse->btn == TUIX_BTN_LEFT) {
             if (s->drag_active) {
                 s->drag_active = 0;
+                tuix_mouse_capture_end(obj->uid);
                 snap->consumed_mouse = true;
             }
         } else if (snap->mouse->event == TUIX_MOUSE_DRAG && s->drag_active) {
@@ -307,6 +303,14 @@ static void scroll_on_resize(TuixObject *obj, TuixBuffer *buffer, int width, int
     }
 }
 
+static int scroll_viewport_content_size(TuixObject *obj, int *content_w, int *content_h) {
+    if (!tuix_scroll_container_is_viewport(obj) || !obj->state) return -1;
+    TuixScrollContainerState *s = (TuixScrollContainerState*)obj->state;
+    if (content_w) *content_w = s->content_w;
+    if (content_h) *content_h = s->content_h;
+    return 0;
+}
+
 const TuixBuilder tuix_scroll_container_builder = {
     .name = "ScrollContainerBuilder",
     .version = "1.0",
@@ -316,6 +320,9 @@ const TuixBuilder tuix_scroll_container_builder = {
     .destroy_state = scroll_destroy_state,
     .on_event = scroll_handler,
     .on_resize = scroll_on_resize,
+    .get_viewport_offset = tuix_scroll_container_get_viewport_offset,
+    .get_viewport_insets = tuix_scroll_container_get_viewport_insets,
+    .get_viewport_content_size = scroll_viewport_content_size,
     .build_content = scroll_build_content
 };
 
@@ -339,8 +346,12 @@ int tuix_scroll_container_set_content_size(TuixObject *obj, int content_w, int c
     TuixScrollContainerState *s = (TuixScrollContainerState*)obj->state;
     if (content_w < 1) content_w = 1;
     if (content_h < 1) content_h = 1;
+    if (s->content_w == content_w && s->content_h == content_h) {
+        return 0;
+    }
     s->content_w = content_w;
     s->content_h = content_h;
+    tuix_mark_buffer_children_geometry_dirty_by_uid(obj->uid);
     scroll_mark_redraw(s);
     return 0;
 }
@@ -355,13 +366,73 @@ int tuix_scroll_container_set_offset(TuixObject *obj, int offset_x, int offset_y
 }
 
 int tuix_scroll_container_get_offset_x(TuixObject *obj) {
-    if (!obj || !obj->state) return -1;
-    TuixScrollContainerState *s = (TuixScrollContainerState*)obj->state;
-    return s->offset_x;
+    int offset_x = -1;
+    tuix_scroll_container_get_viewport_offset(obj, &offset_x, NULL);
+    return offset_x;
 }
 
 int tuix_scroll_container_get_offset_y(TuixObject *obj) {
+    int offset_y = -1;
+    tuix_scroll_container_get_viewport_offset(obj, NULL, &offset_y);
+    return offset_y;
+}
+
+int tuix_scroll_container_get_content_width(TuixObject *obj) {
     if (!obj || !obj->state) return -1;
     TuixScrollContainerState *s = (TuixScrollContainerState*)obj->state;
-    return s->offset_y;
+    return s->content_w;
+}
+
+int tuix_scroll_container_get_content_height(TuixObject *obj) {
+    if (!obj || !obj->state) return -1;
+    TuixScrollContainerState *s = (TuixScrollContainerState*)obj->state;
+    return s->content_h;
+}
+
+int tuix_scroll_container_add_object(const char* scene_name, TuixObject *container_obj, const char* builder_name, float width_mod, float height_mod, float margin_top_mod, float margin_left_mod) {
+    if (!scene_name || !container_obj || !builder_name) return -1;
+    int child_uid = tuix_create_object_ex((char*)builder_name, (char*)scene_name, width_mod, height_mod, margin_top_mod, margin_left_mod, 0);
+    if (child_uid <= 0) return -1;
+    if (tuix_set_buffer_parent((char*)scene_name, child_uid, container_obj->uid) != 0) {
+        tuix_free_buffer((char*)scene_name, child_uid);
+        return -1;
+    }
+    return child_uid;
+}
+
+int tuix_scroll_container_attach_child(const char* scene_name, TuixObject *container_obj, int child_uid) {
+    if (!scene_name || !container_obj || child_uid <= 0) return -1;
+    return tuix_set_buffer_parent((char*)scene_name, child_uid, container_obj->uid);
+}
+
+int tuix_scroll_container_detach_child(const char* scene_name, TuixObject *container_obj, int child_uid) {
+    if (!scene_name || !container_obj || child_uid <= 0) return -1;
+    return tuix_set_buffer_parent((char*)scene_name, child_uid, -1);
+}
+
+int tuix_scroll_container_add_object_at(const char* scene_name, TuixObject *container_obj, const char* builder_name, int content_x, int content_y, int content_w, int content_h) {
+    if (!scene_name || !container_obj || !builder_name) return -1;
+    TuixScrollContainerState *s = (TuixScrollContainerState*)container_obj->state;
+    int base_content_w = (s && s->content_w > 0) ? s->content_w : 1;
+    int base_content_h = (s && s->content_h > 0) ? s->content_h : 1;
+
+    if (content_w < 1) content_w = 1;
+    if (content_h < 1) content_h = 1;
+
+    /* Child mods are expressed in scroll-content coordinates so the child can
+       be created before the container has completed its first layout pass. */
+    float margin_left_mod = (float)content_x / (float)base_content_w;
+    float margin_top_mod = (float)content_y / (float)base_content_h;
+    float width_mod = (float)content_w / (float)base_content_w;
+    float height_mod = (float)content_h / (float)base_content_h;
+
+    int child_uid = tuix_create_object_ex((char*)builder_name, (char*)scene_name, width_mod, height_mod, margin_top_mod, margin_left_mod, 0);
+    if (child_uid <= 0) return -1;
+
+    if (tuix_set_buffer_parent((char*)scene_name, child_uid, container_obj->uid) != 0) {
+        tuix_free_buffer((char*)scene_name, child_uid);
+        return -1;
+    }
+
+    return child_uid;
 }

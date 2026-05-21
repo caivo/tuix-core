@@ -9,16 +9,7 @@ Demonstrates the new scene management features in v0.3:
 """
 
 import time
-import ctypes
-from tuix.core import engine, builders, scenes, registry, objects, buffers, input, _structs, _tuix_cy
-
-
-def get_object_by_uid(uid):
-    """Get a ctypes pointer to a TuixObject by uid."""
-    obj_addr = _tuix_cy._tuix_get_object_addr_by_uid(uid)
-    if obj_addr == 0:
-        return None
-    return ctypes.cast(ctypes.c_void_p(obj_addr), ctypes.POINTER(_structs.TuixObject)).contents
+from tuix.core import engine, builders, scenes, objects, buffers, input
 
 
 def format_bytes(num_bytes):
@@ -41,7 +32,7 @@ def demo_scene_stats():
     
     builders.register_standard()
     scenes.init_scene(b"StatsScene")
-    registry.registry.current_scene_name = b"StatsScene"
+    scenes.select_scene(b"StatsScene")
     input.listen()
     
     # Create various objects
@@ -111,6 +102,7 @@ def demo_scene_stats():
     for uid in uids:
         buffers.free_buffer(b"StatsScene", uid)
     scenes.free_scene(b"StatsScene")
+    input.stop()
     engine.shutdown()
     
     print("✓ Scene stats demo complete")
@@ -126,7 +118,7 @@ def demo_snapshot_api():
     
     builders.register_standard()
     scenes.init_scene(b"SnapshotScene")
-    registry.registry.current_scene_name = b"SnapshotScene"
+    scenes.select_scene(b"SnapshotScene")
     input.listen()
     
     # Create a canvas
@@ -165,7 +157,7 @@ def demo_snapshot_api():
     
     # Draw on canvas using object reference
     print("\n--- Drawing on Canvas ---")
-    obj = get_object_by_uid(uid)
+    obj = objects.get_object_by_uid(uid)
     if obj and buf_snap:
         w = buf_snap['width']
         h = buf_snap['height']
@@ -192,6 +184,7 @@ def demo_snapshot_api():
     # Cleanup
     buffers.free_buffer(b"SnapshotScene", uid)
     scenes.free_scene(b"SnapshotScene")
+    input.stop()
     engine.shutdown()
     
     print("\n✓ Snapshot APIs demo complete")

@@ -48,8 +48,7 @@ static void input_destroy_state(void* state) {
     TuixInputState *s = (TuixInputState*)state;
     free(s->text);
     free(s->placeholder);
-    /* Do NOT free inserted_buffer here - tuix_free_buffer() already frees buffer->pixels,
-       which points to the same allocation. */
+    free(s->inserted_buffer);
     free(s);
 }
 

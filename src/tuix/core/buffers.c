@@ -34,6 +34,28 @@ static int find_subcycles_index(const char* name) {
     return -1;
 }
 
+static int scene_uid_in_subtree_unlocked(TuixScene* scene, int uid, int ancestor_uid) {
+    if (!scene || uid <= 0 || ancestor_uid <= 0) {
+        return 0;
+    }
+    int guard = 0;
+    int current = uid;
+    while (current > 0 && guard < 1024) {
+        if (current == ancestor_uid) {
+            return 1;
+        }
+        TuixBuffer* buffer = (scene->buffer_by_uid && current < scene->max_uid_capacity)
+            ? scene->buffer_by_uid[current]
+            : NULL;
+        if (!buffer) {
+            break;
+        }
+        current = buffer->parent_uid;
+        guard++;
+    }
+    return 0;
+}
+
 static void clear_scene_subcycles_content(TuixSceneSubcycles* scene_subcycles) {
     if (!scene_subcycles) return;
 
@@ -61,16 +83,35 @@ static void clear_scene_buffers_content(TuixScene* scene) {
     for (int i = 0; i < scene->count; i++) {
         TuixBuffer* buf = scene->buffers[i];
         if (!buf) continue;
-        free(buf->pixels);
+        if (buf->pixels) {
+            if (buf->pixels_owned) free(buf->pixels);
+            buf->pixels = NULL;
+            buf->pixels_owned = 0;
+        }
+        free(buf->children_uids);
+        buf->children_uids = NULL;
+        buf->children_count = 0;
+        buf->children_capacity = 0;
         free(buf->obj);
         free(buf);
     }
 
     free(scene->buffers);
+    free(scene->buffer_by_uid);
+    free(scene->root_uids);
     scene->buffers = NULL;
+    scene->buffer_by_uid = NULL;
+    scene->root_uids = NULL;
     scene->count = 0;
     scene->capacity = 0;
+    scene->max_uid_capacity = 0;
+    scene->root_count = 0;
+    scene->root_capacity = 0;
     scene->current_focus = -1;
+    scene->active_modal_uid = -1;
+    scene->modal_restore_focus_uid = -1;
+    scene->transaction_depth = 0;
+    scene->topology_dirty = 0;
     scene->topology_version++;
     scene->last_composited_topology_version = 0;
 }
@@ -100,10 +141,14 @@ int tuix_init_scene(const char* name) {
         exit(1);
     }
     sc->current_focus = -1;
+    sc->active_modal_uid = -1;
+    sc->modal_restore_focus_uid = -1;
     sc->last_active_frame = tuix_registry.frame_counter;
     sc->last_compacted_frame = 0;
     sc->topology_version = 1;
     sc->last_composited_topology_version = 0;
+    sc->transaction_depth = 0;
+    sc->topology_dirty = 0;
 
     TuixSceneSubcycles* scene_subcycles = calloc(1, sizeof(TuixSceneSubcycles));
     if (!scene_subcycles) {
@@ -276,12 +321,16 @@ int tuix_scene_set_focus(const char* scene_name, int uid) {
         printf("Scene not found: %s\n", scene_name);
         return -1;
     }
-    for (int i = 0; i < scene->count; i++) {
-        if (scene->buffers[i]->obj->uid == uid) {
-            scene->current_focus = scene->buffers[i]->obj->uid;
+    if (uid > 0 && uid < scene->max_uid_capacity && scene->buffer_by_uid &&
+        scene->buffer_by_uid[uid] && scene->buffer_by_uid[uid]->obj) {
+        if (scene->active_modal_uid > 0 &&
+            !scene_uid_in_subtree_unlocked(scene, uid, scene->active_modal_uid)) {
             tuix_unlock();
-            return 0;
+            return -1;
         }
+        scene->current_focus = uid;
+        tuix_unlock();
+        return 0;
     }
     tuix_unlock();
     printf("Object not found in scene: %s\n", scene_name);
@@ -318,6 +367,80 @@ int tuix_scene_set_previous_focus(const char* scene_name) {
     return 0;
 }
 
+int tuix_scene_activate_modal(const char* scene_name, int uid) {
+    tuix_lock();
+    TuixScene* scene = tuix_get_scene(scene_name);
+    if (!scene) {
+        tuix_unlock();
+        return -1;
+    }
+    if (uid <= 0 || uid >= scene->max_uid_capacity || !scene->buffer_by_uid || !scene->buffer_by_uid[uid]) {
+        tuix_unlock();
+        return -1;
+    }
+    if (scene->active_modal_uid == uid) {
+        scene->current_focus = uid;
+        tuix_unlock();
+        return 0;
+    }
+    scene->modal_restore_focus_uid = scene->current_focus;
+    scene->active_modal_uid = uid;
+    scene->current_focus = uid;
+    tuix_unlock();
+    return 0;
+}
+
+int tuix_scene_deactivate_modal(const char* scene_name, int uid) {
+    tuix_lock();
+    TuixScene* scene = tuix_get_scene(scene_name);
+    if (!scene) {
+        tuix_unlock();
+        return -1;
+    }
+    if (scene->active_modal_uid <= 0) {
+        tuix_unlock();
+        return 0;
+    }
+    if (uid > 0 && scene->active_modal_uid != uid) {
+        tuix_unlock();
+        return -1;
+    }
+
+    int restore_uid = scene->modal_restore_focus_uid;
+    scene->active_modal_uid = -1;
+    scene->modal_restore_focus_uid = -1;
+
+    if (restore_uid > 0 && restore_uid < scene->max_uid_capacity &&
+        scene->buffer_by_uid && scene->buffer_by_uid[restore_uid] &&
+        scene->buffer_by_uid[restore_uid]->obj) {
+        scene->current_focus = restore_uid;
+    } else if (scene->count > 0 && (!scene->buffer_by_uid || scene->current_focus <= 0 ||
+               scene->current_focus >= scene->max_uid_capacity ||
+               !scene->buffer_by_uid[scene->current_focus])) {
+        scene->current_focus = scene->buffers[0]->obj->uid;
+    }
+
+    tuix_unlock();
+    return 0;
+}
+
+int tuix_scene_get_active_modal(const char* scene_name) {
+    tuix_lock();
+    TuixScene* scene = tuix_get_scene(scene_name);
+    if (!scene) {
+        tuix_unlock();
+        return -1;
+    }
+    int uid = scene->active_modal_uid;
+    if (uid > 0 && (!scene->buffer_by_uid || uid >= scene->max_uid_capacity || !scene->buffer_by_uid[uid])) {
+        scene->active_modal_uid = -1;
+        scene->modal_restore_focus_uid = -1;
+        uid = -1;
+    }
+    tuix_unlock();
+    return uid;
+}
+
 int tuix_scene_get_stats(const char* scene_name, TuixSceneStats* out_stats) {
     if (!scene_name || !out_stats) {
         return -1;
@@ -337,7 +460,60 @@ int tuix_scene_get_stats(const char* scene_name, TuixSceneStats* out_stats) {
     out_stats->last_compacted_frame = scene->last_compacted_frame;
     out_stats->pixel_bytes = scene_pixel_bytes(scene);
     out_stats->approx_heap_bytes = out_stats->pixel_bytes +
-                                   (size_t)scene->count * (sizeof(TuixBuffer) + sizeof(TuixObject));
+                                   (size_t)scene->count * (sizeof(TuixBuffer) + sizeof(TuixObject)) +
+                                   (size_t)scene->capacity * sizeof(TuixBuffer*) +
+                                   (size_t)scene->max_uid_capacity * sizeof(TuixBuffer*) +
+                                   (size_t)scene->root_capacity * sizeof(int);
+    for (int i = 0; i < scene->count; i++) {
+        TuixBuffer* buf = scene->buffers[i];
+        if (!buf) {
+            continue;
+        }
+        out_stats->approx_heap_bytes += (size_t)buf->children_capacity * sizeof(int);
+    }
+    tuix_unlock();
+    return 0;
+}
+
+int tuix_scene_begin_transaction(const char* scene_name) {
+    if (!scene_name) {
+        return -1;
+    }
+    tuix_lock();
+    int scene_idx = find_scene_index(scene_name);
+    if (scene_idx == -1) {
+        tuix_unlock();
+        return -1;
+    }
+    tuix_registry.scenes.scenes[scene_idx]->transaction_depth++;
+    tuix_unlock();
+    return 0;
+}
+
+int tuix_scene_commit_transaction(const char* scene_name) {
+    if (!scene_name) {
+        return -1;
+    }
+    tuix_lock();
+    int scene_idx = find_scene_index(scene_name);
+    if (scene_idx == -1) {
+        tuix_unlock();
+        return -1;
+    }
+
+    TuixScene* scene = tuix_registry.scenes.scenes[scene_idx];
+    if (scene->transaction_depth <= 0) {
+        tuix_unlock();
+        return -1;
+    }
+
+    scene->transaction_depth--;
+    if (scene->transaction_depth == 0 && scene->topology_dirty) {
+        scene->topology_dirty = 0;
+        scene->topology_version++;
+        scene->last_composited_topology_version = 0;
+    }
+
     tuix_unlock();
     return 0;
 }
@@ -423,8 +599,11 @@ static size_t compact_scene_pixels_locked(TuixScene* scene) {
         if (buf->width > 0 && buf->height > 0) {
             freed += (size_t)buf->width * (size_t)buf->height * sizeof(TuixPixel);
         }
-        free(buf->pixels);
-        buf->pixels = NULL;
+        if (buf->pixels) {
+            if (buf->pixels_owned) free(buf->pixels);
+            buf->pixels = NULL;
+            buf->pixels_owned = 0;
+        }
         buf->required_redraw = 1;
     }
     scene->last_compacted_frame = tuix_registry.frame_counter;

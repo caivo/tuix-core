@@ -24,6 +24,22 @@ extern "C" {
 
 void tuix_render_streaming(TuixFinalBuffer *buffer, TuixRowDoneCallback on_row_done, void *user_data);
 
+/* Force the next `tuix_render_streaming()` call to redraw the whole frame.
+   Use this after manual terminal writes like clear-screen sequences, because
+   they invalidate the renderer's diff cache. */
+void tuix_render_invalidate_all(void);
+
+/* Mark a range of rows [y0,y1) as dirty for the next render. If called
+	before `tuix_render_streaming`, only those rows will have their hash
+	recomputed and be considered changed, reducing per-frame CPU when only
+	a small region changed. Safe to call multiple times per frame. */
+void tuix_render_mark_rows_dirty(int y0, int y1);
+
+/* Return the number of bytes written to stdout by the most recent
+	`tuix_render_streaming()` invocation. Use this to compute "physical"
+	frames-per-second (frames that actually emitted bytes to the terminal). */
+size_t tuix_render_get_last_frame_bytes(void);
+
 #ifdef __cplusplus
 }
 #endif

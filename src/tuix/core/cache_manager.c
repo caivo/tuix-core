@@ -170,6 +170,7 @@ void tuix_restore_scenes() {
             buf->obj.height_mod = cJSON_GetObjectItem(jb, "height_mod")->valuedouble;
 
             buf->pixels = calloc((size_t)buf->height * buf->width, sizeof(TuixPixel));
+            buf->pixels_owned = 1;
 
             cJSON* json_pixels = cJSON_GetObjectItem(jb, "pixels");
 

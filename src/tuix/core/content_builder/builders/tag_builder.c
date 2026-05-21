@@ -33,6 +33,7 @@ static void tag_destroy_state(void* state) {
     if (!state) return;
     TuixTagState *s = (TuixTagState*)state;
     free(s->text);
+    free(s->inserted_buffer);
     free(s);
 }
 

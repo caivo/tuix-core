@@ -6,7 +6,10 @@ Press ESC to cancel.
 """
 
 import time
-from tuix.core import engine, builders, scenes, registry, objects, buffers, input
+from tuix.core import engine, builders, scenes, objects, buffers, input
+
+
+SCENE = b"Main"
 
 
 def sleep_ms(ms):
@@ -29,11 +32,11 @@ def main():
         return 1
 
     builders.register_standard()
-    scenes.init_scene(b"Main")
-    registry.registry.current_scene_name = b"Main"
+    scenes.init_scene(SCENE)
+    scenes.select_scene(SCENE)
     input.listen()
 
-    uid = objects.create_object(builders.CHOICE, b"Main", 0.35, 0.55, 0.2, 0.32)
+    uid = objects.create_object(builders.CHOICE, SCENE, 0.35, 0.55, 0.2, 0.32)
     obj = objects.get_object_by_uid(uid)
     if obj is None:
         print("failed to get object")
@@ -41,6 +44,7 @@ def main():
 
     options = [name for name, *_ in COLOURS]
     objects.tuix_choice_set_options(obj, options)
+    scenes.set_focus(SCENE, uid)
 
     while not objects.tuix_choice_is_confirmed(obj):
         snap = input.peek_snapshot()
@@ -57,7 +61,7 @@ def main():
         time.sleep(0.3)
         print(f"\nChosen: {name.decode()}  RGB({r}, {g}, {b})")
 
-    buffers.free_buffer(b"Main", uid)
+    buffers.free_buffer(SCENE, uid)
     input.stop()
     engine.shutdown()
     return 0

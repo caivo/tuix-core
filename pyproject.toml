@@ -4,10 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tuix-core"
-version = "0.4"
+version = "0.5"
 description = "A lightweight and modular terminal UI engine. Designed to make building interactive terminal interfaces simple and structured."
 readme = "README.md"
 requires-python = ">=3.10"
+authors = [{ name = "custosh", email = "contact@custosh.dev" }]
 license = "MIT"
 license-files = ["LICENSE"]
 
@@ -19,6 +20,7 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 
 [tool.cibuildwheel]
 build = "cp31-*"

@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include "tuix_registry.h"
 #include <stdlib.h>
+#ifdef TUIX_ENABLE_SOUND
+#include "tuix_sound.h"
+#endif
 
 #ifndef TUIX_DEFAULT_DEBUG_MODE
 #define TUIX_DEFAULT_DEBUG_MODE TUIX_DEBUG_NONE
@@ -26,6 +29,10 @@ int tuix_init() {
         return response;
     }
     listen_input();
+    /* Optional prototype sound subsystem. */
+#ifdef TUIX_ENABLE_SOUND
+    tuix_sound_init();
+#endif
     return 0;
 }
 
@@ -46,7 +53,7 @@ int tuix_init_registry() {
     tuix_registry.builders.capacity = 0;
 
     tuix_registry.frame_counter = 0;
-    tuix_registry.debug_config = (TuixDebugConfig)TUIX_DEFAULT_DEBUG_MODE;
+    tuix_registry.debug_config = (TuixDebugConfig)TUIX_DEBUG_VERBOSE;
 
     /* initialize lock */
 #ifdef _WIN32
@@ -94,11 +101,19 @@ int tuix_destroy_registry() {
             if (!buf) {
                 continue;
             }
-            free(buf->pixels);
+            if (buf->pixels) {
+                if (buf->pixels_owned) free(buf->pixels);
+                buf->pixels = NULL;
+                buf->pixels_owned = 0;
+            }
+            free(buf->children_uids);
+            buf->children_uids = NULL;
             free(buf->obj);
             free(buf);
         }
         free(tuix_registry.scenes.scenes[i]->buffers);
+        free(tuix_registry.scenes.scenes[i]->buffer_by_uid);
+        free(tuix_registry.scenes.scenes[i]->root_uids);
         free(tuix_registry.scenes.scenes[i]);
         free(tuix_registry.scenes.names[i]);
     }
@@ -126,5 +141,9 @@ int tuix_shutdown() {
         printf("Failed to destroy TUIX registry\n");
         return response;
     }
+    /* Optional prototype sound subsystem. */
+#ifdef TUIX_ENABLE_SOUND
+    tuix_sound_shutdown();
+#endif
     return 0;
 }

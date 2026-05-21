@@ -1,6 +1,11 @@
 import time
 import random
-from tuix.core import engine, builders, scenes, registry, objects, buffers, input, _structs
+from tuix.core import engine, builders, scenes, objects, buffers, input, _structs
+
+
+SCENE = b"MainScene"
+
+
 def sleep_ms(ms):
     time.sleep(ms / 1000.0)
 
@@ -49,8 +54,8 @@ def main():
         return 1
 
     builders.register_standard()
-    scenes.init_scene(b"MainScene")
-    registry.registry.current_scene_name = b"MainScene"
+    scenes.init_scene(SCENE)
+    scenes.select_scene(SCENE)
     input.listen()
 
     # Colour LUT (matches choice order)
@@ -61,7 +66,7 @@ def main():
     user_name = "TUIX Demo"
 
     # Stage 1: ProgressBar
-    uid = objects.create_object(builders.PROGRESSBAR, b"MainScene", 0.8, 0.1, 0.45, 0.1)
+    uid = objects.create_object(builders.PROGRESSBAR, SCENE, 0.8, 0.1, 0.45, 0.1)
     obj = objects.get_object_by_uid(uid)
     if not obj:
         print("progressbar object retrieval failed")
@@ -71,6 +76,7 @@ def main():
     # Progressbar demo with animated value
     objects.tuix_progressbar_set_value(obj, 0.0)
     objects.tuix_progressbar_set_style(obj, b'#'[0], b'-'[0], 80, 200, 120, 60, 60, 60)
+    objects.tuix_progressbar_show_percentage(obj, True)
 
     for f in range(51):
         snap = input.peek_snapshot()
@@ -82,10 +88,10 @@ def main():
         engine.main_loop()
         sleep_ms(40)
 
-    buffers.free_buffer(b"MainScene", uid)
+    buffers.free_buffer(SCENE, uid)
 
     # Stage 2: Choice
-    uid = objects.create_object(builders.CHOICE, b"MainScene", 0.4, 0.25, 0.35, 0.3)
+    uid = objects.create_object(builders.CHOICE, SCENE, 0.4, 0.25, 0.35, 0.3)
     obj = objects.get_object_by_uid(uid)
     if not obj:
         print("choice object retrieval failed")
@@ -94,6 +100,7 @@ def main():
 
     options = [b"Red", b"Green", b"Blue", b"Yellow", b"Cyan"]
     objects.tuix_choice_set_options(obj, options)
+    scenes.set_focus(SCENE, uid)
 
     while not objects.tuix_choice_is_confirmed(obj):
         snap = input.peek_snapshot()
@@ -112,16 +119,17 @@ def main():
         engine.main_loop()
         sleep_ms(400)
 
-    buffers.free_buffer(b"MainScene", uid)
+    buffers.free_buffer(SCENE, uid)
 
     # Stage 3: Input
-    uid = objects.create_object(builders.INPUT, b"MainScene", 0.6, 0.1, 0.45, 0.2)
+    uid = objects.create_object(builders.INPUT, SCENE, 0.6, 0.1, 0.45, 0.2)
     obj = objects.get_object_by_uid(uid)
     if not obj:
         print("input object retrieval failed")
         engine.shutdown()
         return 1
     objects.tuix_input_set_placeholder(obj, b"Type your name...")
+    scenes.set_focus(SCENE, uid)
 
     while not objects.tuix_input_is_submitted(obj):
         snap = input.peek_snapshot()
@@ -141,15 +149,15 @@ def main():
         engine.main_loop()
         sleep_ms(400)
 
-    buffers.free_buffer(b"MainScene", uid)
+    buffers.free_buffer(SCENE, uid)
 
     # Stage 4: Canvas
-    uid = objects.create_object(builders.CANVAS, b"MainScene", 0.9, 0.85, 0.05, 0.05)
+    uid = objects.create_object(builders.CANVAS, SCENE, 0.9, 0.85, 0.05, 0.05)
     # allow one frame to resolve geometry
     engine.main_loop()
     sleep_ms(50)
 
-    snap = buffers.get_buffer_snapshot(b"MainScene", uid)
+    snap = buffers.get_buffer_snapshot(SCENE, uid)
     if snap and snap['width'] > 0 and snap['height'] > 0:
         cw = snap['width']
         ch = snap['height']
@@ -187,7 +195,7 @@ def main():
         engine.main_loop()
         sleep_ms(16)
 
-    buffers.free_buffer(b"MainScene", uid)
+    buffers.free_buffer(SCENE, uid)
 
     # Cleanup
     input.stop()

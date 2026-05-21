@@ -6,7 +6,10 @@ Press ESC to quit early.
 """
 
 import time
-from tuix.core import engine, builders, scenes, registry, objects, buffers, input
+from tuix.core import engine, builders, scenes, objects, buffers, input
+
+
+SCENE = b"Main"
 
 
 def sleep_ms(ms):
@@ -19,12 +22,12 @@ def main():
         return 1
 
     builders.register_standard()
-    scenes.init_scene(b"Main")
-    registry.registry.current_scene_name = b"Main"
+    scenes.init_scene(SCENE)
+    scenes.select_scene(SCENE)
     input.listen()
 
-    uid_a = objects.create_object(builders.PROGRESSBAR, b"Main", 0.7, 0.08, 0.3, 0.15)
-    uid_b = objects.create_object(builders.PROGRESSBAR, b"Main", 0.7, 0.08, 0.55, 0.15)
+    uid_a = objects.create_object(builders.PROGRESSBAR, SCENE, 0.7, 0.08, 0.3, 0.15)
+    uid_b = objects.create_object(builders.PROGRESSBAR, SCENE, 0.7, 0.08, 0.55, 0.15)
 
     obj_a = objects.get_object_by_uid(uid_a)
     obj_b = objects.get_object_by_uid(uid_b)
@@ -34,6 +37,8 @@ def main():
 
     objects.tuix_progressbar_set_style(obj_a, ord('#'), ord('-'), 120, 220, 80, 50, 50, 50)
     objects.tuix_progressbar_set_style(obj_b, ord('='), ord('.'), 60, 160, 255, 50, 50, 50)
+    objects.tuix_progressbar_show_percentage(obj_a, True)
+    objects.tuix_progressbar_show_percentage(obj_b, True)
 
     step = 0
     while step <= 100:
@@ -50,8 +55,8 @@ def main():
         sleep_ms(60)
         step += 1
 
-    buffers.free_buffer(b"Main", uid_a)
-    buffers.free_buffer(b"Main", uid_b)
+    buffers.free_buffer(SCENE, uid_a)
+    buffers.free_buffer(SCENE, uid_b)
     input.stop()
     engine.shutdown()
     return 0

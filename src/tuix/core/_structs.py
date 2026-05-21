@@ -24,6 +24,34 @@ class TuixPixel(ctypes.Structure):
         ('q_cached', ctypes.c_uint8),
     ]
 
+class TuixLayoutSlot(ctypes.Structure):
+    _fields_ = [
+        ('grow', ctypes.c_float),
+        ('shrink', ctypes.c_float),
+        ('basis', ctypes.c_int),
+        ('min_w', ctypes.c_int),
+        ('min_h', ctypes.c_int),
+        ('max_w', ctypes.c_int),
+        ('max_h', ctypes.c_int),
+        ('align_self', ctypes.c_int),
+        ('grid_row', ctypes.c_int),
+        ('grid_col', ctypes.c_int),
+        ('row_span', ctypes.c_int),
+        ('col_span', ctypes.c_int),
+    ]
+
+class TuixLayoutRect(ctypes.Structure):
+    _fields_ = [
+        ('active', ctypes.c_int),
+        ('offset_left', ctypes.c_int),
+        ('offset_top', ctypes.c_int),
+        ('width', ctypes.c_int),
+        ('height', ctypes.c_int),
+    ]
+
+class TuixGridTrack(ctypes.Structure):
+    _fields_ = [('kind', ctypes.c_int), ('value', ctypes.c_int)]
+
 class TuixObject(ctypes.Structure):
     pass
 
@@ -41,6 +69,7 @@ class TuixBuffer(ctypes.Structure):
     _fields_ = [
         ('obj', ctypes.POINTER(TuixObject)),
         ('pixels', ctypes.POINTER(TuixPixel)),
+        ('pixels_owned', ctypes.c_int),
         ('width', ctypes.c_int),
         ('height', ctypes.c_int),
         ('required_redraw', ctypes.c_int),
@@ -48,6 +77,12 @@ class TuixBuffer(ctypes.Structure):
         ('margin_top', ctypes.c_int),
         ('parent_uid', ctypes.c_int),
         ('z_index', ctypes.c_int),
+        ('flat_index', ctypes.c_int),
+        ('children_uids', ctypes.POINTER(ctypes.c_int)),
+        ('children_count', ctypes.c_int),
+        ('children_capacity', ctypes.c_int),
+        ('layout_slot', TuixLayoutSlot),
+        ('layout_rect', TuixLayoutRect),
     ]
 
 class TuixFinalBuffer(ctypes.Structure):
@@ -58,22 +93,57 @@ class TuixFinalBuffer(ctypes.Structure):
         ('full_redraw', ctypes.c_int),
     ]
 
+class TuixMouseKey(ctypes.Structure):
+    _fields_ = [
+        ('event', ctypes.c_int),
+        ('btn', ctypes.c_int),
+        ('buttons_held', ctypes.c_int),
+        ('col', ctypes.c_int),
+        ('row', ctypes.c_int),
+        ('timestamp', ctypes.c_double),
+        ('has_event', ctypes.c_int),
+    ]
+
+class TuixKeyboardKey(ctypes.Structure):
+    _fields_ = [
+        ('btn', ctypes.c_int),
+        ('code', ctypes.c_int),
+        ('scancode', ctypes.c_int),
+        ('modifiers', ctypes.c_int),
+        ('pressed', ctypes.c_int),
+        ('repeat', ctypes.c_int),
+        ('timestamp', ctypes.c_double),
+        ('has_event', ctypes.c_int),
+        ('text', ctypes.c_char * 8),
+    ]
+
 class TuixInputSnapshot(ctypes.Structure):
     _fields_ = [
         ('term_x', ctypes.c_int),
         ('term_y', ctypes.c_int),
-        ('mouse', ctypes.c_void_p),
-        ('keyboard', ctypes.c_void_p),
+        ('mouse', ctypes.POINTER(TuixMouseKey)),
+        ('keyboard', ctypes.POINTER(TuixKeyboardKey)),
+        ('consumed_keyboard', ctypes.c_bool),
+        ('consumed_mouse', ctypes.c_bool),
     ]
 
 
 class TuixScene(ctypes.Structure):
     _fields_ = [
         ('buffers', ctypes.c_void_p),
+        ('buffer_by_uid', ctypes.c_void_p),
+        ('root_uids', ctypes.POINTER(ctypes.c_int)),
         ('count', ctypes.c_int),
         ('active', ctypes.c_int),
         ('capacity', ctypes.c_int),
+        ('max_uid_capacity', ctypes.c_int),
+        ('root_count', ctypes.c_int),
+        ('root_capacity', ctypes.c_int),
         ('current_focus', ctypes.c_int),
+        ('active_modal_uid', ctypes.c_int),
+        ('modal_restore_focus_uid', ctypes.c_int),
+        ('transaction_depth', ctypes.c_int),
+        ('topology_dirty', ctypes.c_int),
         ('last_active_frame', ctypes.c_ulonglong),
         ('last_compacted_frame', ctypes.c_ulonglong),
         ('topology_version', ctypes.c_ulonglong),

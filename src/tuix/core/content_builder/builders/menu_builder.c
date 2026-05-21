@@ -84,6 +84,7 @@ static void menu_destroy_state(void* state) {
     }
     free(s->items);
     free(s->title);
+    free(s->inserted_buffer);
     free(s);
 }
 

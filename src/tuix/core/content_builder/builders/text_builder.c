@@ -31,6 +31,7 @@ static void text_destroy_state(void* state) {
     if (!state) return;
     TuixTextState *s = (TuixTextState*)state;
     free(s->text);
+    free(s->inserted_buffer);
     free(s);
 }
 

@@ -4,6 +4,15 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#ifdef TUIX_DEBUG_HEAP
+#include <stdlib.h>
+#include "debug_heap.h"
+#define malloc(S) debug_malloc((S), __FILE__, __LINE__)
+#define calloc(N,S) debug_calloc((N),(S), __FILE__, __LINE__)
+#define realloc(P,S) debug_realloc((P),(S), __FILE__, __LINE__)
+#define free(P) debug_free((P), __FILE__, __LINE__)
+#endif
+
 typedef struct TuixRGBTuple {
     unsigned char r;
     unsigned char g;
@@ -40,6 +49,53 @@ typedef struct TuixHandlerResponse {
     int requires_redraw;
 } TuixHandlerResponse;
 
+typedef enum TuixLayoutAxis {
+    TUIX_LAYOUT_AXIS_NONE = 0,
+    TUIX_LAYOUT_AXIS_HORIZONTAL = 1,
+    TUIX_LAYOUT_AXIS_VERTICAL = 2
+} TuixLayoutAxis;
+
+typedef enum TuixLayoutJustify {
+    TUIX_LAYOUT_JUSTIFY_START = 0,
+    TUIX_LAYOUT_JUSTIFY_CENTER = 1,
+    TUIX_LAYOUT_JUSTIFY_END = 2,
+    TUIX_LAYOUT_JUSTIFY_SPACE_BETWEEN = 3
+} TuixLayoutJustify;
+
+typedef enum TuixLayoutAlign {
+    TUIX_LAYOUT_ALIGN_START = 0,
+    TUIX_LAYOUT_ALIGN_CENTER = 1,
+    TUIX_LAYOUT_ALIGN_END = 2,
+    TUIX_LAYOUT_ALIGN_STRETCH = 3
+} TuixLayoutAlign;
+
+#define TUIX_LAYOUT_ALIGN_AUTO (-1)
+#define TUIX_LAYOUT_BASIS_AUTO (-1)
+#define TUIX_LAYOUT_UNBOUNDED (-1)
+
+typedef struct TuixLayoutSlot {
+    float grow;
+    float shrink;
+    int basis;
+    int min_w;
+    int min_h;
+    int max_w;
+    int max_h;
+    int align_self;
+    int grid_row;
+    int grid_col;
+    int row_span;
+    int col_span;
+} TuixLayoutSlot;
+
+typedef struct TuixLayoutRect {
+    int active;
+    int offset_left;
+    int offset_top;
+    int width;
+    int height;
+} TuixLayoutRect;
+
 typedef struct TuixObject {
     int uid;
     const TuixBuilder* builder;
@@ -53,6 +109,7 @@ typedef struct TuixObject {
 typedef struct TuixBuffer {
     TuixObject* obj;
     TuixPixel* pixels;
+    int pixels_owned; /* 1 if core owns and may free `pixels`, 0 if builder-owned */
     int width;
     int height;
     int required_redraw;
@@ -60,6 +117,12 @@ typedef struct TuixBuffer {
     int margin_top;
     int parent_uid;
     int z_index;
+    int flat_index;
+    int* children_uids;
+    int children_count;
+    int children_capacity;
+    TuixLayoutSlot layout_slot;
+    TuixLayoutRect layout_rect;
 } TuixBuffer;
 
 typedef struct TuixFinalBuffer {
@@ -123,10 +186,19 @@ struct TuixInputSnapshot {
 
 typedef struct TuixScene {
     TuixBuffer** buffers;
+    TuixBuffer** buffer_by_uid;
+    int* root_uids;
     int count;
     int active;
     int capacity;
+    int max_uid_capacity;
+    int root_count;
+    int root_capacity;
     int current_focus;
+    int active_modal_uid;
+    int modal_restore_focus_uid;
+    int transaction_depth;
+    int topology_dirty;
     unsigned long long last_active_frame;
     unsigned long long last_compacted_frame;
     unsigned long long topology_version;
@@ -173,6 +245,10 @@ typedef TuixPixel* (*build_content_fn)(struct TuixObject* obj, TuixBuffer* buffe
 typedef void* (*create_state_fn)(void* params);
 typedef void (*destroy_state_fn)(void* state);
 typedef void (*resize_fn)(struct TuixObject* obj, TuixBuffer* buffer, int width, int height);
+typedef void (*layout_children_fn)(struct TuixObject* obj, TuixBuffer* buffer);
+typedef int (*viewport_offset_fn)(struct TuixObject* obj, int *offset_x, int *offset_y);
+typedef int (*viewport_insets_fn)(struct TuixObject* obj, int *left, int *top, int *right, int *bottom);
+typedef int (*viewport_content_size_fn)(struct TuixObject* obj, int *content_w, int *content_h);
 
 struct TuixBuilder {
     const char* name;
@@ -185,7 +261,17 @@ struct TuixBuilder {
     /* Optional callback invoked when buffer geometry changes due to terminal resize.
        Called after `tuix_resolve_geometry` and before `build_content`. */
     resize_fn on_resize;
+    /* Optional callback for parent-controlled child layout. Invoked after geometry
+       is resolved and resize handling is complete, before `build_content`. */
+    layout_children_fn layout_children;
+    viewport_offset_fn get_viewport_offset;
+    viewport_insets_fn get_viewport_insets;
+    viewport_content_size_fn get_viewport_content_size;
     build_content_fn build_content;
+    /* When set, `build_content` returns a short-lived heap buffer that the core
+       must free after copying. Default builders return persistent state-owned
+       scratch buffers and leave cleanup to `destroy_state`. */
+    unsigned char returns_temporary_pixels;
 };
 
 typedef struct TuixBuilders {
@@ -217,6 +303,7 @@ typedef struct TuixRegistry {
 
 typedef struct TuixHitmapPixel {
     int obj_uid;
+    int viewport_uid;
     int idx; /* index of the pixel in the hitmap */
 } TuixHitmapPixel;
 

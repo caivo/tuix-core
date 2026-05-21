@@ -29,6 +29,7 @@ static void box_destroy_state(void* state) {
     if (!state) return;
     TuixBoxState *s = (TuixBoxState*)state;
     free(s->title);
+    free(s->inserted_buffer);
     free(s);
 }
 

@@ -56,6 +56,27 @@ cdef extern from "types.h":
     ctypedef struct TuixHandlerResponse:
         int requires_redraw
 
+    ctypedef struct TuixLayoutSlot:
+        float grow
+        float shrink
+        int basis
+        int min_w
+        int min_h
+        int max_w
+        int max_h
+        int align_self
+        int grid_row
+        int grid_col
+        int row_span
+        int col_span
+
+    ctypedef struct TuixLayoutRect:
+        int active
+        int offset_left
+        int offset_top
+        int width
+        int height
+
     ctypedef struct TuixObject:
         int uid
         const TuixBuilder* builder
@@ -68,6 +89,7 @@ cdef extern from "types.h":
     ctypedef struct TuixBuffer:
         TuixObject* obj
         TuixPixel* pixels
+        int pixels_owned
         int width
         int height
         int required_redraw
@@ -75,6 +97,12 @@ cdef extern from "types.h":
         int margin_top
         int parent_uid
         int z_index
+        int flat_index
+        int* children_uids
+        int children_count
+        int children_capacity
+        TuixLayoutSlot layout_slot
+        TuixLayoutRect layout_rect
 
     ctypedef struct TuixFinalBuffer:
         TuixPixel* pixels
@@ -112,10 +140,19 @@ cdef extern from "types.h":
 
     ctypedef struct TuixScene:
         TuixBuffer** buffers
+        TuixBuffer** buffer_by_uid
+        int* root_uids
         int count
         int active
         int capacity
+        int max_uid_capacity
+        int root_count
+        int root_capacity
         int current_focus
+        int active_modal_uid
+        int modal_restore_focus_uid
+        int transaction_depth
+        int topology_dirty
         unsigned long long last_active_frame
         unsigned long long last_compacted_frame
         unsigned long long topology_version
@@ -140,6 +177,10 @@ cdef extern from "types.h":
     ctypedef void* (*create_state_fn)(void* params) nogil
     ctypedef void (*destroy_state_fn)(void* state) nogil
     ctypedef void (*resize_fn)(TuixObject* obj, TuixBuffer* buffer, int width, int height) nogil
+    ctypedef void (*layout_children_fn)(TuixObject* obj, TuixBuffer* buffer) nogil
+    ctypedef int (*viewport_offset_fn)(TuixObject* obj, int *offset_x, int *offset_y) nogil
+    ctypedef int (*viewport_insets_fn)(TuixObject* obj, int *left, int *top, int *right, int *bottom) nogil
+    ctypedef int (*viewport_content_size_fn)(TuixObject* obj, int *content_w, int *content_h) nogil
 
     ctypedef struct TuixBuilder:
         const char* name
@@ -148,9 +189,14 @@ cdef extern from "types.h":
         const char* namespace_ "namespace"
         create_state_fn create_state
         destroy_state_fn destroy_state
-        TuixHandlerResponse (*handler_func)(TuixObject* obj) nogil
+        TuixHandlerResponse (*on_event)(TuixObject* obj, bint has_event, bint is_focused, TuixInputSnapshot* snap) nogil
         resize_fn on_resize
+        layout_children_fn layout_children
+        viewport_offset_fn get_viewport_offset
+        viewport_insets_fn get_viewport_insets
+        viewport_content_size_fn get_viewport_content_size
         build_content_fn build_content
+        unsigned char returns_temporary_pixels
 
     ctypedef struct TuixSubcycle:
         TuixObject* obj
@@ -199,6 +245,9 @@ cdef extern from "main.h":
     void c_tuix_main_loop "tuix_main_loop"() nogil
     # tuix_get_terminal_size lives in main.c but is linked into the extension
     void c_tuix_get_terminal_size "tuix_get_terminal_size"(int* width, int* height) nogil
+    int c_tuix_mouse_capture_begin "tuix_mouse_capture_begin"(int uid) nogil
+    int c_tuix_mouse_capture_end "tuix_mouse_capture_end"(int uid) nogil
+    int c_tuix_get_mouse_capture_uid "tuix_get_mouse_capture_uid"() nogil
 
     ctypedef struct TuixCoreLoopStats:
         unsigned long long frame_counter
@@ -233,19 +282,30 @@ cdef extern from "buffers.h":
     int c_tuix_select_scene "tuix_select_scene"(char* name) nogil
     int c_tuix_scene_set_focus "tuix_scene_set_focus"(const char* scene_name, int uid) nogil
     int c_tuix_scene_set_previous_focus "tuix_scene_set_previous_focus"(const char* scene_name) nogil
+    int c_tuix_scene_activate_modal "tuix_scene_activate_modal"(const char* scene_name, int uid) nogil
+    int c_tuix_scene_deactivate_modal "tuix_scene_deactivate_modal"(const char* scene_name, int uid) nogil
+    int c_tuix_scene_get_active_modal "tuix_scene_get_active_modal"(const char* scene_name) nogil
     int c_tuix_scene_get_stats "tuix_scene_get_stats"(const char* scene_name, TuixSceneStats* out_stats) nogil
     size_t c_tuix_compact_scene_pixels "tuix_compact_scene_pixels"(const char* scene_name) nogil
     int c_tuix_compact_cold_scenes "tuix_compact_cold_scenes"(unsigned long long cold_frames, size_t min_pixel_bytes, int keep_active_scene) nogil
+    int c_tuix_scene_begin_transaction "tuix_scene_begin_transaction"(const char* scene_name) nogil
+    int c_tuix_scene_commit_transaction "tuix_scene_commit_transaction"(const char* scene_name) nogil
 
 cdef extern from "buffer_manager.h":
     void c_tuix_init_buffer "tuix_init_buffer"(char* scene_name, TuixObject obj) nogil
     void c_tuix_clear_buffer "tuix_clear_buffer"(char* scene_name, int uid) nogil
     void c_tuix_free_buffer "tuix_free_buffer"(char* scene_name, int uid) nogil
     int c_tuix_set_buffer_parent "tuix_set_buffer_parent"(char* scene_name, int uid, int parent_uid) nogil
+    int c_tuix_get_buffer_parent "tuix_get_buffer_parent"(char* scene_name, int uid) nogil
     int c_tuix_get_buffer_z_index "tuix_get_buffer_z_index"(char* scene_name, int uid) nogil
     int c_tuix_set_buffer_z_index "tuix_set_buffer_z_index"(char* scene_name, int uid, int z_index) nogil
     int c_tuix_get_buffer_snapshot "tuix_get_buffer_snapshot"(char* scene_name, int uid, TuixBuffer* out_buffer) nogil
     int c_tuix_get_buffer_snapshot_by_uid "tuix_get_buffer_snapshot_by_uid"(int uid, TuixBuffer* out_buffer) nogil
+    int c_tuix_set_buffer_layout_slot_by_uid "tuix_set_buffer_layout_slot_by_uid"(int uid, const TuixLayoutSlot* slot) nogil
+    int c_tuix_get_buffer_layout_slot_by_uid "tuix_get_buffer_layout_slot_by_uid"(int uid, TuixLayoutSlot* out_slot) nogil
+    int c_tuix_set_buffer_layout_rect_by_uid "tuix_set_buffer_layout_rect_by_uid"(int uid, int offset_left, int offset_top, int width, int height) nogil
+    int c_tuix_clear_buffer_layout_rect_by_uid "tuix_clear_buffer_layout_rect_by_uid"(int uid) nogil
+    int c_tuix_set_buffer_grid_placement_by_uid "tuix_set_buffer_grid_placement_by_uid"(int uid, int row, int col, int row_span, int col_span) nogil
     TuixObject* c_tuix_get_object_by_uid "_tuix_get_object_by_uid"(int uid) nogil
 
 # ═══════════════════════════════════════════════════════════════════
@@ -347,12 +407,6 @@ cdef extern from "content_builder/builders/button_builder.h":
     int c_tuix_button_take_pressed "tuix_button_take_pressed"(TuixObject* obj) nogil
     void c_tuix_button_reset "tuix_button_reset"(TuixObject* obj) nogil
 
-cdef extern from "content_builder/builders/icon_builder.h":
-    int c_tuix_icon_set_symbol "tuix_icon_set_symbol"(TuixObject* obj, const char* symbol) nogil
-    int c_tuix_icon_set_fg "tuix_icon_set_fg"(TuixObject* obj, uint8_t r, uint8_t g, uint8_t b) nogil
-    int c_tuix_icon_set_bg "tuix_icon_set_bg"(TuixObject* obj, uint8_t r, uint8_t g, uint8_t b) nogil
-    int c_tuix_icon_clear_bg "tuix_icon_clear_bg"(TuixObject* obj) nogil
-
 cdef extern from "content_builder/builders/tag_builder.h":
     int c_tuix_tag_set_text "tuix_tag_set_text"(TuixObject* obj, const char* text) nogil
     int c_tuix_tag_set_brackets "tuix_tag_set_brackets"(TuixObject* obj, char left, char right) nogil
@@ -371,11 +425,100 @@ cdef extern from "content_builder/builders/menu_builder.h":
     void c_tuix_menu_reset "tuix_menu_reset"(TuixObject* obj) nogil
 
 cdef extern from "content_builder/builders/scroll_container_builder.h":
+    int c_tuix_scroll_container_is_viewport "tuix_scroll_container_is_viewport"(TuixObject* obj) nogil
+    int c_tuix_scroll_container_get_viewport_offset "tuix_scroll_container_get_viewport_offset"(TuixObject* obj, int *offset_x, int *offset_y) nogil
+    int c_tuix_scroll_container_get_viewport_insets "tuix_scroll_container_get_viewport_insets"(TuixObject* obj, int *left, int *top, int *right, int *bottom) nogil
     int c_tuix_scroll_container_set_title "tuix_scroll_container_set_title"(TuixObject* obj, const char* title) nogil
     int c_tuix_scroll_container_set_content_size "tuix_scroll_container_set_content_size"(TuixObject* obj, int content_w, int content_h) nogil
     int c_tuix_scroll_container_set_offset "tuix_scroll_container_set_offset"(TuixObject* obj, int offset_x, int offset_y) nogil
     int c_tuix_scroll_container_get_offset_x "tuix_scroll_container_get_offset_x"(TuixObject* obj) nogil
     int c_tuix_scroll_container_get_offset_y "tuix_scroll_container_get_offset_y"(TuixObject* obj) nogil
+    int c_tuix_scroll_container_get_content_width "tuix_scroll_container_get_content_width"(TuixObject* obj) nogil
+    int c_tuix_scroll_container_get_content_height "tuix_scroll_container_get_content_height"(TuixObject* obj) nogil
+    int c_tuix_scroll_container_add_object "tuix_scroll_container_add_object"(const char* scene_name, TuixObject *container_obj, const char* builder_name, float width_mod, float height_mod, float margin_top_mod, float margin_left_mod) nogil
+    int c_tuix_scroll_container_attach_child "tuix_scroll_container_attach_child"(const char* scene_name, TuixObject *container_obj, int child_uid) nogil
+    int c_tuix_scroll_container_detach_child "tuix_scroll_container_detach_child"(const char* scene_name, TuixObject *container_obj, int child_uid) nogil
+    int c_tuix_scroll_container_add_object_at "tuix_scroll_container_add_object_at"(const char* scene_name, TuixObject *container_obj, const char* builder_name, int content_x, int content_y, int content_w, int content_h) nogil
+
+cdef extern from "content_builder/builders/checkbox_builder.h":
+    int c_tuix_checkbox_set_label "tuix_checkbox_set_label"(TuixObject* obj, const char* label) nogil
+    int c_tuix_checkbox_set_checked "tuix_checkbox_set_checked"(TuixObject* obj, int checked) nogil
+    int c_tuix_checkbox_get_checked "tuix_checkbox_get_checked"(TuixObject* obj) nogil
+    int c_tuix_checkbox_toggle "tuix_checkbox_toggle"(TuixObject* obj) nogil
+    int c_tuix_checkbox_take_changed "tuix_checkbox_take_changed"(TuixObject* obj) nogil
+    int c_tuix_checkbox_set_disabled "tuix_checkbox_set_disabled"(TuixObject* obj, int disabled) nogil
+
+cdef extern from "content_builder/builders/listview_builder.h":
+    int c_tuix_listview_set_title "tuix_listview_set_title"(TuixObject* obj, const char* title) nogil
+    int c_tuix_listview_set_items "tuix_listview_set_items"(TuixObject* obj, const char** items, int count) nogil
+    int c_tuix_listview_set_selected "tuix_listview_set_selected"(TuixObject* obj, int index) nogil
+    int c_tuix_listview_get_selected "tuix_listview_get_selected"(TuixObject* obj) nogil
+    int c_tuix_listview_take_activated "tuix_listview_take_activated"(TuixObject* obj) nogil
+
+cdef extern from "content_builder/builders/textarea_builder.h":
+    int c_tuix_textarea_set_title "tuix_textarea_set_title"(TuixObject* obj, const char* title) nogil
+    int c_tuix_textarea_set_text "tuix_textarea_set_text"(TuixObject* obj, const char* text) nogil
+    const char* c_tuix_textarea_get_text "tuix_textarea_get_text"(TuixObject* obj) nogil
+    int c_tuix_textarea_set_placeholder "tuix_textarea_set_placeholder"(TuixObject* obj, const char* text) nogil
+    int c_tuix_textarea_set_readonly "tuix_textarea_set_readonly"(TuixObject* obj, int readonly) nogil
+
+cdef extern from "content_builder/builders/dialog_builder.h":
+    int c_tuix_dialog_attach_child "tuix_dialog_attach_child"(const char* scene_name, TuixObject *dialog_obj, int child_uid) nogil
+    int c_tuix_dialog_detach_child "tuix_dialog_detach_child"(const char* scene_name, TuixObject *dialog_obj, int child_uid) nogil
+    int c_tuix_dialog_add_object "tuix_dialog_add_object"(const char* scene_name, TuixObject *dialog_obj, const char* builder_name, float width_mod, float height_mod) nogil
+    int c_tuix_dialog_set_title "tuix_dialog_set_title"(TuixObject* obj, const char* title) nogil
+    int c_tuix_dialog_set_body_size "tuix_dialog_set_body_size"(TuixObject* obj, int width, int height) nogil
+    int c_tuix_dialog_set_padding "tuix_dialog_set_padding"(TuixObject* obj, int left, int top, int right, int bottom) nogil
+    int c_tuix_dialog_set_close_on_esc "tuix_dialog_set_close_on_esc"(TuixObject* obj, int enabled) nogil
+    int c_tuix_dialog_set_close_on_backdrop "tuix_dialog_set_close_on_backdrop"(TuixObject* obj, int enabled) nogil
+    int c_tuix_dialog_set_colors "tuix_dialog_set_colors"(TuixObject* obj,
+        uint8_t backdrop_r, uint8_t backdrop_g, uint8_t backdrop_b,
+        uint8_t border_r, uint8_t border_g, uint8_t border_b,
+        uint8_t body_r, uint8_t body_g, uint8_t body_b) nogil
+    int c_tuix_dialog_activate "tuix_dialog_activate"(const char* scene_name, TuixObject *obj) nogil
+    int c_tuix_dialog_deactivate "tuix_dialog_deactivate"(const char* scene_name, TuixObject *obj) nogil
+    int c_tuix_dialog_take_close_requested "tuix_dialog_take_close_requested"(TuixObject* obj) nogil
+
+cdef extern from "content_builder/builders/stack_builder.h":
+    int c_tuix_stack_attach_child "tuix_stack_attach_child"(const char* scene_name, TuixObject *layout_obj, int child_uid) nogil
+    int c_tuix_stack_detach_child "tuix_stack_detach_child"(const char* scene_name, TuixObject *layout_obj, int child_uid) nogil
+    int c_tuix_stack_add_object "tuix_stack_add_object"(const char* scene_name, TuixObject *layout_obj, const char* builder_name, float width_mod, float height_mod) nogil
+    int c_tuix_stack_set_gap "tuix_stack_set_gap"(TuixObject* obj, int gap) nogil
+    int c_tuix_stack_set_padding "tuix_stack_set_padding"(TuixObject* obj, int left, int top, int right, int bottom) nogil
+    int c_tuix_stack_set_justify "tuix_stack_set_justify"(TuixObject* obj, int justify) nogil
+    int c_tuix_stack_set_align "tuix_stack_set_align"(TuixObject* obj, int align) nogil
+    int c_tuix_stack_set_bg "tuix_stack_set_bg"(TuixObject* obj, uint8_t r, uint8_t g, uint8_t b) nogil
+    int c_tuix_stack_clear_bg "tuix_stack_clear_bg"(TuixObject* obj) nogil
+
+cdef extern from "content_builder/builders/splitpane_builder.h":
+    int c_tuix_splitpane_attach_child "tuix_splitpane_attach_child"(const char* scene_name, TuixObject *split_obj, int child_uid) nogil
+    int c_tuix_splitpane_detach_child "tuix_splitpane_detach_child"(const char* scene_name, TuixObject *split_obj, int child_uid) nogil
+    int c_tuix_splitpane_add_object "tuix_splitpane_add_object"(const char* scene_name, TuixObject *split_obj, const char* builder_name, float width_mod, float height_mod) nogil
+    int c_tuix_splitpane_set_orientation "tuix_splitpane_set_orientation"(TuixObject* obj, int orientation) nogil
+    int c_tuix_splitpane_set_split_ratio "tuix_splitpane_set_split_ratio"(TuixObject* obj, float ratio) nogil
+    int c_tuix_splitpane_set_split_pixels "tuix_splitpane_set_split_pixels"(TuixObject* obj, int pixels) nogil
+    int c_tuix_splitpane_set_divider_size "tuix_splitpane_set_divider_size"(TuixObject* obj, int divider_size) nogil
+    int c_tuix_splitpane_set_min_sizes "tuix_splitpane_set_min_sizes"(TuixObject* obj, int min_first, int min_second) nogil
+    int c_tuix_splitpane_set_colors "tuix_splitpane_set_colors"(TuixObject* obj,
+        uint8_t divider_fg_r, uint8_t divider_fg_g, uint8_t divider_fg_b,
+        uint8_t divider_bg_r, uint8_t divider_bg_g, uint8_t divider_bg_b,
+        uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) nogil
+    int c_tuix_splitpane_clear_bg "tuix_splitpane_clear_bg"(TuixObject* obj) nogil
+
+cdef extern from "content_builder/builders/grid_builder.h":
+    ctypedef struct TuixGridTrack:
+        int kind
+        int value
+
+    int c_tuix_grid_attach_child "tuix_grid_attach_child"(const char* scene_name, TuixObject *grid_obj, int child_uid) nogil
+    int c_tuix_grid_detach_child "tuix_grid_detach_child"(const char* scene_name, TuixObject *grid_obj, int child_uid) nogil
+    int c_tuix_grid_add_object "tuix_grid_add_object"(const char* scene_name, TuixObject *grid_obj, const char* builder_name, float width_mod, float height_mod) nogil
+    int c_tuix_grid_set_columns "tuix_grid_set_columns"(TuixObject* obj, const TuixGridTrack* tracks, int count) nogil
+    int c_tuix_grid_set_rows "tuix_grid_set_rows"(TuixObject* obj, const TuixGridTrack* tracks, int count) nogil
+    int c_tuix_grid_set_padding "tuix_grid_set_padding"(TuixObject* obj, int left, int top, int right, int bottom) nogil
+    int c_tuix_grid_set_gaps "tuix_grid_set_gaps"(TuixObject* obj, int gap_x, int gap_y) nogil
+    int c_tuix_grid_set_bg "tuix_grid_set_bg"(TuixObject* obj, uint8_t r, uint8_t g, uint8_t b) nogil
+    int c_tuix_grid_clear_bg "tuix_grid_clear_bg"(TuixObject* obj) nogil
 
 # ═══════════════════════════════════════════════════════════════════
 #  Input system (listener thread)
@@ -451,6 +594,43 @@ cdef inline int _emit_bg(char* buf, int r, int g, int b) noexcept nogil:
     return snprintf(buf, ANSI_ESC_MAX, "\x1b[48;2;%d;%d;%dm", r, g, b)
 
 
+cdef dict _layout_slot_to_dict(TuixLayoutSlot slot):
+    return {
+        "grow": slot.grow,
+        "shrink": slot.shrink,
+        "basis": slot.basis,
+        "min_w": slot.min_w,
+        "min_h": slot.min_h,
+        "max_w": slot.max_w,
+        "max_h": slot.max_h,
+        "align_self": slot.align_self,
+        "grid_row": slot.grid_row,
+        "grid_col": slot.grid_col,
+        "row_span": slot.row_span,
+        "col_span": slot.col_span,
+    }
+
+
+cdef dict _layout_rect_to_dict(TuixLayoutRect rect):
+    return {
+        "active": rect.active,
+        "offset_left": rect.offset_left,
+        "offset_top": rect.offset_top,
+        "width": rect.width,
+        "height": rect.height,
+    }
+
+
+cdef tuple _grid_track_parts(object item):
+    if isinstance(item, dict):
+        return int(item.get("kind", 1)), int(item.get("value", 1))
+    if isinstance(item, (tuple, list)):
+        if len(item) < 2:
+            raise ValueError("grid track entries must contain kind and value")
+        return int(item[0]), int(item[1])
+    return int(getattr(item, "kind")), int(getattr(item, "value"))
+
+
 # ═══════════════════════════════════════════════════════════════════
 #  MODULE-LEVEL PYTHON API — lifecycle
 # ═══════════════════════════════════════════════════════════════════
@@ -495,6 +675,24 @@ cpdef void tuix_main_loop():
 
 cpdef tuple tuix_get_terminal_size():
     return get_terminal_size()
+
+cpdef int tuix_mouse_capture_begin(int uid):
+    cdef int r
+    with nogil:
+        r = c_tuix_mouse_capture_begin(uid)
+    return r
+
+cpdef int tuix_mouse_capture_end(int uid):
+    cdef int r
+    with nogil:
+        r = c_tuix_mouse_capture_end(uid)
+    return r
+
+cpdef int tuix_get_mouse_capture_uid():
+    cdef int uid
+    with nogil:
+        uid = c_tuix_get_mouse_capture_uid()
+    return uid
 
 cpdef void tuix_lock():
     with nogil:
@@ -659,6 +857,13 @@ cpdef int tuix_set_buffer_parent(bytes scene_name, int uid, int parent_uid):
         r = c_tuix_set_buffer_parent(sn, uid, parent_uid)
     return r
 
+cpdef int tuix_get_buffer_parent(bytes scene_name, int uid):
+    cdef char* sn = scene_name
+    cdef int parent_uid
+    with nogil:
+        parent_uid = c_tuix_get_buffer_parent(sn, uid)
+    return parent_uid
+
 cpdef int tuix_get_buffer_z_index(bytes scene_name, int uid):
     """Get the z-index of a buffer."""
     cdef char* sn = scene_name
@@ -675,6 +880,66 @@ cpdef int tuix_set_buffer_z_index(bytes scene_name, int uid, int z_index):
         r = c_tuix_set_buffer_z_index(sn, uid, z_index)
     return r
 
+cpdef int tuix_set_buffer_layout_slot_by_uid(
+    int uid,
+    float grow,
+    float shrink,
+    int basis,
+    int min_w,
+    int min_h,
+    int max_w,
+    int max_h,
+    int align_self,
+    int grid_row,
+    int grid_col,
+    int row_span,
+    int col_span,
+):
+    cdef TuixLayoutSlot slot
+    cdef int r
+    slot.grow = grow
+    slot.shrink = shrink
+    slot.basis = basis
+    slot.min_w = min_w
+    slot.min_h = min_h
+    slot.max_w = max_w
+    slot.max_h = max_h
+    slot.align_self = align_self
+    slot.grid_row = grid_row
+    slot.grid_col = grid_col
+    slot.row_span = row_span
+    slot.col_span = col_span
+    with nogil:
+        r = c_tuix_set_buffer_layout_slot_by_uid(uid, &slot)
+    return r
+
+cpdef dict tuix_get_buffer_layout_slot_by_uid(int uid):
+    cdef TuixLayoutSlot slot
+    cdef int r
+    with nogil:
+        r = c_tuix_get_buffer_layout_slot_by_uid(uid, &slot)
+    if r != 0:
+        return None
+    return _layout_slot_to_dict(slot)
+
+cpdef int tuix_set_buffer_layout_rect_by_uid(int uid, int offset_left, int offset_top, int width, int height):
+    cdef int r
+    with nogil:
+        r = c_tuix_set_buffer_layout_rect_by_uid(uid, offset_left, offset_top, width, height)
+    return r
+
+cpdef int tuix_clear_buffer_layout_rect_by_uid(int uid):
+    cdef int r
+    with nogil:
+        r = c_tuix_clear_buffer_layout_rect_by_uid(uid)
+    return r
+
+cpdef int tuix_set_buffer_grid_placement_by_uid(int uid, int row, int col, int row_span, int col_span):
+    cdef int r
+    with nogil:
+        r = c_tuix_set_buffer_grid_placement_by_uid(uid, row, col, row_span, col_span)
+    return r
+
 cpdef dict tuix_get_buffer_snapshot(bytes scene_name, int uid):
     """Get a snapshot (read-only copy) of a buffer."""
     cdef char* sn = scene_name
@@ -686,6 +951,7 @@ cpdef dict tuix_get_buffer_snapshot(bytes scene_name, int uid):
         return None
     return {
         'uid': buf_copy.obj.uid if buf_copy.obj else -1,
+        'pixels_owned': buf_copy.pixels_owned,
         'width': buf_copy.width,
         'height': buf_copy.height,
         'required_redraw': buf_copy.required_redraw,
@@ -693,6 +959,11 @@ cpdef dict tuix_get_buffer_snapshot(bytes scene_name, int uid):
         'margin_top': buf_copy.margin_top,
         'parent_uid': buf_copy.parent_uid,
         'z_index': buf_copy.z_index,
+        'flat_index': buf_copy.flat_index,
+        'children_count': buf_copy.children_count,
+        'children_capacity': buf_copy.children_capacity,
+        'layout_slot': _layout_slot_to_dict(buf_copy.layout_slot),
+        'layout_rect': _layout_rect_to_dict(buf_copy.layout_rect),
     }
 
 cpdef dict tuix_get_buffer_snapshot_by_uid(int uid):
@@ -705,6 +976,7 @@ cpdef dict tuix_get_buffer_snapshot_by_uid(int uid):
         return None
     return {
         'uid': buf_copy.obj.uid if buf_copy.obj else -1,
+        'pixels_owned': buf_copy.pixels_owned,
         'width': buf_copy.width,
         'height': buf_copy.height,
         'required_redraw': buf_copy.required_redraw,
@@ -712,6 +984,11 @@ cpdef dict tuix_get_buffer_snapshot_by_uid(int uid):
         'margin_top': buf_copy.margin_top,
         'parent_uid': buf_copy.parent_uid,
         'z_index': buf_copy.z_index,
+        'flat_index': buf_copy.flat_index,
+        'children_count': buf_copy.children_count,
+        'children_capacity': buf_copy.children_capacity,
+        'layout_slot': _layout_slot_to_dict(buf_copy.layout_slot),
+        'layout_rect': _layout_rect_to_dict(buf_copy.layout_rect),
     }
 
 cpdef dict tuix_get_object_snapshot_by_uid(int uid):
@@ -757,6 +1034,41 @@ cpdef dict tuix_scene_get_stats(bytes scene_name):
         'pixel_bytes': stats.pixel_bytes,
         'approx_heap_bytes': stats.approx_heap_bytes,
     }
+
+cpdef int tuix_scene_activate_modal(bytes scene_name, int uid):
+    cdef char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scene_activate_modal(sn, uid)
+    return r
+
+cpdef int tuix_scene_deactivate_modal(bytes scene_name, int uid):
+    cdef char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scene_deactivate_modal(sn, uid)
+    return r
+
+cpdef int tuix_scene_get_active_modal(bytes scene_name):
+    cdef char* sn = scene_name
+    cdef int uid
+    with nogil:
+        uid = c_tuix_scene_get_active_modal(sn)
+    return uid
+
+cpdef int tuix_scene_begin_transaction(bytes scene_name):
+    cdef char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scene_begin_transaction(sn)
+    return r
+
+cpdef int tuix_scene_commit_transaction(bytes scene_name):
+    cdef char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scene_commit_transaction(sn)
+    return r
 
 cpdef size_t tuix_compact_scene_pixels(bytes scene_name):
     """Compact (defragment) pixels in a scene. Returns bytes freed."""
@@ -1035,6 +1347,13 @@ cpdef int tuix_text_set_bg(uintptr_t obj_addr, int r, int g, int b):
         ans = c_tuix_text_set_bg(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
     return ans
 
+cpdef int tuix_text_clear_bg(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_text_clear_bg(p)
+    return r
+
 cpdef int tuix_box_set_title(uintptr_t obj_addr, bytes title):
     cdef TuixObject* p = <TuixObject*>obj_addr
     cdef const char* t = title
@@ -1126,43 +1445,6 @@ cpdef int tuix_button_is_pressed(uintptr_t obj_addr):
 
 cpdef int tuix_button_get_state(uintptr_t obj_addr):
     return tuix_button_take_pressed(obj_addr)
-
-cpdef int tuix_icon_set_symbol(uintptr_t obj_addr, bytes symbol):
-    cdef TuixObject* p = <TuixObject*>obj_addr
-    cdef const char* t = symbol
-    cdef int r
-    with nogil:
-        r = c_tuix_icon_set_symbol(p, t)
-    return r
-
-cpdef int tuix_icon_set_fg(uintptr_t obj_addr, int r, int g, int b):
-    cdef TuixObject* p = <TuixObject*>obj_addr
-    cdef int ans
-    with nogil:
-        ans = c_tuix_icon_set_fg(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
-    return ans
-
-cpdef int tuix_icon_set_bg(uintptr_t obj_addr, int r, int g, int b):
-    cdef TuixObject* p = <TuixObject*>obj_addr
-    cdef int ans
-    with nogil:
-        ans = c_tuix_icon_set_bg(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
-    return ans
-
-cpdef int tuix_icon_clear_bg(uintptr_t obj_addr):
-    cdef TuixObject* p = <TuixObject*>obj_addr
-    cdef int r
-    with nogil:
-        r = c_tuix_icon_clear_bg(p)
-    return r
-
-cpdef int tuix_icon_set_colors(uintptr_t obj_addr, int fg_r, int fg_g, int fg_b,
-                               int bg_r, int bg_g, int bg_b):
-    cdef int r1 = tuix_icon_set_fg(obj_addr, fg_r, fg_g, fg_b)
-    cdef int r2 = tuix_icon_set_bg(obj_addr, bg_r, bg_g, bg_b)
-    if r1 != 0:
-        return r1
-    return r2
 
 cpdef int tuix_tag_set_text(uintptr_t obj_addr, bytes text):
     cdef TuixObject* p = <TuixObject*>obj_addr
@@ -1310,11 +1592,561 @@ cpdef int tuix_scroll_container_get_offset_y(uintptr_t obj_addr):
         r = c_tuix_scroll_container_get_offset_y(p)
     return r
 
+cpdef int tuix_scroll_container_is_viewport(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_is_viewport(p)
+    return r
+
+cpdef tuple tuix_scroll_container_get_viewport_offset(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int offset_x = 0
+    cdef int offset_y = 0
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_get_viewport_offset(p, &offset_x, &offset_y)
+    if r != 0:
+        return None
+    return offset_x, offset_y
+
+cpdef tuple tuix_scroll_container_get_viewport_insets(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int left = 0
+    cdef int top = 0
+    cdef int right = 0
+    cdef int bottom = 0
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_get_viewport_insets(p, &left, &top, &right, &bottom)
+    if r != 0:
+        return None
+    return left, top, right, bottom
+
+cpdef int tuix_scroll_container_get_content_width(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_get_content_width(p)
+    return r
+
+cpdef int tuix_scroll_container_get_content_height(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_get_content_height(p)
+    return r
+
+cpdef int tuix_scroll_container_add_object(uintptr_t obj_addr, bytes scene_name, bytes builder_name,
+                                           float width_mod, float height_mod, float margin_top_mod, float margin_left_mod):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef const char* bn = builder_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_add_object(sn, p, bn, width_mod, height_mod, margin_top_mod, margin_left_mod)
+    return r
+
+cpdef int tuix_scroll_container_attach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_attach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_scroll_container_detach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_detach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_scroll_container_add_object_at(uintptr_t obj_addr, bytes scene_name, bytes builder_name,
+                                              int content_x, int content_y, int content_w, int content_h):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef const char* bn = builder_name
+    cdef int r
+    with nogil:
+        r = c_tuix_scroll_container_add_object_at(sn, p, bn, content_x, content_y, content_w, content_h)
+    return r
+
 cpdef int tuix_scroll_container_feed_input(uintptr_t obj_addr, object snap):
     return 0
 
 cpdef int tuix_scroll_container_get_scroll_pos(uintptr_t obj_addr):
     return tuix_scroll_container_get_offset_y(obj_addr)
+
+
+cpdef int tuix_checkbox_set_label(uintptr_t obj_addr, bytes label):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = label
+    cdef int r
+    with nogil:
+        r = c_tuix_checkbox_set_label(p, t)
+    return r
+
+cpdef int tuix_checkbox_set_checked(uintptr_t obj_addr, int checked):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_checkbox_set_checked(p, checked)
+    return r
+
+cpdef int tuix_checkbox_get_checked(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_checkbox_get_checked(p)
+    return r
+
+cpdef int tuix_checkbox_toggle(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_checkbox_toggle(p)
+    return r
+
+cpdef int tuix_checkbox_take_changed(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_checkbox_take_changed(p)
+    return r
+
+cpdef int tuix_checkbox_set_disabled(uintptr_t obj_addr, int disabled):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_checkbox_set_disabled(p, disabled)
+    return r
+
+cpdef int tuix_listview_set_title(uintptr_t obj_addr, bytes title):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = title
+    cdef int r
+    with nogil:
+        r = c_tuix_listview_set_title(p, t)
+    return r
+
+cpdef int tuix_listview_set_items(uintptr_t obj_addr, list items):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int count = <int>len(items)
+    cdef const char** c_items = <const char**>malloc(count * sizeof(const char*))
+    if c_items == NULL and count > 0:
+        raise MemoryError()
+    cdef int i
+    for i in range(count):
+        c_items[i] = <const char*>(<bytes>items[i])
+    cdef int r
+    with nogil:
+        r = c_tuix_listview_set_items(p, c_items, count)
+    free(c_items)
+    return r
+
+cpdef int tuix_listview_set_selected(uintptr_t obj_addr, int index):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_listview_set_selected(p, index)
+    return r
+
+cpdef int tuix_listview_get_selected(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_listview_get_selected(p)
+    return r
+
+cpdef int tuix_listview_take_activated(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_listview_take_activated(p)
+    return r
+
+cpdef int tuix_textarea_set_title(uintptr_t obj_addr, bytes title):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = title
+    cdef int r
+    with nogil:
+        r = c_tuix_textarea_set_title(p, t)
+    return r
+
+cpdef int tuix_textarea_set_text(uintptr_t obj_addr, bytes text):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = text
+    cdef int r
+    with nogil:
+        r = c_tuix_textarea_set_text(p, t)
+    return r
+
+cpdef bytes tuix_textarea_get_text(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* r
+    with nogil:
+        r = c_tuix_textarea_get_text(p)
+    if r == NULL:
+        return b""
+    return r
+
+cpdef int tuix_textarea_set_placeholder(uintptr_t obj_addr, bytes text):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = text
+    cdef int r
+    with nogil:
+        r = c_tuix_textarea_set_placeholder(p, t)
+    return r
+
+cpdef int tuix_textarea_set_readonly(uintptr_t obj_addr, int readonly):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_textarea_set_readonly(p, readonly)
+    return r
+
+cpdef int tuix_dialog_attach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_attach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_dialog_detach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_detach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_dialog_add_object(uintptr_t obj_addr, bytes scene_name, bytes builder_name,
+                                 float width_mod, float height_mod):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef const char* bn = builder_name
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_add_object(sn, p, bn, width_mod, height_mod)
+    return r
+
+cpdef int tuix_dialog_set_title(uintptr_t obj_addr, bytes title):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* t = title
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_set_title(p, t)
+    return r
+
+cpdef int tuix_dialog_set_body_size(uintptr_t obj_addr, int width, int height):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_set_body_size(p, width, height)
+    return r
+
+cpdef int tuix_dialog_set_padding(uintptr_t obj_addr, int left, int top, int right, int bottom):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_set_padding(p, left, top, right, bottom)
+    return r
+
+cpdef int tuix_dialog_set_close_on_esc(uintptr_t obj_addr, int enabled):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_set_close_on_esc(p, enabled)
+    return r
+
+cpdef int tuix_dialog_set_close_on_backdrop(uintptr_t obj_addr, int enabled):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_set_close_on_backdrop(p, enabled)
+    return r
+
+cpdef int tuix_dialog_set_colors(uintptr_t obj_addr,
+                                 int backdrop_r, int backdrop_g, int backdrop_b,
+                                 int border_r, int border_g, int border_b,
+                                 int body_r, int body_g, int body_b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_set_colors(
+            p,
+            <uint8_t>backdrop_r, <uint8_t>backdrop_g, <uint8_t>backdrop_b,
+            <uint8_t>border_r, <uint8_t>border_g, <uint8_t>border_b,
+            <uint8_t>body_r, <uint8_t>body_g, <uint8_t>body_b
+        )
+    return r
+
+cpdef int tuix_dialog_activate(uintptr_t obj_addr, bytes scene_name):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_activate(sn, p)
+    return r
+
+cpdef int tuix_dialog_deactivate(uintptr_t obj_addr, bytes scene_name):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_deactivate(sn, p)
+    return r
+
+cpdef int tuix_dialog_take_close_requested(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_dialog_take_close_requested(p)
+    return r
+
+cpdef int tuix_stack_attach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_stack_attach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_stack_detach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_stack_detach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_stack_add_object(uintptr_t obj_addr, bytes scene_name, bytes builder_name,
+                                float width_mod, float height_mod):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef const char* bn = builder_name
+    cdef int r
+    with nogil:
+        r = c_tuix_stack_add_object(sn, p, bn, width_mod, height_mod)
+    return r
+
+cpdef int tuix_stack_set_gap(uintptr_t obj_addr, int gap):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_stack_set_gap(p, gap)
+    return r
+
+cpdef int tuix_stack_set_padding(uintptr_t obj_addr, int left, int top, int right, int bottom):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_stack_set_padding(p, left, top, right, bottom)
+    return r
+
+cpdef int tuix_stack_set_justify(uintptr_t obj_addr, int justify):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_stack_set_justify(p, justify)
+    return r
+
+cpdef int tuix_stack_set_align(uintptr_t obj_addr, int align):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_stack_set_align(p, align)
+    return r
+
+cpdef int tuix_stack_set_bg(uintptr_t obj_addr, int r, int g, int b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int ans
+    with nogil:
+        ans = c_tuix_stack_set_bg(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
+    return ans
+
+cpdef int tuix_stack_clear_bg(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_stack_clear_bg(p)
+    return r
+
+cpdef int tuix_splitpane_attach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_attach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_splitpane_detach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_detach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_splitpane_add_object(uintptr_t obj_addr, bytes scene_name, bytes builder_name,
+                                    float width_mod, float height_mod):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef const char* bn = builder_name
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_add_object(sn, p, bn, width_mod, height_mod)
+    return r
+
+cpdef int tuix_splitpane_set_orientation(uintptr_t obj_addr, int orientation):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_set_orientation(p, orientation)
+    return r
+
+cpdef int tuix_splitpane_set_split_ratio(uintptr_t obj_addr, float ratio):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_set_split_ratio(p, ratio)
+    return r
+
+cpdef int tuix_splitpane_set_split_pixels(uintptr_t obj_addr, int pixels):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_set_split_pixels(p, pixels)
+    return r
+
+cpdef int tuix_splitpane_set_divider_size(uintptr_t obj_addr, int divider_size):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_set_divider_size(p, divider_size)
+    return r
+
+cpdef int tuix_splitpane_set_min_sizes(uintptr_t obj_addr, int min_first, int min_second):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_set_min_sizes(p, min_first, min_second)
+    return r
+
+cpdef int tuix_splitpane_set_colors(uintptr_t obj_addr,
+                                    int divider_fg_r, int divider_fg_g, int divider_fg_b,
+                                    int divider_bg_r, int divider_bg_g, int divider_bg_b,
+                                    int bg_r, int bg_g, int bg_b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_set_colors(
+            p,
+            <uint8_t>divider_fg_r, <uint8_t>divider_fg_g, <uint8_t>divider_fg_b,
+            <uint8_t>divider_bg_r, <uint8_t>divider_bg_g, <uint8_t>divider_bg_b,
+            <uint8_t>bg_r, <uint8_t>bg_g, <uint8_t>bg_b
+        )
+    return r
+
+cpdef int tuix_splitpane_clear_bg(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_splitpane_clear_bg(p)
+    return r
+
+cpdef int tuix_grid_attach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_grid_attach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_grid_detach_child(uintptr_t obj_addr, bytes scene_name, int child_uid):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef int r
+    with nogil:
+        r = c_tuix_grid_detach_child(sn, p, child_uid)
+    return r
+
+cpdef int tuix_grid_add_object(uintptr_t obj_addr, bytes scene_name, bytes builder_name,
+                               float width_mod, float height_mod):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef const char* sn = scene_name
+    cdef const char* bn = builder_name
+    cdef int r
+    with nogil:
+        r = c_tuix_grid_add_object(sn, p, bn, width_mod, height_mod)
+    return r
+
+cpdef int tuix_grid_set_columns(uintptr_t obj_addr, list tracks):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int count = <int>len(tracks)
+    cdef TuixGridTrack* c_tracks = <TuixGridTrack*>malloc(count * sizeof(TuixGridTrack))
+    if c_tracks == NULL and count > 0:
+        raise MemoryError()
+    cdef int i
+    cdef tuple pair
+    for i in range(count):
+        pair = _grid_track_parts(tracks[i])
+        c_tracks[i].kind = <int>pair[0]
+        c_tracks[i].value = <int>pair[1]
+    cdef int r
+    with nogil:
+        r = c_tuix_grid_set_columns(p, c_tracks, count)
+    free(c_tracks)
+    return r
+
+cpdef int tuix_grid_set_rows(uintptr_t obj_addr, list tracks):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int count = <int>len(tracks)
+    cdef TuixGridTrack* c_tracks = <TuixGridTrack*>malloc(count * sizeof(TuixGridTrack))
+    if c_tracks == NULL and count > 0:
+        raise MemoryError()
+    cdef int i
+    cdef tuple pair
+    for i in range(count):
+        pair = _grid_track_parts(tracks[i])
+        c_tracks[i].kind = <int>pair[0]
+        c_tracks[i].value = <int>pair[1]
+    cdef int r
+    with nogil:
+        r = c_tuix_grid_set_rows(p, c_tracks, count)
+    free(c_tracks)
+    return r
+
+cpdef int tuix_grid_set_padding(uintptr_t obj_addr, int left, int top, int right, int bottom):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_grid_set_padding(p, left, top, right, bottom)
+    return r
+
+cpdef int tuix_grid_set_gaps(uintptr_t obj_addr, int gap_x, int gap_y):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_grid_set_gaps(p, gap_x, gap_y)
+    return r
+
+cpdef int tuix_grid_set_bg(uintptr_t obj_addr, int r, int g, int b):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int ans
+    with nogil:
+        ans = c_tuix_grid_set_bg(p, <uint8_t>r, <uint8_t>g, <uint8_t>b)
+    return ans
+
+cpdef int tuix_grid_clear_bg(uintptr_t obj_addr):
+    cdef TuixObject* p = <TuixObject*>obj_addr
+    cdef int r
+    with nogil:
+        r = c_tuix_grid_clear_bg(p)
+    return r
 
 
 # ═══════════════════════════════════════════════════════════════════

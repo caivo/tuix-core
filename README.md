@@ -24,7 +24,7 @@ v0.5 ships a compiled **C + Cython** core focused on stability and composition. 
 - Compatibility aliases remain for older high-level names such as `menu_set_options`, `status_set_status`, `button_is_pressed`, `scroll_container_get_scroll_pos`, and `box_set_color`.
 - `VideoPlayerBuilder` remains internal-only for now due to stability concerns and low practical demand.
 
-**Core vs Framework:** TUIX provides a low-level engine core - not a high-level application framework. The public API intentionally exposes low-level primitives and is not designed to be "simple" by itself. A higher-level framework API is now available at https://github.com/custosh/tuixpy.
+**Core vs Framework:** TUIX provides a low-level engine core - not a high-level application framework. The public API intentionally exposes low-level primitives and is not designed to be "simple" by itself.
 
 ---
 
